@@ -1,0 +1,37 @@
+name: WildBuster
+version: 2.1.0
+api-version: 1.13
+main: xyz.wildseries.wildbuster.WildBusterPlugin
+description: Highly configurable and optimized chunk-busters plugin.
+website: http://wildseries.xyz/
+authors: [Ome_R, WildSeries]
+softdepend: [Factions, WorldGuard]
+commands:
+  buster:
+    description: WildBuster command list.
+permissions:
+  wildbuster.*:
+    description: Gives access to all the command.
+    default: op
+    children:
+      wildbuster.use: true
+      wildbuster.cancel: true
+      wildbuster.cancel.other: true
+      wildbuster.give: true
+      wildbuster.give.other: true
+      wildbuster.reload: true
+      wildbuster.save: true
+  wildbuster.use:
+    description: Gives access to place a chunkbuster
+  wildbuster.cancel:
+    description: Gives access to cancel your own active chunkbuster
+  wildbuster.cancel.other:
+    description: Gives access to cancel players' active chunkbuster
+  wildbuster.give:
+    description: Gives access to give to yourself the chunkbuster item
+  wildbuster.give.other:
+    description: Gives access to give to any player the chunkbuster item
+  wildbuster.reload:
+    description: Gives access to reload all configuration files.
+  wildbuster.save:
+    description: Gives access to save manually all busters to files.

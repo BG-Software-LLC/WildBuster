@@ -1,0 +1,69 @@
+#######################################################
+##                                                   ##
+##               WildBuster Messages                 ##
+##                Developed by Ome_R                 ##
+##                                                   ##
+#######################################################
+
+# Called when a layer of the notify-buster is updated
+ACTIONBAR_BUSTER_MESSAGE: '&eBusting Y Level: &a{0}'
+ACTIONBAR_CANCEL_MESSAGE: '&eReversing Y Level: &a{0}'
+
+# Called when a player cancels a chunk-buster that is below the minimum level
+BELOW_MINIMUM_CANCEL: '&a&lWildBuster &7You cannot cancel this chunk-buster now...'
+
+# Called when a player tries to cancel a cancelled chunk-buster
+BUSTER_ALREADY_CANCELLED: '&a&lWildBuster &7This chunk-buster is already cancelled.'
+
+# Called when a chunk-buster finishes its task
+BUSTER_FINISHED: '&a&lWildBuster &7Your chunk-buster has been finished'
+
+# Called when a player cancels a chunk-buster
+CANCELLED_BUSTER: '&a&lWildBuster &7You cancelled a chunk-buster of {0}. Starting to reverse blocks now...'
+CANCELLED_BUSTER_OTHER: '&a&lWildBuster &7Your chunk-buster was cancelled by {0}. Starting to reverse blocks now...'
+
+# Called when a player places a chunk-buster inside a busted chunk.
+CHUNK_ALREADY_BUSTED: '&a&lWildBuster &7This chunk is currently busted, and you cannot place your chunk-buster inside it.'
+
+# Called when fails to follow a command's format usage
+COMMAND_USAGE: '&a&lWildBuster &7Usage: /{0}'
+
+# Called when a player gives a chunk-player to another player
+GIVE_SUCCESS: '&a&lWildBuster &7Successfully gave x{0} {1} to {2}.'
+
+# Called when a player runs an invalid sub-command
+HELP_COMMAND_HEADER: '&8&m---------------&a&l WildBuster &8&m------------------'
+HELP_COMMAND_LINE: '&a/{0} &8- &f{1}'
+HELP_COMMAND_FOOTER: '&8&m---------------&a&l WildBuster &8&m------------------'
+
+# Called when a player runs the cancel command and the plugin couldn't find any chunk-busters.
+INVALID_BUSTER_LOCATION: '&a&lWildBuster &7Couldn''t find any active chunk-busters at {0}.'
+INVALID_BUSTER_PLAYER: '&a&lWildBuster &7Couldn''t find any active chunk-busters for {0}.'
+
+# Called when a player runs a command with a buster-parameter.
+INVALID_BUSTER_ITEM: '&a&lWildBuster &7Couldn''t find the chunk-buster ''{0}''.'
+
+# Called when a player runs a command with an amount-parameter.
+INVALID_NUMBER: '&a&lWildBuster &7The number ''{0}'' is invalid.'
+
+# Called when a player runs a command with a player-parameter.
+INVALID_PLAYER: '&a&lWildBuster &7Couldn''t find a player called ''{0}''.'
+
+# Called when a player tries to place a chunk-buster
+MAX_BUSTERS_AMOUNT: '&a&lWildBuster &7You cannot run more than {0} chunk-busters at a time.'
+MUST_PLACE_IN_CLAIM: '&a&lWildBuster &7You cannot place a chunk-buster outside your claims.'
+
+# Called when a player runs a command without the required permission.
+NO_PERMISSION: '&a&lWildBuster &7You cannot use this command.'
+
+# Called when a player places a chunk-buster without the required permission.
+NO_PERMISSION_PLACE: '&a&lWildBuster &7You don''t have access to place chunk-busters.'
+
+# Called when a player successfully placed a new chunk-buster
+PLACED_BUSTER: '&a&lWildBuster &7You placed a new chunk-buster and it should start running in {0} seconds.'
+
+# Called when a player successfully reloaded all configuration files.
+RELOAD_SUCCESS: '&a&lWildBuster &7Successfully reloaded configuration files.'
+
+# Called when a player successfully saved all running chunk-busters.
+SAVE_SUCCESS: '&a&lWildBuster &7Successfully saved all chunk-busters to files.'
