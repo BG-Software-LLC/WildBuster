@@ -1,7 +1,7 @@
 name: WildBuster
 version: 2.1.0
 api-version: 1.13
-main: WildBusterPlugin
+main: com.bgsoftware.wildbuster.WildBusterPlugin
 description: Highly configurable and optimized chunk-busters plugin.
 website: http://wildseries.xyz/
 authors: [Ome_R, WildSeries]
