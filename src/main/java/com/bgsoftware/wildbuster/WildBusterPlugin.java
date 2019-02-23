@@ -1,8 +1,12 @@
 package com.bgsoftware.wildbuster;
 
+import com.bgsoftware.wildbuster.api.WildBuster;
+import com.bgsoftware.wildbuster.api.WildBusterAPI;
 import com.bgsoftware.wildbuster.api.handlers.BustersManager;
 import com.bgsoftware.wildbuster.command.CommandsHandler;
 import com.bgsoftware.wildbuster.handlers.BustersHandler;
+import com.bgsoftware.wildbuster.handlers.DataHandler;
+import com.bgsoftware.wildbuster.handlers.SettingsHandler;
 import com.bgsoftware.wildbuster.hooks.BlockBreakProvider;
 import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_Default;
 import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_WorldGuard;
@@ -19,10 +23,6 @@ import com.bgsoftware.wildbuster.listeners.PlayersListener;
 import com.bgsoftware.wildbuster.metrics.Metrics;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
 import org.bukkit.plugin.java.JavaPlugin;
-import com.bgsoftware.wildbuster.api.WildBuster;
-import com.bgsoftware.wildbuster.api.WildBusterAPI;
-import com.bgsoftware.wildbuster.handlers.DataHandler;
-import com.bgsoftware.wildbuster.handlers.SettingsHandler;
 
 import java.lang.reflect.Field;
 import java.util.logging.Level;
@@ -83,7 +83,7 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
     private void loadNMSAdapter(){
         String version = getServer().getClass().getPackage().getName().split("\\.")[3];
         try{
-            nmsAdapter = (NMSAdapter) Class.forName("xyz.wildseries.wildbuster.nms.NMSAdapter_" + version).newInstance();
+            nmsAdapter = (NMSAdapter) Class.forName("com.bgsoftware.wildbuster.nms.NMSAdapter_" + version).newInstance();
         } catch(ClassNotFoundException | InstantiationException | IllegalAccessException ex){
             log("Couldn't load up with an adapter " + version + ". Please contact @Ome_R");
             getServer().getPluginManager().disablePlugin(this);
