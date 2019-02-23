@@ -21,6 +21,7 @@ import xyz.wildseries.wildbuster.hooks.FactionsProvider_MassiveCore;
 import xyz.wildseries.wildbuster.listeners.BlocksListener;
 import xyz.wildseries.wildbuster.listeners.InventorysListener;
 import xyz.wildseries.wildbuster.listeners.PlayersListener;
+import xyz.wildseries.wildbuster.metrics.Metrics;
 import xyz.wildseries.wildbuster.nms.NMSAdapter;
 
 import java.lang.reflect.Field;
@@ -42,6 +43,8 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
     @Override
     public void onEnable() {
         plugin = this;
+        new Metrics(this);
+
         log("******** ENABLE START ********");
 
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
