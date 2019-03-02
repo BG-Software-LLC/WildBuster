@@ -18,6 +18,7 @@ import com.bgsoftware.wildbuster.hooks.FactionsProvider_Default;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider_FactionsUUID;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider_MassiveCore;
 import com.bgsoftware.wildbuster.listeners.BlocksListener;
+import com.bgsoftware.wildbuster.listeners.ChunksListener;
 import com.bgsoftware.wildbuster.listeners.InventorysListener;
 import com.bgsoftware.wildbuster.listeners.PlayersListener;
 import com.bgsoftware.wildbuster.metrics.Metrics;
@@ -48,6 +49,7 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         log("******** ENABLE START ********");
 
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
+        getServer().getPluginManager().registerEvents(new ChunksListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayersListener(this), this);
         getServer().getPluginManager().registerEvents(new InventorysListener(this), this);
 
