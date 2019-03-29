@@ -1,5 +1,8 @@
 package com.bgsoftware.wildbuster.listeners;
 
+import com.bgsoftware.wildbuster.Locale;
+import com.bgsoftware.wildbuster.WildBusterPlugin;
+import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 import com.bgsoftware.wildbuster.utils.ItemUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -10,9 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import com.bgsoftware.wildbuster.Locale;
-import com.bgsoftware.wildbuster.WildBusterPlugin;
-import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -29,7 +29,7 @@ public final class InventorysListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e){
-        if(e.getClickedInventory() == null || e.getInventory() == null || e.getCurrentItem().getType() == Material.AIR || !(e.getWhoClicked() instanceof Player))
+        if(e.getClickedInventory() == null || e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR || !(e.getWhoClicked() instanceof Player))
             return;
 
         Player player = (Player) e.getWhoClicked();
