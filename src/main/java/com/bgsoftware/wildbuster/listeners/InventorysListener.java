@@ -11,9 +11,14 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,10 +26,35 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unused")
 public final class InventorysListener implements Listener {
 
-    private WildBusterPlugin instance;
+    private WildBusterPlugin plugin;
 
-    public InventorysListener(WildBusterPlugin instance){
-        this.instance = instance;
+    public InventorysListener(WildBusterPlugin plugin){
+        this.plugin = plugin;
+    }
+
+    /**
+     * The following two events are here for patching a dupe glitch caused
+     * by shift clicking and closing the inventory in the same time.
+     */
+
+    private Map<UUID, ItemStack> latestClickedItem = new HashMap<>();
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onInventoryClickMonitor(InventoryClickEvent e){
+        latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
+        Bukkit.getScheduler().runTaskLater(plugin, () -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onInventoryCloseMonitor(InventoryCloseEvent e){
+        if(latestClickedItem.containsKey(e.getPlayer().getUniqueId())){
+            ItemStack clickedItem = latestClickedItem.get(e.getPlayer().getUniqueId());
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                e.getPlayer().getInventory().removeItem(clickedItem);
+                //noinspection deprecation
+                ((Player) e.getPlayer()).updateInventory();
+            }, 1L);
+        }
     }
 
     @EventHandler
@@ -61,7 +91,7 @@ public final class InventorysListener implements Listener {
                 String chunkString = e.getCurrentItem().getItemMeta().getLore().get(0).split(" ")[2];
                 String[] chunkSections = chunkString.split(",");
                 Chunk chunk = Bukkit.getWorld(chunkSections[0]).getChunkAt(Integer.valueOf(chunkSections[1]), Integer.valueOf(chunkSections[2]));
-                PlayerBuster playerBuster = instance.getBustersManager().getPlayerBuster(chunk);
+                PlayerBuster playerBuster = plugin.getBustersManager().getPlayerBuster(chunk);
 
                 if(playerBuster != null) {
                     playerBuster.performCancel(player);
