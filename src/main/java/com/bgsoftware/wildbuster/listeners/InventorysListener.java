@@ -53,7 +53,6 @@ public final class InventorysListener implements Listener {
             ItemStack clickedItem = latestClickedItem.get(e.getPlayer().getUniqueId());
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 e.getPlayer().getInventory().removeItem(clickedItem);
-                //noinspection deprecation
                 ((Player) e.getPlayer()).updateInventory();
             }, 1L);
         }
