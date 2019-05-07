@@ -1,12 +1,13 @@
 package com.bgsoftware.wildbuster.nms;
 
+import com.bgsoftware.wildbuster.api.objects.BlockData;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import com.bgsoftware.wildbuster.api.objects.BlockData;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -27,5 +28,7 @@ public interface NMSAdapter {
     int getCombinedId(Block block);
 
     Object getBlockData(int combined);
+
+    ItemStack getPlayerSkull(ItemStack itemStack, String texture);
 
 }

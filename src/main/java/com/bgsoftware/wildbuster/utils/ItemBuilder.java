@@ -1,17 +1,23 @@
 package com.bgsoftware.wildbuster.utils;
 
+import com.bgsoftware.wildbuster.WildBusterPlugin;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.Arrays;
+import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
 public final class ItemBuilder {
 
+    private static final WildBusterPlugin plugin = WildBusterPlugin.getPlugin();
+
     private final ItemStack itemStack;
     private final ItemMeta itemMeta;
+    private String texture = "";
 
     public ItemBuilder(Material type){
         this(type, 1);
@@ -40,7 +46,11 @@ public final class ItemBuilder {
     }
 
     public ItemBuilder setLore(String... lore){
-        itemMeta.setLore(Arrays.asList(lore));
+        return setLore(Arrays.asList(lore));
+    }
+
+    public ItemBuilder setLore(List<String> lore){
+        itemMeta.setLore(lore);
         return this;
     }
 
@@ -51,9 +61,19 @@ public final class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder setTexture(String texture){
+        this.texture = texture;
+        return this;
+    }
+
+    public ItemBuilder addEnchant(Enchantment ench, int level){
+        itemMeta.addEnchant(ench, level, true);
+        return this;
+    }
+
     public ItemStack build(){
         itemStack.setItemMeta(itemMeta);
-        return itemStack;
+        return texture.isEmpty() ? itemStack : plugin.getNMSAdapter().getPlayerSkull(itemStack, texture);
     }
 
 }

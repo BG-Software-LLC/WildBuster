@@ -1,12 +1,11 @@
 package com.bgsoftware.wildbuster.handlers;
 
 import com.bgsoftware.wildbuster.WildBusterPlugin;
+import com.bgsoftware.wildbuster.utils.ItemBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -50,17 +49,16 @@ public final class SettingsHandler {
         for (String name : cfg.getConfigurationSection("chunkbusters").getKeys(false)) {
             int radius = cfg.getInt("chunkbusters." + name + ".radius", 0);
 
-            ItemStack item;
+            ItemBuilder itemBuilder = null;
 
             try{
                 Material type = Material.valueOf(cfg.getString("chunkbusters." + name + ".type", ""));
                 short data = (short) cfg.getInt("chunkbusters." + name + ".data", 0);
-                item = new ItemStack(type, 1, data);
 
-                ItemMeta meta = item.getItemMeta();
+                itemBuilder = new ItemBuilder(type, data);
 
                 if(cfg.contains("chunkbusters." + name + ".name"))
-                    meta.setDisplayName(ChatColor.translateAlternateColorCodes('&',
+                    itemBuilder.setDisplayName(ChatColor.translateAlternateColorCodes('&',
                             cfg.getString("chunkbusters." + name + ".name")));
 
                 if(cfg.contains("chunkbusters." + name + ".lore")) {
@@ -69,28 +67,28 @@ public final class SettingsHandler {
                     cfg.getStringList("chunkbusters." + name + ".lore")
                             .forEach(line -> lore.add(ChatColor.translateAlternateColorCodes('&', line)));
 
-                    meta.setLore(lore);
+                    itemBuilder.setLore(lore);
                 }
 
                 if(cfg.contains("chunkbusters." + name + ".enchants")) {
-                    cfg.getStringList("chunkbusters." + name + ".enchants").forEach(line -> {
+                    for(String line : cfg.getStringList("chunkbusters." + name + ".enchants")){
                         Enchantment enchantment = Enchantment.getByName(line.split(":")[0]);
                         int level = Integer.valueOf(line.split(":")[1]);
-                        meta.addEnchant(enchantment, level, true);
-                    });
+                        itemBuilder.addEnchant(enchantment, level);
+                    }
                 }
 
-                item.setItemMeta(meta);
-            } catch(Exception ex){
-                item = null;
-            }
+                if(cfg.contains("chunkbusters." + name + ".skull")) {
+                    itemBuilder.setTexture(cfg.getString("chunkbusters." + name + ".skull"));
+                }
+            } catch(Exception ignored){}
 
-            if (radius <= 0 || item == null) {
+            if (radius <= 0 || itemBuilder == null) {
                 WildBusterPlugin.log("Something went wrong while loading chunk-buster '" + name + "'.");
                 continue;
             }
 
-            plugin.getBustersManager().createChunkBuster(name, radius, item);
+            plugin.getBustersManager().createChunkBuster(name, radius, itemBuilder.build());
             bustersAmount++;
         }
 

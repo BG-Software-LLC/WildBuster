@@ -1,5 +1,6 @@
 package com.bgsoftware.wildbuster.nms;
 
+import com.bgsoftware.wildbuster.api.objects.BlockData;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Chunk;
@@ -7,6 +8,9 @@ import net.minecraft.server.v1_8_R3.EntityHuman;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.IBlockData;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
+import net.minecraft.server.v1_8_R3.ItemStack;
+import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import net.minecraft.server.v1_8_R3.NBTTagList;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_8_R3.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_8_R3.World;
@@ -15,11 +19,12 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
-import com.bgsoftware.wildbuster.api.objects.BlockData;
 
 import java.util.List;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
@@ -74,4 +79,32 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     public Object getBlockData(int combined) {
         return null;
     }
+
+    @Override
+    public org.bukkit.inventory.ItemStack getPlayerSkull(org.bukkit.inventory.ItemStack itemStack, String texture) {
+        ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
+
+        NBTTagCompound nbtTagCompound = nmsItem.hasTag() ? nmsItem.getTag() : new NBTTagCompound();
+
+        NBTTagCompound skullOwner = nbtTagCompound.hasKey("SkullOwner") ? nbtTagCompound.getCompound("SkullOwner") : new NBTTagCompound();
+
+        NBTTagCompound properties = new NBTTagCompound();
+
+        NBTTagList textures = new NBTTagList();
+        NBTTagCompound signature = new NBTTagCompound();
+        signature.setString("Value", texture);
+        textures.add(signature);
+
+        properties.set("textures", textures);
+
+        skullOwner.set("Properties", properties);
+        skullOwner.setString("Id", UUID.randomUUID().toString());
+
+        nbtTagCompound.set("SkullOwner", skullOwner);
+
+        nmsItem.setTag(nbtTagCompound);
+
+        return CraftItemStack.asBukkitCopy(nmsItem);
+    }
+
 }
