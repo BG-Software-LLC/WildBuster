@@ -43,7 +43,7 @@ public final class InventorysListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryClickMonitor(InventoryClickEvent e){
-        if(e.getCurrentItem() != null && e.isCancelled() && Arrays.stream(inventoryTitles).anyMatch(title -> e.getClickedInventory().getTitle().contains(title))) {
+        if(e.getCurrentItem() != null && e.isCancelled() && Arrays.stream(inventoryTitles).anyMatch(title -> e.getView().getTitle().contains(title))) {
             latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
             Bukkit.getScheduler().runTaskLater(plugin, () -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
         }
@@ -67,7 +67,7 @@ public final class InventorysListener implements Listener {
 
         Player player = (Player) e.getWhoClicked();
 
-        if(e.getInventory().getName().equals(ChatColor.BOLD + "Cancelling Menu")){
+        if(e.getView().getTitle().equals(ChatColor.BOLD + "Cancelling Menu")){
             e.setCancelled(true);
             //Player head
             if(e.getRawSlot() < 36){
@@ -85,7 +85,7 @@ public final class InventorysListener implements Listener {
             }
         }
 
-        else if(e.getInventory().getName().equals(ChatColor.BOLD + "Player's Active Busters")){
+        else if(e.getView().getTitle().equals(ChatColor.BOLD + "Player's Active Busters")){
             e.setCancelled(true);
             OfflinePlayer target = Bukkit.getOfflinePlayer(UUID.fromString(e.getInventory().getItem(40).getItemMeta().getLore().get(1).split(" ")[1]));
             //Buster item

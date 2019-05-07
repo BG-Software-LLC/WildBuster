@@ -1,6 +1,7 @@
 package com.bgsoftware.wildbuster.api.events;
 
 import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -13,6 +14,7 @@ public final class ChunkBusterFinishEvent extends Event {
     private final FinishReason finishReason;
 
     public ChunkBusterFinishEvent(PlayerBuster playerBuster, FinishReason finishReason){
+        super(!Bukkit.isPrimaryThread());
         this.playerBuster = playerBuster;
         this.finishReason = finishReason;
     }

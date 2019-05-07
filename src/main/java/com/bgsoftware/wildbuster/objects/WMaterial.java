@@ -9,6 +9,8 @@ public enum WMaterial {
     PLAYER_HEAD("SKULL_ITEM", (short) 3),
     BLACK_STAINED_GLASS_PANE("STAINED_GLASS_PANE", (short) 15);
 
+    private static boolean isLegacy = !Bukkit.getBukkitVersion().contains("1.13") && !Bukkit.getBukkitVersion().contains("1.14");
+
     private final String legacy;
     private final short damage;
 
@@ -19,11 +21,11 @@ public enum WMaterial {
 
     public ItemStack parseItem(){
         Material material = parseMaterial();
-        return Bukkit.getBukkitVersion().contains("1.13") ? new ItemStack(material) : new ItemStack(material, 1, damage);
+        return !isLegacy ? new ItemStack(material) : new ItemStack(material, 1, damage);
     }
 
     public Material parseMaterial(){
-        return Bukkit.getBukkitVersion().contains("1.13") ? Material.matchMaterial(toString()) : Material.matchMaterial(legacy);
+        return !isLegacy ? Material.matchMaterial(toString()) : Material.matchMaterial(legacy);
     }
 
 }
