@@ -1,5 +1,10 @@
 package com.bgsoftware.wildbuster.command.commands;
 
+import com.bgsoftware.wildbuster.Locale;
+import com.bgsoftware.wildbuster.WildBusterPlugin;
+import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
+import com.bgsoftware.wildbuster.command.ICommand;
+import com.bgsoftware.wildbuster.utils.ItemUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -7,11 +12,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import com.bgsoftware.wildbuster.Locale;
-import com.bgsoftware.wildbuster.WildBusterPlugin;
-import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
-import com.bgsoftware.wildbuster.command.ICommand;
-import com.bgsoftware.wildbuster.utils.ItemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -146,11 +146,7 @@ public final class CommandCancel implements ICommand {
             List<String> list = new ArrayList<>();
             if(!sender.hasPermission(getPermission() + ".other")) {
                 list.add(sender.getName());
-            }else{
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    list.add(player.getName());
-                }
-            }
+            }else return null;
             return list;
         }
 
