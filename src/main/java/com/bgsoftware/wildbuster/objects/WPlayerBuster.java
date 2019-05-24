@@ -1,5 +1,15 @@
 package com.bgsoftware.wildbuster.objects;
 
+import com.bgsoftware.wildbuster.Locale;
+import com.bgsoftware.wildbuster.WildBusterPlugin;
+import com.bgsoftware.wildbuster.api.events.ChunkBusterCancelEvent;
+import com.bgsoftware.wildbuster.api.events.ChunkBusterFinishEvent;
+import com.bgsoftware.wildbuster.api.objects.BlockData;
+import com.bgsoftware.wildbuster.api.objects.ChunkBuster;
+import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
+import com.bgsoftware.wildbuster.utils.BukkitUtil;
+import com.bgsoftware.wildbuster.utils.ItemUtil;
+import com.bgsoftware.wildbuster.utils.PlayerUtil;
 import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -11,16 +21,6 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
-import com.bgsoftware.wildbuster.Locale;
-import com.bgsoftware.wildbuster.WildBusterPlugin;
-import com.bgsoftware.wildbuster.api.events.ChunkBusterCancelEvent;
-import com.bgsoftware.wildbuster.api.events.ChunkBusterFinishEvent;
-import com.bgsoftware.wildbuster.api.objects.BlockData;
-import com.bgsoftware.wildbuster.api.objects.ChunkBuster;
-import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
-import com.bgsoftware.wildbuster.utils.BukkitUtil;
-import com.bgsoftware.wildbuster.utils.ItemUtil;
-import com.bgsoftware.wildbuster.utils.PlayerUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -160,6 +160,7 @@ public final class WPlayerBuster implements PlayerBuster {
                                 Block block = ch.getBlock(x, (currentLevel - y), z);
 
                                 if(block.getType() == Material.AIR || blockedMaterials.contains(block.getType().name()) ||
+                                        !plugin.getNMSAdapter().isInsideBorder(block.getLocation()) ||
                                         !plugin.getBlockBreakProvider().canBuild(Bukkit.getPlayer(uuid), block))
                                     continue;
 

@@ -31,4 +31,6 @@ public interface NMSAdapter {
 
     ItemStack getPlayerSkull(ItemStack itemStack, String texture);
 
+    boolean isInsideBorder(Location location);
+
 }

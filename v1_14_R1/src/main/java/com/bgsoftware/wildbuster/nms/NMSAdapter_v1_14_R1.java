@@ -17,6 +17,7 @@ import net.minecraft.server.v1_14_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_14_R1.World;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.WorldBorder;
 import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.block.data.CraftBlockData;
@@ -111,6 +112,15 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
         nmsItem.setTag(nbtTagCompound);
 
         return CraftItemStack.asBukkitCopy(nmsItem);
+    }
+
+    @Override
+    public boolean isInsideBorder(Location location) {
+        WorldBorder worldBorder = location.getWorld().getWorldBorder();
+        Location center = worldBorder.getCenter();
+        int radius = (int) worldBorder.getSize() / 2;
+        return location.getBlockX() <=(center.getBlockX() + radius) && location.getBlockX() >= (center.getBlockX() - radius) &&
+                location.getBlockZ() <= (center.getBlockZ() + radius) && location.getBlockZ() >= (center.getBlockZ() - radius);
     }
 
 }

@@ -99,4 +99,8 @@ public final class NMSAdapter_v1_7_R3 implements NMSAdapter {
         return CraftItemStack.asBukkitCopy(nmsItem);
     }
 
+    @Override
+    public boolean isInsideBorder(Location location) {
+        return true;
+    }
 }
