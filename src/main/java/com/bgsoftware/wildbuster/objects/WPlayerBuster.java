@@ -60,7 +60,7 @@ public final class WPlayerBuster implements PlayerBuster {
         }
 
         else{
-            runRegularTask();
+            Bukkit.getScheduler().runTaskLater(plugin, this::runRegularTask, plugin.getSettings().timeBeforeRunning);
         }
     }
 
