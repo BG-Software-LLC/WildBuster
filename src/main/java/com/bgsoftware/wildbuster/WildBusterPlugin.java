@@ -22,6 +22,7 @@ import com.bgsoftware.wildbuster.listeners.InventorysListener;
 import com.bgsoftware.wildbuster.listeners.PlayersListener;
 import com.bgsoftware.wildbuster.metrics.Metrics;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
@@ -62,7 +63,6 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         dataHandler = new DataHandler(this);
 
         Locale.reload();
-        loadHooks();
         loadAPI();
 
         if(Updater.isOutdated()) {
@@ -73,6 +73,9 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         }
 
         log("******** ENABLE DONE ********");
+
+        //Load hooks on first tick
+        Bukkit.getScheduler().runTask(plugin, this::loadHooks);
     }
 
     @Override
