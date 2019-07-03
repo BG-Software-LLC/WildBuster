@@ -138,6 +138,9 @@ public final class WPlayerBuster implements PlayerBuster {
 
     @Override
     public void runRegularTask() {
+        if(cancelStatus)
+            return;
+
         taskID = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             //Counter for skipped levels
             int skipLevels = 0, levelsAmount = 1, stopLevel = 1;
