@@ -46,6 +46,8 @@ public final class SettingsHandler {
         timeBeforeRunning = cfg.getLong("time-before-running", 0);
         blockedMaterials = cfg.getStringList("blocked-materials");
 
+        plugin.getBustersManager().removeChunkBusters();
+
         for (String name : cfg.getConfigurationSection("chunkbusters").getKeys(false)) {
             int radius = cfg.getInt("chunkbusters." + name + ".radius", 0);
 

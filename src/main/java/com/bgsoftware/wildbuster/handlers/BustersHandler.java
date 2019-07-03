@@ -1,5 +1,9 @@
 package com.bgsoftware.wildbuster.handlers;
 
+import com.bgsoftware.wildbuster.api.handlers.BustersManager;
+import com.bgsoftware.wildbuster.api.objects.BlockData;
+import com.bgsoftware.wildbuster.api.objects.ChunkBuster;
+import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 import com.bgsoftware.wildbuster.objects.WBlockData;
 import com.bgsoftware.wildbuster.objects.WChunkBuster;
 import com.bgsoftware.wildbuster.objects.WPlayerBuster;
@@ -10,10 +14,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import com.bgsoftware.wildbuster.api.handlers.BustersManager;
-import com.bgsoftware.wildbuster.api.objects.BlockData;
-import com.bgsoftware.wildbuster.api.objects.ChunkBuster;
-import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,12 +88,13 @@ public final class BustersHandler implements BustersManager {
     @Override
     public ChunkBuster createChunkBuster(String name, int radius, ItemStack busterItem) {
         ChunkBuster chunkBuster = new WChunkBuster(name, radius, busterItem);
-        //Remove duplicates
-        chunkBusters.remove(getChunkBuster(name));
-        //Add our chunk-buster
         chunkBusters.add(chunkBuster);
-
         return chunkBuster;
+    }
+
+    @Override
+    public void removeChunkBusters() {
+        chunkBusters.clear();
     }
 
     @Override

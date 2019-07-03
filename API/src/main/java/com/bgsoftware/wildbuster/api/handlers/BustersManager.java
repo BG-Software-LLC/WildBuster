@@ -1,5 +1,8 @@
 package com.bgsoftware.wildbuster.api.handlers;
 
+import com.bgsoftware.wildbuster.api.objects.BlockData;
+import com.bgsoftware.wildbuster.api.objects.ChunkBuster;
+import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -7,9 +10,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import com.bgsoftware.wildbuster.api.objects.BlockData;
-import com.bgsoftware.wildbuster.api.objects.ChunkBuster;
-import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +32,8 @@ public interface BustersManager {
     List<PlayerBuster> getPlayerBusters(OfflinePlayer player);
 
     ChunkBuster createChunkBuster(String name, int radius, ItemStack busterItem);
+
+    void removeChunkBusters();
 
     PlayerBuster createPlayerBuster(Player player, Location placedLocation, ChunkBuster buster);
 
