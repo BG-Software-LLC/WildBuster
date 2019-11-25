@@ -100,7 +100,7 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
 
         //Load factions provider
         if(getServer().getPluginManager().isPluginEnabled("Factions")){
-            if(getServer().getPluginManager().isPluginEnabled("MassiveCore")){
+            if(!getServer().getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("drtshock")){
                 factionsProvider = new FactionsProvider_MassiveCore();
                 log(" - Using MassiveCore as FactionsProvider.");
             }else{
