@@ -23,12 +23,13 @@ public final class WBlockData implements BlockData {
 
     private ItemStack[] contents;
 
-    public WBlockData(Block block){
-        this(block.getType(), (byte) WildBusterPlugin.getPlugin().getNMSAdapter().getMaterialData(block),
-                WildBusterPlugin.getPlugin().getNMSAdapter().getCombinedId(block), block.getWorld(),
+    public WBlockData(Block block, InventoryHolder inventoryHolder){
+        this(block.getType(), (byte) plugin.getNMSAdapter().getMaterialData(block),
+                plugin.getNMSAdapter().getCombinedId(block), block.getWorld(),
                 block.getX(), block.getY(), block.getZ());
-        if(block.getState() instanceof InventoryHolder)
-            this.contents = ((InventoryHolder) block.getState()).getInventory().getContents();
+
+        if(inventoryHolder != null)
+            this.contents = inventoryHolder.getInventory().getContents();
     }
 
     public WBlockData(Material type, byte data, int combinedId, World world, int x, int y, int z){

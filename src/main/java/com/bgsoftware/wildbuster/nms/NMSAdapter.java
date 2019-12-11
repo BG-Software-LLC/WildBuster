@@ -4,22 +4,19 @@ import com.bgsoftware.wildbuster.api.objects.BlockData;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.List;
 
 public interface NMSAdapter {
 
     String getVersion();
 
-    void setFastBlock(Location loc, BlockData blockData);
+    void setFastBlock(Location location, BlockData blockData);
 
-    void refreshChunks(World bukkitWorld, List<Chunk> chunksList);
+    void refreshChunk(Chunk chunk);
 
-    void sendActionBar(Player pl, String message);
+    void sendActionBar(Player player, String message);
 
     int getMaterialId(Material type);
 

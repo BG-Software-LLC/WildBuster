@@ -7,19 +7,20 @@ import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 import com.bgsoftware.wildbuster.objects.WBlockData;
 import com.bgsoftware.wildbuster.objects.WChunkBuster;
 import com.bgsoftware.wildbuster.objects.WPlayerBuster;
+import com.bgsoftware.wildbuster.utils.blocks.ChunkPosition;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -46,7 +47,7 @@ public final class BustersHandler implements BustersManager {
 
     @Override
     public PlayerBuster getPlayerBuster(Chunk chunk){
-        return playerBusters.get(new ChunkPosition(chunk));
+        return playerBusters.get(ChunkPosition.of(chunk));
     }
 
     @Override
@@ -81,20 +82,20 @@ public final class BustersHandler implements BustersManager {
     @Override
     public PlayerBuster createPlayerBuster(Player player, Location placedLocation, ChunkBuster buster) {
         PlayerBuster playerBuster = new WPlayerBuster(player, placedLocation, buster);
-        playerBuster.getChunks().forEach(chunk -> playerBusters.put(new ChunkPosition(chunk), playerBuster));
+        playerBuster.getChunks().forEach(chunk -> playerBusters.put(ChunkPosition.of(chunk), playerBuster));
         return playerBuster;
     }
 
     @Override
     public PlayerBuster loadPlayerBuster(String busterName, UUID uuid, World world, boolean cancelStatus, boolean notifyStatus, int currentLevel, List<Chunk> chunksList, List<BlockData> removedBlocks) {
         PlayerBuster playerBuster = new WPlayerBuster(busterName, uuid, world, cancelStatus, notifyStatus, currentLevel, chunksList, removedBlocks);
-        chunksList.forEach(chunk -> playerBusters.put(new ChunkPosition(chunk), playerBuster));
+        chunksList.forEach(chunk -> playerBusters.put(ChunkPosition.of(chunk), playerBuster));
         return playerBuster;
     }
 
     @Override
     public void removePlayerBuster(PlayerBuster buster){
-        buster.getChunks().forEach(chunk -> playerBusters.remove(new ChunkPosition(chunk)));
+        buster.getChunks().forEach(chunk -> playerBusters.remove(ChunkPosition.of(chunk)));
         notifyBusters.remove(buster.getUniqueID());
     }
 
@@ -110,34 +111,7 @@ public final class BustersHandler implements BustersManager {
 
     @Override
     public BlockData getBlockData(Block block) {
-        return new WBlockData(block);
-    }
-
-    private static final class ChunkPosition{
-
-        private String world;
-        private int x, z;
-
-        ChunkPosition(Chunk chunk){
-            this.world = chunk.getWorld().getName();
-            this.x = chunk.getX();
-            this.z = chunk.getZ();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            ChunkPosition that = (ChunkPosition) o;
-            return x == that.x &&
-                    z == that.z &&
-                    Objects.equals(world, that.world);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(world, x, z);
-        }
+        return new WBlockData(block, block.getState() instanceof InventoryHolder ? (InventoryHolder) block.getState() : null);
     }
 
 }

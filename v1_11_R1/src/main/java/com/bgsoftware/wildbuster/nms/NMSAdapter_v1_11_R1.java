@@ -4,6 +4,7 @@ import com.bgsoftware.wildbuster.api.objects.BlockData;
 import net.minecraft.server.v1_11_R1.Block;
 import net.minecraft.server.v1_11_R1.BlockPosition;
 import net.minecraft.server.v1_11_R1.Chunk;
+import net.minecraft.server.v1_11_R1.ChunkSection;
 import net.minecraft.server.v1_11_R1.EntityHuman;
 import net.minecraft.server.v1_11_R1.EntityPlayer;
 import net.minecraft.server.v1_11_R1.IBlockData;
@@ -24,7 +25,6 @@ import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_11_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
@@ -36,19 +36,23 @@ public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
     }
 
     @Override
-    public void setFastBlock(Location loc, BlockData blockData) {
-        World world = ((CraftWorld) loc.getWorld()).getHandle();
-        Chunk chunk = world.getChunkAt(loc.getChunk().getX(), loc.getChunk().getZ());
-        chunk.a(new BlockPosition(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), Block.getByCombinedId(blockData.getCombinedId()));
+    public void setFastBlock(Location location, BlockData blockData) {
+        Chunk chunk = ((CraftWorld) location.getWorld()).getHandle().getChunkAt(location.getBlockX() >> 4, location.getBlockZ() >> 4);
+        int indexY = location.getBlockY() >> 4;
+        ChunkSection chunkSection = chunk.getSections()[indexY];
+
+        if(chunkSection == null)
+            chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, !chunk.world.worldProvider.m());
+
+        chunkSection.setType(location.getBlockX() & 15, location.getBlockY() & 15, location.getBlockZ() & 15, Block.getByCombinedId(blockData.getCombinedId()));
     }
 
     @Override
-    public void refreshChunks(org.bukkit.World bukkitWorld, List<org.bukkit.Chunk> chunksList) {
-        World world = ((CraftWorld) bukkitWorld).getHandle();
-        for(org.bukkit.Chunk bukkitChunk : chunksList){
-            Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-            for(EntityHuman entityHuman : world.players)
-                ((EntityPlayer) entityHuman).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk,65535));
+    public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        for(EntityHuman entityHuman : chunk.world.players){
+            EntityPlayer entityPlayer = (EntityPlayer) entityHuman;
+            entityPlayer.playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, 65535));
         }
     }
 

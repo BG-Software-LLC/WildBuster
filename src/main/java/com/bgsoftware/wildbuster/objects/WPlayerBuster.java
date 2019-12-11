@@ -7,8 +7,8 @@ import com.bgsoftware.wildbuster.api.events.ChunkBusterFinishEvent;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.api.objects.ChunkBuster;
 import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
-import com.bgsoftware.wildbuster.utils.BukkitUtil;
 import com.bgsoftware.wildbuster.utils.PlayerUtils;
+import com.bgsoftware.wildbuster.utils.blocks.MultiBlockTask;
 import com.bgsoftware.wildbuster.utils.items.ItemUtils;
 import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
@@ -23,7 +23,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public final class WPlayerBuster implements PlayerBuster {
@@ -39,6 +42,8 @@ public final class WPlayerBuster implements PlayerBuster {
     private List<Chunk> chunks;
     private List<BlockData> removedBlocks;
 
+    private Map<Location, InventoryHolder> blockStateMap = new HashMap<>();
+
     public WPlayerBuster(Player player, Location placedLocation, ChunkBuster buster){
         this(buster.getName(), player.getUniqueId(), placedLocation.getWorld(), false, true, plugin.getSettings().startingLevel, getChunks(player, placedLocation.getChunk(), buster.getRadius()), new ArrayList<>());
     }
@@ -51,6 +56,10 @@ public final class WPlayerBuster implements PlayerBuster {
         this.currentLevel = currentLevel;
         this.chunks = new ArrayList<>(chunksList);
         this.removedBlocks = new ArrayList<>(removedBlocks);
+
+        chunksList.forEach(chunk ->
+            Arrays.stream(chunk.getTileEntities()).filter(blockState -> blockState instanceof InventoryHolder)
+                    .forEach(blockState -> blockStateMap.put(blockState.getLocation(), (InventoryHolder) blockState)));
 
         if(notifyStatus)
             setNotify();
@@ -147,6 +156,8 @@ public final class WPlayerBuster implements PlayerBuster {
             List<String> blockedMaterials;
             boolean isSkippingAir;
 
+            MultiBlockTask multiBlockTask = new MultiBlockTask(plugin, Bukkit.getOfflinePlayer(uuid));
+
             for (int y = 0; y < (levelsAmount + skipLevels); y++) {
                 //Each loop the settings should be updated (in-case of /buster reload)
                 isSkippingAir = plugin.getSettings().skipAirLevels;
@@ -167,21 +178,17 @@ public final class WPlayerBuster implements PlayerBuster {
                                         !plugin.getBlockBreakProvider().canBuild(Bukkit.getPlayer(uuid), block))
                                     continue;
 
-                                BlockData blockData = new WBlockData(block);
+                                InventoryHolder inventoryHolder = blockStateMap.get(block.getLocation());
+
+                                BlockData blockData = new WBlockData(block, inventoryHolder);
 
                                 //Record to CoreProtect if installed
                                 plugin.getCoreProtectHook().recordBlockChange(Bukkit.getOfflinePlayer(uuid), block.getLocation(), blockData, false);
 
-                                if(plugin.getSettings().reverseMode){
+                                if(plugin.getSettings().reverseMode)
                                     removedBlocks.add(blockData);
 
-                                    //Prevent the items from dropping when destroying the block
-                                    if(block.getState() instanceof InventoryHolder)
-                                        ((InventoryHolder) block.getState()).getInventory().clear();
-                                }
-
-
-                                BukkitUtil.setFastBlock(block.getLocation(), WBlockData.AIR);
+                                multiBlockTask.setBlock(block.getLocation(), WBlockData.AIR);
 
                                 isAirLevel = false;
                             }
@@ -193,10 +200,12 @@ public final class WPlayerBuster implements PlayerBuster {
                     skipLevels++;
             }
 
-            BukkitUtil.refreshChunks(world, chunks);
+            int currentLevelToNotify = currentLevel;
 
-            if (isNotify())
-                PlayerUtils.sendActionBar(Bukkit.getPlayer(uuid), Locale.ACTIONBAR_BUSTER_MESSAGE, currentLevel);
+            multiBlockTask.submitUpdate(() -> {
+                if (isNotify())
+                    PlayerUtils.sendActionBar(Bukkit.getPlayer(uuid), Locale.ACTIONBAR_BUSTER_MESSAGE, currentLevelToNotify);
+            });
 
             currentLevel -= levelsAmount + skipLevels;
 
@@ -255,6 +264,8 @@ public final class WPlayerBuster implements PlayerBuster {
         removedBlocks = Lists.reverse(removedBlocks);
 
         taskID = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+            MultiBlockTask multiBlockTask = new MultiBlockTask(plugin, Bukkit.getOfflinePlayer(uuid));
+
             for(int index = 0; index < chunks.size() * 16 * 16 * levelsAmount; index++){
                 if(removedBlocks.isEmpty()) {
                     ChunkBusterFinishEvent event = new ChunkBusterFinishEvent(this, ChunkBusterFinishEvent.FinishReason.CANCEL_FINISH);
@@ -264,25 +275,18 @@ public final class WPlayerBuster implements PlayerBuster {
                 }
 
                 BlockData blockData = removedBlocks.get(0);
-                BukkitUtil.setFastBlock(blockData.getLocation(), blockData);
-
-                //Record to CoreProtect if installed
-                plugin.getCoreProtectHook().recordBlockChange(Bukkit.getOfflinePlayer(uuid), blockData.getLocation(), blockData, true);
-
-                Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-                    Block block = blockData.getBlock();
-                    if(blockData.hasContents() && block.getState() instanceof InventoryHolder)
-                        ((InventoryHolder) block.getState()).getInventory().setContents(blockData.getContents());
-                }, 10L);
+                multiBlockTask.setBlock(blockData.getLocation(), blockData);
 
                 currentLevel = blockData.getY();
                 removedBlocks.remove(0);
             }
 
-            BukkitUtil.refreshChunks(world, chunks);
+            int currentLevelToNotify = currentLevel;
 
-            if(isNotify())
-                PlayerUtils.sendActionBar(Bukkit.getPlayer(uuid), Locale.ACTIONBAR_CANCEL_MESSAGE, currentLevel);
+            multiBlockTask.submitUpdate(() -> {
+                if(isNotify())
+                    PlayerUtils.sendActionBar(Bukkit.getPlayer(uuid), Locale.ACTIONBAR_CANCEL_MESSAGE, currentLevelToNotify);
+            });
         }, 0L, plugin.getSettings().bustingInterval).getTaskId();
     }
 
@@ -294,7 +298,7 @@ public final class WPlayerBuster implements PlayerBuster {
 
         //Refreshing the chunks
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () ->
-                BukkitUtil.refreshChunks(world, chunks), plugin.getSettings().bustingInterval);
+                chunks.forEach(plugin.getNMSAdapter()::refreshChunk), plugin.getSettings().bustingInterval);
 
         Bukkit.getServer().getScheduler().cancelTask(taskID);
         plugin.getBustersManager().removePlayerBuster(this);
