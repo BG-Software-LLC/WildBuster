@@ -1,6 +1,11 @@
 package com.bgsoftware.wildbuster.listeners;
 
-import com.bgsoftware.wildbuster.utils.PlayerUtil;
+import com.bgsoftware.wildbuster.Locale;
+import com.bgsoftware.wildbuster.WildBusterPlugin;
+import com.bgsoftware.wildbuster.api.events.ChunkBusterPlaceEvent;
+import com.bgsoftware.wildbuster.api.objects.ChunkBuster;
+import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
+import com.bgsoftware.wildbuster.utils.PlayerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
@@ -8,11 +13,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
-import com.bgsoftware.wildbuster.Locale;
-import com.bgsoftware.wildbuster.WildBusterPlugin;
-import com.bgsoftware.wildbuster.api.events.ChunkBusterPlaceEvent;
-import com.bgsoftware.wildbuster.api.objects.ChunkBuster;
-import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 
 import java.util.List;
 
@@ -44,7 +44,7 @@ public final class BlocksListener implements Listener {
         List<PlayerBuster> busters = instance.getBustersManager().getPlayerBusters(e.getPlayer());
 
         //Checks if the player has too many running busters
-        int limit = PlayerUtil.getBustersLimit(e.getPlayer());
+        int limit = PlayerUtils.getBustersLimit(e.getPlayer());
         if(limit != 0 && busters.size() >= limit){
             Locale.MAX_BUSTERS_AMOUNT.send(e.getPlayer(), limit);
             return;
@@ -59,7 +59,7 @@ public final class BlocksListener implements Listener {
         }
 
         //Checks if the player can bust the chunk.
-        if(!PlayerUtil.canBustChunk(e.getPlayer(), chunk)){
+        if(!PlayerUtils.canBustChunk(e.getPlayer(), chunk)){
             Locale.MUST_PLACE_IN_CLAIM.send(e.getPlayer());
             return;
         }

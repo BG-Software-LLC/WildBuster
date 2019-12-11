@@ -3,7 +3,7 @@ package com.bgsoftware.wildbuster.listeners;
 import com.bgsoftware.wildbuster.Locale;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
-import com.bgsoftware.wildbuster.utils.ItemUtil;
+import com.bgsoftware.wildbuster.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -72,7 +72,7 @@ public final class InventorysListener implements Listener {
             //Player head
             if(e.getRawSlot() < 36){
                 UUID playerUUID = UUID.fromString(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getLore().get(1)));
-                player.openInventory(ItemUtil.getPlayerMenu(Bukkit.getOfflinePlayer(playerUUID), 0));
+                player.openInventory(ItemUtils.getPlayerMenu(Bukkit.getOfflinePlayer(playerUUID), 0));
             }
             //Previous or Next page
             else if(e.getRawSlot() == 38 || e.getRawSlot() == 42){
@@ -80,7 +80,7 @@ public final class InventorysListener implements Listener {
                 Matcher matcher;
                 if((matcher = Pattern.compile("Page (\\d)").matcher(firstLoreLine)).matches()){
                     int newPage = Integer.valueOf(matcher.group(1));
-                    e.getWhoClicked().openInventory(ItemUtil.getCancelMenu(newPage - 1));
+                    e.getWhoClicked().openInventory(ItemUtils.getCancelMenu(newPage - 1));
                 }
             }
         }
@@ -109,7 +109,7 @@ public final class InventorysListener implements Listener {
                 Matcher matcher;
                 if((matcher = Pattern.compile("Page (\\d)").matcher(firstLoreLine)).matches()){
                     int newPage = Integer.valueOf(matcher.group(1));
-                    e.getWhoClicked().openInventory(ItemUtil.getPlayerMenu(target, newPage - 1));
+                    e.getWhoClicked().openInventory(ItemUtils.getPlayerMenu(target, newPage - 1));
                 }
             }
         }

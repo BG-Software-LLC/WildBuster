@@ -4,7 +4,7 @@ import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 import com.bgsoftware.wildbuster.objects.WBlockData;
-import com.bgsoftware.wildbuster.utils.ItemUtil;
+import com.bgsoftware.wildbuster.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -68,7 +68,7 @@ public final class DataHandler {
                 cfg.set(path + ".combined", blockData.getCombinedId());
 
                 if(blockData.hasContents())
-                    ItemUtil.saveContents(blockData.getContents(), cfg.createSection(path + ".inventory"));
+                    ItemUtils.saveContents(blockData.getContents(), cfg.createSection(path + ".inventory"));
             }
 
             try{
@@ -136,7 +136,7 @@ public final class DataHandler {
                             Integer.valueOf(blockSections[1]), Integer.valueOf(blockSections[2]));
 
                     if(cfg.contains("blocks." + block + ".inventory")) {
-                        blockData.setContents(ItemUtil.loadContents(cfg.getConfigurationSection("blocks." + block + ".inventory")));
+                        blockData.setContents(ItemUtils.loadContents(cfg.getConfigurationSection("blocks." + block + ".inventory")));
                     }
 
                     removedBlocks.add(blockData);

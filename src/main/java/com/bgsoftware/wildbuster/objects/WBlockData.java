@@ -1,16 +1,19 @@
 package com.bgsoftware.wildbuster.objects;
 
+import com.bgsoftware.wildbuster.WildBusterPlugin;
+import com.bgsoftware.wildbuster.api.objects.BlockData;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import com.bgsoftware.wildbuster.WildBusterPlugin;
-import com.bgsoftware.wildbuster.api.objects.BlockData;
 
 @SuppressWarnings("WeakerAccess")
 public final class WBlockData implements BlockData {
+
+    private static WildBusterPlugin plugin = WildBusterPlugin.getPlugin();
+    public static BlockData AIR = new WBlockData(Material.AIR, (byte) 0, 0, null, 0, 0, 0);
 
     private final Material type;
     private final byte data;
@@ -46,7 +49,7 @@ public final class WBlockData implements BlockData {
 
     @Override
     public int getTypeId() {
-        return WildBusterPlugin.getPlugin().getNMSAdapter().getMaterialId(type);
+        return plugin.getNMSAdapter().getMaterialId(type);
     }
 
     @Override
@@ -102,10 +105,6 @@ public final class WBlockData implements BlockData {
     @Override
     public ItemStack[] getContents() {
         return contents.clone();
-    }
-
-    public static BlockData AIR(){
-        return new WBlockData(Material.AIR, (byte) 0, 0, null, 0, 0, 0);
     }
 
 }

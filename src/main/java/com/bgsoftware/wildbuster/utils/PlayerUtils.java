@@ -1,16 +1,16 @@
 package com.bgsoftware.wildbuster.utils;
 
-import org.bukkit.Chunk;
-import org.bukkit.entity.Player;
-import org.bukkit.permissions.PermissionAttachmentInfo;
 import com.bgsoftware.wildbuster.Locale;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider;
+import org.bukkit.Chunk;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class PlayerUtil {
+public final class PlayerUtils {
 
     private static WildBusterPlugin plugin = WildBusterPlugin.getPlugin();
 

@@ -1,4 +1,4 @@
-package com.bgsoftware.wildbuster.utils;
+package com.bgsoftware.wildbuster.utils.items;
 
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import org.bukkit.Material;

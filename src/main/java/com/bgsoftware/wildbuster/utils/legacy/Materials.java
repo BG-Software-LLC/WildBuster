@@ -1,10 +1,10 @@
-package com.bgsoftware.wildbuster.objects;
+package com.bgsoftware.wildbuster.utils.legacy;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-public enum WMaterial {
+public enum Materials {
 
     PLAYER_HEAD("SKULL_ITEM", (short) 3),
     BLACK_STAINED_GLASS_PANE("STAINED_GLASS_PANE", (short) 15);
@@ -14,7 +14,7 @@ public enum WMaterial {
     private final String legacy;
     private final short damage;
 
-    WMaterial(String legacy, short damage){
+    Materials(String legacy, short damage){
         this.legacy = legacy;
         this.damage = damage;
     }

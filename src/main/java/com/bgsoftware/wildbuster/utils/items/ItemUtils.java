@@ -1,6 +1,8 @@
-package com.bgsoftware.wildbuster.utils;
+package com.bgsoftware.wildbuster.utils.items;
 
-import com.bgsoftware.wildbuster.objects.WMaterial;
+import com.bgsoftware.wildbuster.WildBusterPlugin;
+import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
+import com.bgsoftware.wildbuster.utils.legacy.Materials;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -10,14 +12,12 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import com.bgsoftware.wildbuster.WildBusterPlugin;
-import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public final class ItemUtil {
+public final class ItemUtils {
 
     private static WildBusterPlugin plugin = WildBusterPlugin.getPlugin();
 
@@ -74,7 +74,7 @@ public final class ItemUtil {
         for(int slot = 0; slot < 36 && (page * 36 + slot) < players.size(); slot++){
             OfflinePlayer player = players.get(page * 36 + slot);
             int bustersAmount = plugin.getBustersManager().getPlayerBusters(player).size();
-            inventory.setItem(slot, new ItemBuilder(WMaterial.PLAYER_HEAD.parseItem())
+            inventory.setItem(slot, new ItemBuilder(Materials.PLAYER_HEAD.parseItem())
                     .setDisplayName(ChatColor.GREEN + player.getName())
                     .setLore(ChatColor.GRAY + player.getName() + " has " + bustersAmount + " running busters.", ChatColor.GRAY + player.getUniqueId().toString())
                     .setOwner(player.getName())
@@ -84,7 +84,7 @@ public final class ItemUtil {
         //Set glass panes
         for(int slot = 36; slot < 45; slot++){
             //inventory.setItem(slot, new ItemBuilder(Material.STAINED_GLASS_PANE, (short) 15).setDisplayName(ChatColor.WHITE + "").build());
-            inventory.setItem(slot, new ItemBuilder(WMaterial.BLACK_STAINED_GLASS_PANE.parseItem()).setDisplayName(ChatColor.WHITE + "").build());
+            inventory.setItem(slot, new ItemBuilder(Materials.BLACK_STAINED_GLASS_PANE.parseItem()).setDisplayName(ChatColor.WHITE + "").build());
         }
 
         //Set next page
@@ -118,7 +118,7 @@ public final class ItemUtil {
         //Set glass panes
         for(int slot = 36; slot < 45; slot++){
             //inventory.setItem(slot, new ItemBuilder(Material.STAINED_GLASS_PANE, (short) 15).setDisplayName(ChatColor.WHITE + "").build());
-            inventory.setItem(slot, new ItemBuilder(WMaterial.BLACK_STAINED_GLASS_PANE.parseItem()).setDisplayName(ChatColor.WHITE + "").build());
+            inventory.setItem(slot, new ItemBuilder(Materials.BLACK_STAINED_GLASS_PANE.parseItem()).setDisplayName(ChatColor.WHITE + "").build());
         }
 
         //Set next page

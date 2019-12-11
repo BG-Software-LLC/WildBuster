@@ -8,8 +8,8 @@ import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.api.objects.ChunkBuster;
 import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 import com.bgsoftware.wildbuster.utils.BukkitUtil;
-import com.bgsoftware.wildbuster.utils.ItemUtil;
-import com.bgsoftware.wildbuster.utils.PlayerUtil;
+import com.bgsoftware.wildbuster.utils.PlayerUtils;
+import com.bgsoftware.wildbuster.utils.items.ItemUtils;
 import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -72,7 +72,7 @@ public final class WPlayerBuster implements PlayerBuster {
         for (int x = 0; x < radius; x++) {
             for (int z = 0; z < radius; z++) {
                 Chunk ch = origin.getWorld().getChunkAt(origin.getX() + x, origin.getZ() + z);
-                if (PlayerUtil.canBustChunk(player, ch) && plugin.getBustersManager().getPlayerBuster(ch) == null)
+                if (PlayerUtils.canBustChunk(player, ch) && plugin.getBustersManager().getPlayerBuster(ch) == null)
                     chunks.add(ch);
             }
         }
@@ -181,7 +181,7 @@ public final class WPlayerBuster implements PlayerBuster {
                                 }
 
 
-                                BukkitUtil.setFastBlock(block.getLocation(), WBlockData.AIR());
+                                BukkitUtil.setFastBlock(block.getLocation(), WBlockData.AIR);
 
                                 isAirLevel = false;
                             }
@@ -196,7 +196,7 @@ public final class WPlayerBuster implements PlayerBuster {
             BukkitUtil.refreshChunks(world, chunks);
 
             if (isNotify())
-                PlayerUtil.sendActionBar(Bukkit.getPlayer(uuid), Locale.ACTIONBAR_BUSTER_MESSAGE, currentLevel);
+                PlayerUtils.sendActionBar(Bukkit.getPlayer(uuid), Locale.ACTIONBAR_BUSTER_MESSAGE, currentLevel);
 
             currentLevel -= levelsAmount + skipLevels;
 
@@ -282,7 +282,7 @@ public final class WPlayerBuster implements PlayerBuster {
             BukkitUtil.refreshChunks(world, chunks);
 
             if(isNotify())
-                PlayerUtil.sendActionBar(Bukkit.getPlayer(uuid), Locale.ACTIONBAR_CANCEL_MESSAGE, currentLevel);
+                PlayerUtils.sendActionBar(Bukkit.getPlayer(uuid), Locale.ACTIONBAR_CANCEL_MESSAGE, currentLevel);
         }, 0L, plugin.getSettings().bustingInterval).getTaskId();
     }
 
@@ -290,7 +290,7 @@ public final class WPlayerBuster implements PlayerBuster {
     public void deleteBuster(boolean giveBusterItem) {
         Player pl = Bukkit.getPlayer(uuid);
         if(giveBusterItem && pl != null)
-            ItemUtil.addItem(plugin.getBustersManager().getChunkBuster(busterName).getBusterItem(), pl.getInventory(), pl.getLocation());
+            ItemUtils.addItem(plugin.getBustersManager().getChunkBuster(busterName).getBusterItem(), pl.getInventory(), pl.getLocation());
 
         //Refreshing the chunks
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () ->

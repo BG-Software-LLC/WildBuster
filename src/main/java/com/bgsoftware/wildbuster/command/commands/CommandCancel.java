@@ -4,7 +4,7 @@ import com.bgsoftware.wildbuster.Locale;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 import com.bgsoftware.wildbuster.command.ICommand;
-import com.bgsoftware.wildbuster.utils.ItemUtil;
+import com.bgsoftware.wildbuster.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -61,9 +61,9 @@ public final class CommandCancel implements ICommand {
 
             if(plugin.getSettings().cancelGUI){
                 if(!sender.hasPermission(getPermission() + ".other"))
-                    ((Player) sender).openInventory(ItemUtil.getPlayerMenu((Player) sender,0));
+                    ((Player) sender).openInventory(ItemUtils.getPlayerMenu((Player) sender,0));
                 else
-                    ((Player) sender).openInventory(ItemUtil.getCancelMenu(0));
+                    ((Player) sender).openInventory(ItemUtils.getCancelMenu(0));
                 return;
             }
 

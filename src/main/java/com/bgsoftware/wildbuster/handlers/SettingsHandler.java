@@ -1,7 +1,7 @@
 package com.bgsoftware.wildbuster.handlers;
 
 import com.bgsoftware.wildbuster.WildBusterPlugin;
-import com.bgsoftware.wildbuster.utils.ItemBuilder;
+import com.bgsoftware.wildbuster.utils.items.ItemBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;

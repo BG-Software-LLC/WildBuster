@@ -1,15 +1,15 @@
 package com.bgsoftware.wildbuster.command.commands;
 
+import com.bgsoftware.wildbuster.Locale;
+import com.bgsoftware.wildbuster.WildBusterPlugin;
+import com.bgsoftware.wildbuster.api.objects.ChunkBuster;
+import com.bgsoftware.wildbuster.command.ICommand;
+import com.bgsoftware.wildbuster.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import com.bgsoftware.wildbuster.Locale;
-import com.bgsoftware.wildbuster.WildBusterPlugin;
-import com.bgsoftware.wildbuster.api.objects.ChunkBuster;
-import com.bgsoftware.wildbuster.command.ICommand;
-import com.bgsoftware.wildbuster.utils.ItemUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +86,7 @@ public final class CommandGive implements ICommand {
         ItemStack item = buster.getBusterItem();
         item.setAmount(amount);
 
-        ItemUtil.addItem(item, target.getInventory(), null);
+        ItemUtils.addItem(item, target.getInventory(), null);
 
         Locale.GIVE_SUCCESS.send(sender, amount, buster.getName(), target.getName());
     }
