@@ -19,15 +19,18 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 public final class BustersHandler implements BustersManager {
 
     private final Map<String, ChunkBuster> chunkBusters = new HashMap<>();
-    private final Map<ChunkPosition, PlayerBuster> playerBusters = new HashMap<>();
+    private final Set<PlayerBuster> playerBusters = new HashSet<>();
+    private final Map<ChunkPosition, PlayerBuster> chunksToPlayerBusters = new HashMap<>();
     private final Map<UUID, PlayerBuster> notifyBusters = new HashMap<>();
 
     @Override
@@ -47,7 +50,7 @@ public final class BustersHandler implements BustersManager {
 
     @Override
     public PlayerBuster getPlayerBuster(Chunk chunk){
-        return playerBusters.get(ChunkPosition.of(chunk));
+        return chunksToPlayerBusters.get(ChunkPosition.of(chunk));
     }
 
     @Override
@@ -57,12 +60,12 @@ public final class BustersHandler implements BustersManager {
 
     @Override
     public List<PlayerBuster> getPlayerBusters(){
-        return new ArrayList<>(playerBusters.values());
+        return new ArrayList<>(playerBusters);
     }
 
     @Override
     public List<PlayerBuster> getPlayerBusters(OfflinePlayer player){
-        return playerBusters.values().stream()
+        return playerBusters.stream()
                 .filter(buster -> buster.getUniqueID().equals(player.getUniqueId()))
                 .collect(Collectors.toList());
     }
@@ -82,20 +85,23 @@ public final class BustersHandler implements BustersManager {
     @Override
     public PlayerBuster createPlayerBuster(Player player, Location placedLocation, ChunkBuster buster) {
         PlayerBuster playerBuster = new WPlayerBuster(player, placedLocation, buster);
-        playerBuster.getChunks().forEach(chunk -> playerBusters.put(ChunkPosition.of(chunk), playerBuster));
+        playerBusters.add(playerBuster);
+        playerBuster.getChunks().forEach(chunk -> chunksToPlayerBusters.put(ChunkPosition.of(chunk), playerBuster));
         return playerBuster;
     }
 
     @Override
     public PlayerBuster loadPlayerBuster(String busterName, UUID uuid, World world, boolean cancelStatus, boolean notifyStatus, int currentLevel, List<Chunk> chunksList, List<BlockData> removedBlocks) {
         PlayerBuster playerBuster = new WPlayerBuster(busterName, uuid, world, cancelStatus, notifyStatus, currentLevel, chunksList, removedBlocks);
-        chunksList.forEach(chunk -> playerBusters.put(ChunkPosition.of(chunk), playerBuster));
+        playerBusters.add(playerBuster);
+        chunksList.forEach(chunk -> chunksToPlayerBusters.put(ChunkPosition.of(chunk), playerBuster));
         return playerBuster;
     }
 
     @Override
     public void removePlayerBuster(PlayerBuster buster){
-        buster.getChunks().forEach(chunk -> playerBusters.remove(ChunkPosition.of(chunk)));
+        playerBusters.remove(buster);
+        buster.getChunks().forEach(chunk -> chunksToPlayerBusters.remove(ChunkPosition.of(chunk)));
         notifyBusters.remove(buster.getUniqueID());
     }
 
