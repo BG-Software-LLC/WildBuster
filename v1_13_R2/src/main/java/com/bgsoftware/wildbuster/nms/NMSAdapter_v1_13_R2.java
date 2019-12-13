@@ -25,6 +25,7 @@ import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_13_R2.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,6 +59,16 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
     @Override
     public void refreshLight(org.bukkit.Chunk chunk) {
         ((CraftChunk) chunk).getHandle().initLighting();
+    }
+
+    @Override
+    public void clearTileEntities(org.bukkit.Chunk bukkitChunk, List<Location> tileEntities) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        new HashMap<>(chunk.tileEntities).forEach(((blockPosition, tileEntity) -> {
+            Location location = new Location(bukkitChunk.getWorld(), blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
+            if(tileEntities.contains(location))
+                chunk.tileEntities.remove(blockPosition);
+        }));
     }
 
     @Override

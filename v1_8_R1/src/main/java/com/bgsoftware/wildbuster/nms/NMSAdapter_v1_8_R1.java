@@ -13,6 +13,7 @@ import net.minecraft.server.v1_8_R1.NBTTagCompound;
 import net.minecraft.server.v1_8_R1.NBTTagList;
 import net.minecraft.server.v1_8_R1.PacketPlayOutChat;
 import net.minecraft.server.v1_8_R1.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_8_R1.TileEntity;
 import net.minecraft.server.v1_8_R1.World;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,7 +25,9 @@ import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_8_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
@@ -57,6 +60,17 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
     @Override
     public void refreshLight(org.bukkit.Chunk chunk) {
         ((CraftChunk) chunk).getHandle().initLighting();
+    }
+
+    @Override
+    public void clearTileEntities(org.bukkit.Chunk bukkitChunk, List<Location> tileEntities) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        //noinspection unchecked
+        new HashMap<>((Map<BlockPosition, TileEntity>) chunk.tileEntities).forEach(((blockPosition, tileEntity) -> {
+            Location location = new Location(bukkitChunk.getWorld(), blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
+            if(tileEntities.contains(location))
+                chunk.tileEntities.remove(blockPosition);
+        }));
     }
 
     @Override

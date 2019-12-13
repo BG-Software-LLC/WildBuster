@@ -20,6 +20,10 @@ public interface NMSAdapter {
 
     void refreshLight(Chunk chunk);
 
+    void clearTileEntities(Chunk chunk, List<Location> tileEntities);
+
+    //void loadTileEntities(Collection<Location> tileEntities);
+
     void sendActionBar(Player player, String message);
 
     int getMaterialId(Material type);

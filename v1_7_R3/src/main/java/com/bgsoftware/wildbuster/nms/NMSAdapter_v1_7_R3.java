@@ -3,11 +3,13 @@ package com.bgsoftware.wildbuster.nms;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import net.minecraft.server.v1_7_R3.Block;
 import net.minecraft.server.v1_7_R3.Chunk;
+import net.minecraft.server.v1_7_R3.ChunkPosition;
 import net.minecraft.server.v1_7_R3.ChunkSection;
 import net.minecraft.server.v1_7_R3.ItemStack;
 import net.minecraft.server.v1_7_R3.NBTTagCompound;
 import net.minecraft.server.v1_7_R3.NBTTagList;
 import net.minecraft.server.v1_7_R3.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_7_R3.TileEntity;
 import net.minecraft.server.v1_7_R3.World;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,7 +20,9 @@ import org.bukkit.craftbukkit.v1_7_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_7_R3.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
@@ -49,6 +53,17 @@ public final class NMSAdapter_v1_7_R3 implements NMSAdapter {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         for(Player player : playerList)
             ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 65535));
+    }
+
+    @Override
+    public void clearTileEntities(org.bukkit.Chunk bukkitChunk, List<Location> tileEntities) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        //noinspection unchecked
+        new HashMap<>((Map<ChunkPosition, TileEntity>) chunk.tileEntities).forEach(((chunkPosition, tileEntity) -> {
+            Location location = new Location(bukkitChunk.getWorld(), chunkPosition.x, chunkPosition.y, chunkPosition.z);
+            if(tileEntities.contains(location))
+                chunk.tileEntities.remove(chunkPosition);
+        }));
     }
 
     @Override

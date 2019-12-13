@@ -3,12 +3,14 @@ package com.bgsoftware.wildbuster.nms;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import net.minecraft.server.v1_7_R4.Block;
 import net.minecraft.server.v1_7_R4.Chunk;
+import net.minecraft.server.v1_7_R4.ChunkPosition;
 import net.minecraft.server.v1_7_R4.ChunkSection;
 import net.minecraft.server.v1_7_R4.EntityPlayer;
 import net.minecraft.server.v1_7_R4.ItemStack;
 import net.minecraft.server.v1_7_R4.NBTTagCompound;
 import net.minecraft.server.v1_7_R4.NBTTagList;
 import net.minecraft.server.v1_7_R4.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_7_R4.TileEntity;
 import net.minecraft.server.v1_7_R4.World;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,7 +21,9 @@ import org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_7_R4.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
@@ -57,6 +61,17 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
     @Override
     public void refreshLight(org.bukkit.Chunk chunk) {
         ((CraftChunk) chunk).getHandle().initLighting();
+    }
+
+    @Override
+    public void clearTileEntities(org.bukkit.Chunk bukkitChunk, List<Location> tileEntities) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        //noinspection unchecked
+        new HashMap<>((Map<ChunkPosition, TileEntity>) chunk.tileEntities).forEach(((chunkPosition, tileEntity) -> {
+            Location location = new Location(bukkitChunk.getWorld(), chunkPosition.x, chunkPosition.y, chunkPosition.z);
+            if(tileEntities.contains(location))
+                chunk.tileEntities.remove(chunkPosition);
+        }));
     }
 
     @Override

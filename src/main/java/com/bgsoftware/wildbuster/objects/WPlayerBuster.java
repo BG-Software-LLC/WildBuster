@@ -20,6 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
@@ -28,8 +29,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -43,6 +46,7 @@ public final class WPlayerBuster implements PlayerBuster {
     private final World world;
     private final Chunk originalChunk;
     private final List<Chunk> chunks;
+    private final Set<Location> tileEntities;
 
     private List<BlockData> removedBlocks;
 
@@ -66,6 +70,7 @@ public final class WPlayerBuster implements PlayerBuster {
         this.currentLevel = currentLevel;
         this.chunks = Collections.unmodifiableList(chunksList);
         this.originalChunk = originalChunk == null ? getOriginalChunk() : originalChunk;
+        this.tileEntities = loadTileEntities();
         this.removedBlocks = new ArrayList<>(removedBlocks);
 
         chunksList.forEach(chunk ->
@@ -112,6 +117,15 @@ public final class WPlayerBuster implements PlayerBuster {
         }).orElse(chunks.get(0));
 
         return minimumChunk.getWorld().getChunkAt(minimumChunk.getX() + radius, minimumChunk.getZ() + radius);
+    }
+
+    private Set<Location> loadTileEntities(){
+        Set<Location> tileEntities = new HashSet<>();
+
+        chunks.forEach(chunk ->
+            tileEntities.addAll(Arrays.stream(chunk.getTileEntities()).map(BlockState::getLocation).collect(Collectors.toList())));
+
+        return tileEntities;
     }
 
     @Override
@@ -208,7 +222,7 @@ public final class WPlayerBuster implements PlayerBuster {
                 int levelsAmount = plugin.getSettings().bustingLevelsAmount, stopLevel = plugin.getSettings().stoppingLevel;
                 List<String> blockedMaterials = plugin.getSettings().blockedMaterials;
 
-                MultiBlockTask multiBlockTask = new MultiBlockTask(plugin, Bukkit.getOfflinePlayer(uuid), this);
+                MultiBlockTask multiBlockTask = new MultiBlockTask(plugin, Bukkit.getOfflinePlayer(uuid), this, true);
 
                 for (int y = 0; y < levelsAmount; y++) {
                     //Making sure the buster hasn't reached the stop level
@@ -230,7 +244,7 @@ public final class WPlayerBuster implements PlayerBuster {
                                     if (plugin.getSettings().reverseMode)
                                         removedBlocks.add(blockData);
 
-                                    multiBlockTask.setBlock(block.getLocation(), WBlockData.AIR);
+                                    multiBlockTask.setBlock(block.getLocation(), WBlockData.AIR, tileEntities.contains(block.getLocation()));
                                 }
                             }
                         }
@@ -305,7 +319,7 @@ public final class WPlayerBuster implements PlayerBuster {
         timer = new Timer();
 
         TimerUtils.runTimer(timer, () -> {
-            MultiBlockTask multiBlockTask = new MultiBlockTask(plugin, Bukkit.getOfflinePlayer(uuid), this);
+            MultiBlockTask multiBlockTask = new MultiBlockTask(plugin, Bukkit.getOfflinePlayer(uuid), this, false);
 
             for(int index = 0; index < chunks.size() * 16 * 16 * levelsAmount; index++){
                 if(removedBlocks.isEmpty()) {
@@ -316,7 +330,7 @@ public final class WPlayerBuster implements PlayerBuster {
                 }
 
                 BlockData blockData = removedBlocks.get(0);
-                multiBlockTask.setBlock(blockData.getLocation(), blockData);
+                multiBlockTask.setBlock(blockData.getLocation(), blockData, tileEntities.contains(blockData.getLocation()));
 
                 currentLevel = blockData.getY();
                 removedBlocks.remove(0);

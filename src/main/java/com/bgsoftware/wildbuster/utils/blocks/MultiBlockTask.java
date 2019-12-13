@@ -22,25 +22,31 @@ import java.util.concurrent.TimeUnit;
 
 public final class MultiBlockTask {
 
-    private final Map<ChunkPosition,  List<Pair<Location, BlockData>>> blocksCache = Maps.newConcurrentMap();
+    private final Map<ChunkPosition, List<Pair<Location, BlockData>>> blocksCache = Maps.newConcurrentMap();
+    private final Map<ChunkPosition, List<Location>> tileEntities = Maps.newConcurrentMap();
     private final WildBusterPlugin plugin;
     private final OfflinePlayer offlinePlayer;
     private final PlayerBuster playerBuster;
+    private final boolean remover;
 
     private boolean submitted = false;
 
-    public MultiBlockTask(WildBusterPlugin plugin, OfflinePlayer offlinePlayer, PlayerBuster playerBuster){
+    public MultiBlockTask(WildBusterPlugin plugin, OfflinePlayer offlinePlayer, PlayerBuster playerBuster, boolean remover){
         this.plugin = plugin;
         this.offlinePlayer = offlinePlayer;
         this.playerBuster = playerBuster;
+        this.remover = remover;
     }
 
-    public void setBlock(Location location, BlockData blockData){
+    public void setBlock(Location location, BlockData blockData, boolean tileEntity){
         if(submitted)
             throw new IllegalArgumentException("This MultiBlockChange was already submitted.");
 
         ChunkPosition chunkPosition = ChunkPosition.of(location);
         blocksCache.computeIfAbsent(chunkPosition, pairs -> new ArrayList<>()).add(new Pair<>(location, blockData));
+
+        if(tileEntity)
+            tileEntities.computeIfAbsent(chunkPosition, list -> new ArrayList<>()).add(location);
     }
 
     public void submitUpdate(Runnable onFinish){
@@ -82,6 +88,8 @@ public final class MultiBlockTask {
 
                    plugin.getNMSAdapter().refreshLight(chunk);
                    plugin.getNMSAdapter().refreshChunk(playerList, chunk);
+                   if(remover && tileEntities.containsKey(chunkPosition))
+                       plugin.getNMSAdapter().clearTileEntities(chunk, tileEntities.get(chunkPosition));
                });
 
                blocksCache.clear();
