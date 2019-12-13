@@ -48,9 +48,7 @@ public final class MultiBlockTask {
         for(Map.Entry<ChunkPosition, List<Pair<Location, BlockData>>> entry : blocksCache.entrySet()){
             executor.execute(() -> {
                 for(Pair<Location, BlockData> pair : entry.getValue()) {
-                    synchronized (MultiBlockTask.class) {
-                        plugin.getNMSAdapter().setFastBlock(pair.key, pair.value);
-                    }
+                    plugin.getNMSAdapter().setFastBlock(pair.key, pair.value);
                 }
             });
         }
@@ -66,14 +64,13 @@ public final class MultiBlockTask {
 
            Bukkit.getScheduler().runTask(plugin, () -> {
                blocksCache.keySet().forEach(chunkPosition -> {
-                   if(plugin.getCoreProtectHook() instanceof CoreProtectHook_CoreProtect) {
-                       blocksCache.get(chunkPosition).forEach(pair -> {
+                   blocksCache.get(chunkPosition).forEach(pair -> {
+                       if(plugin.getCoreProtectHook() instanceof CoreProtectHook_CoreProtect)
                            plugin.getCoreProtectHook().recordBlockChange(offlinePlayer, pair.key, pair.value, pair.value.getType() != Material.AIR);
 
-                           if(pair.value.hasContents())
-                               ((InventoryHolder) pair.key.getBlock().getState()).getInventory().setContents(pair.value.getContents());
-                       });
-                   }
+                       if(pair.value.hasContents())
+                           ((InventoryHolder) pair.key.getBlock().getState()).getInventory().setContents(pair.value.getContents());
+                   });
 
                    plugin.getNMSAdapter().refreshChunk(Bukkit.getWorld(chunkPosition.getWorld()).getChunkAt(chunkPosition.getX(), chunkPosition.getZ()));
                });

@@ -22,6 +22,7 @@ public interface PlayerBuster {
 
     int getCurrentLevel();
 
+    @Deprecated
     int getTaskID();
 
     List<BlockData> getRemovedBlocks();

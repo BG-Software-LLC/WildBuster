@@ -13,21 +13,22 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 
 import java.util.List;
 
 @SuppressWarnings("unused")
 public final class BlocksListener implements Listener {
 
-    private WildBusterPlugin instance;
+    private WildBusterPlugin plugin;
 
-    public BlocksListener(WildBusterPlugin instance){
-        this.instance = instance;
+    public BlocksListener(WildBusterPlugin plugin){
+        this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerBusterPlace(BlockPlaceEvent e){
-        ChunkBuster chunkBuster = instance.getBustersManager().getChunkBuster(e.getItemInHand());
+        ChunkBuster chunkBuster = plugin.getBustersManager().getChunkBuster(e.getItemInHand());
 
         //Checks if a player-buster was placed
         if(chunkBuster == null)
@@ -41,7 +42,7 @@ public final class BlocksListener implements Listener {
             return;
         }
 
-        List<PlayerBuster> busters = instance.getBustersManager().getPlayerBusters(e.getPlayer());
+        List<PlayerBuster> busters = plugin.getBustersManager().getPlayerBusters(e.getPlayer());
 
         //Checks if the player has too many running busters
         int limit = PlayerUtils.getBustersLimit(e.getPlayer());
@@ -53,7 +54,7 @@ public final class BlocksListener implements Listener {
         Chunk chunk = e.getBlockPlaced().getChunk();
 
         //Checks if the chunk is currently busted
-        if(instance.getBustersManager().isChunkBusted(chunk)){
+        if(plugin.getBustersManager().isChunkBusted(chunk)){
             Locale.CHUNK_ALREADY_BUSTED.send(e.getPlayer());
             return;
         }
@@ -75,9 +76,16 @@ public final class BlocksListener implements Listener {
             e.getPlayer().getInventory().removeItem(chunkBuster.getBusterItem());
 
         //Register the player-buster in the system
-        instance.getBustersManager().createPlayerBuster(e.getPlayer(), e.getBlockPlaced().getLocation(), chunkBuster);
+        plugin.getBustersManager().createPlayerBuster(e.getPlayer(), e.getBlockPlaced().getLocation(), chunkBuster);
 
-        Locale.PLACED_BUSTER.send(e.getPlayer(), instance.getSettings().timeBeforeRunning / 20);
+        Locale.PLACED_BUSTER.send(e.getPlayer(), plugin.getSettings().timeBeforeRunning / 20);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onChunkUnload(ChunkUnloadEvent e){
+        PlayerBuster playerBuster = plugin.getBustersManager().getPlayerBuster(e.getChunk());
+        if(playerBuster != null)
+            e.setCancelled(true);
     }
 
 }
