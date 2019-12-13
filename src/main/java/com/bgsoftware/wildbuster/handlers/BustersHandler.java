@@ -92,7 +92,7 @@ public final class BustersHandler implements BustersManager {
 
     @Override
     public PlayerBuster loadPlayerBuster(String busterName, UUID uuid, World world, boolean cancelStatus, boolean notifyStatus, int currentLevel, List<Chunk> chunksList, List<BlockData> removedBlocks) {
-        PlayerBuster playerBuster = new WPlayerBuster(busterName, uuid, world, cancelStatus, notifyStatus, currentLevel, chunksList, removedBlocks);
+        PlayerBuster playerBuster = new WPlayerBuster(busterName, uuid, world, cancelStatus, notifyStatus, currentLevel, chunksList, removedBlocks, null);
         playerBusters.add(playerBuster);
         chunksList.forEach(chunk -> chunksToPlayerBusters.put(ChunkPosition.of(chunk), playerBuster));
         return playerBuster;

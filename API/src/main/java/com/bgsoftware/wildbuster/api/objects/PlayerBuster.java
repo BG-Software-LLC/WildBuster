@@ -3,8 +3,10 @@ package com.bgsoftware.wildbuster.api.objects;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.Timer;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
@@ -25,6 +27,8 @@ public interface PlayerBuster {
     @Deprecated
     int getTaskID();
 
+    Timer getBusterTimer();
+
     List<BlockData> getRemovedBlocks();
 
     boolean isCancelled();
@@ -40,5 +44,7 @@ public interface PlayerBuster {
     void runCancelTask();
 
     void deleteBuster(boolean giveBusterItem);
+
+    List<Player> getNearbyPlayers();
 
 }

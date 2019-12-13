@@ -14,10 +14,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_7_R4.CraftChunk;
 import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
+import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_7_R4.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
@@ -44,10 +46,10 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
     }
 
     @Override
-    public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
+    public void refreshChunk(List<Player> playerList, org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        for(Object entityHuman : chunk.world.players){
-            EntityPlayer entityPlayer = (EntityPlayer) entityHuman;
+        for(Player player : playerList) {
+            EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
             entityPlayer.playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 65535, entityPlayer.playerConnection.networkManager.getVersion()));
         }
     }

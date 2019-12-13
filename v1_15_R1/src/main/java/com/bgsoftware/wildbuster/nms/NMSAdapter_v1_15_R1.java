@@ -6,8 +6,6 @@ import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.ChatMessageType;
 import net.minecraft.server.v1_15_R1.Chunk;
 import net.minecraft.server.v1_15_R1.ChunkSection;
-import net.minecraft.server.v1_15_R1.EntityHuman;
-import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.IBlockData;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent;
 import net.minecraft.server.v1_15_R1.ItemStack;
@@ -27,6 +25,7 @@ import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
@@ -51,12 +50,10 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
     }
 
     @Override
-    public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
+    public void refreshChunk(List<Player> playerList, org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        for(EntityHuman entityHuman : chunk.world.getPlayers()){
-            EntityPlayer entityPlayer = (EntityPlayer) entityHuman;
-            entityPlayer.playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, 65535));
-        }
+        for(Player player : playerList)
+            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, 65535));
     }
 
     @Override

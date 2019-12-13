@@ -2,6 +2,7 @@ package com.bgsoftware.wildbuster.utils.blocks;
 
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
+import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 import com.bgsoftware.wildbuster.hooks.CoreProtectHook_CoreProtect;
 import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
@@ -9,6 +10,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.util.ArrayList;
@@ -23,12 +25,14 @@ public final class MultiBlockTask {
     private final Map<ChunkPosition,  List<Pair<Location, BlockData>>> blocksCache = Maps.newConcurrentMap();
     private final WildBusterPlugin plugin;
     private final OfflinePlayer offlinePlayer;
+    private final PlayerBuster playerBuster;
 
     private boolean submitted = false;
 
-    public MultiBlockTask(WildBusterPlugin plugin, OfflinePlayer offlinePlayer){
+    public MultiBlockTask(WildBusterPlugin plugin, OfflinePlayer offlinePlayer, PlayerBuster playerBuster){
         this.plugin = plugin;
         this.offlinePlayer = offlinePlayer;
+        this.playerBuster = playerBuster;
     }
 
     public void setBlock(Location location, BlockData blockData){
@@ -64,6 +68,7 @@ public final class MultiBlockTask {
            }
 
            Bukkit.getScheduler().runTask(plugin, () -> {
+               List<Player> playerList = playerBuster.getNearbyPlayers();
                blocksCache.keySet().forEach(chunkPosition -> {
                    blocksCache.get(chunkPosition).forEach(pair -> {
                        if(plugin.getCoreProtectHook() instanceof CoreProtectHook_CoreProtect)
@@ -76,7 +81,7 @@ public final class MultiBlockTask {
                    Chunk chunk = Bukkit.getWorld(chunkPosition.getWorld()).getChunkAt(chunkPosition.getX(), chunkPosition.getZ());
 
                    plugin.getNMSAdapter().refreshLight(chunk);
-                   plugin.getNMSAdapter().refreshChunk(chunk);
+                   plugin.getNMSAdapter().refreshChunk(playerList, chunk);
                });
 
                blocksCache.clear();

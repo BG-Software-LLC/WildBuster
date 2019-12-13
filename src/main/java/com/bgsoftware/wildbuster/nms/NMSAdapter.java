@@ -8,13 +8,15 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
+
 public interface NMSAdapter {
 
     String getVersion();
 
     void setFastBlock(Location location, BlockData blockData);
 
-    void refreshChunk(Chunk chunk);
+    void refreshChunk(List<Player> playerList, Chunk chunk);
 
     void refreshLight(Chunk chunk);
 

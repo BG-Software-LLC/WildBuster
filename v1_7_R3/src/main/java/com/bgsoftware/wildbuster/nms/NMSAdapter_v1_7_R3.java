@@ -4,7 +4,6 @@ import com.bgsoftware.wildbuster.api.objects.BlockData;
 import net.minecraft.server.v1_7_R3.Block;
 import net.minecraft.server.v1_7_R3.Chunk;
 import net.minecraft.server.v1_7_R3.ChunkSection;
-import net.minecraft.server.v1_7_R3.EntityPlayer;
 import net.minecraft.server.v1_7_R3.ItemStack;
 import net.minecraft.server.v1_7_R3.NBTTagCompound;
 import net.minecraft.server.v1_7_R3.NBTTagList;
@@ -14,10 +13,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_7_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_7_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_7_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_7_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_7_R3.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
@@ -44,10 +45,10 @@ public final class NMSAdapter_v1_7_R3 implements NMSAdapter {
     }
 
     @Override
-    public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
+    public void refreshChunk(List<Player> playerList, org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        for(Object object : chunk.world.players)
-            ((EntityPlayer) object).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 65535));
+        for(Player player : playerList)
+            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 65535));
     }
 
     @Override

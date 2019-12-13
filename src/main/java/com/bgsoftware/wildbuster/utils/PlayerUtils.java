@@ -4,6 +4,7 @@ import com.bgsoftware.wildbuster.Locale;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
@@ -40,13 +41,18 @@ public final class PlayerUtils {
 
         for(PermissionAttachmentInfo permissionAttachmentInfo : player.getEffectivePermissions()){
             if((matcher = pattern.matcher(permissionAttachmentInfo.getPermission())).matches()){
-                int permissionLimit = Integer.valueOf(matcher.group(1));
+                int permissionLimit = Integer.parseInt(matcher.group(1));
                 if(permissionLimit > limit)
                     limit = permissionLimit;
             }
         }
 
-        return limit < 0 ? 0 : limit;
+        return Math.max(limit, 0);
+    }
+
+    public static boolean isCloseEnough(Location location, Chunk chunk){
+        int chunkX = location.getBlockX() >> 4, chunkZ = location.getBlockZ() >> 4;
+        return Math.abs(chunkX - chunk.getX()) <= 32 && Math.abs(chunkZ - chunk.getZ()) <= 32;
     }
 
 }
