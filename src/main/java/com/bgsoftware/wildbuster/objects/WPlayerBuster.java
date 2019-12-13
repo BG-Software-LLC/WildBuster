@@ -241,7 +241,7 @@ public final class WPlayerBuster implements PlayerBuster {
 
                                     BlockData blockData = new WBlockData(block, inventoryHolder);
 
-                                    if (plugin.getSettings().reverseMode)
+                                    if (plugin.getSettings().reverseMode && !cancelStatus)
                                         removedBlocks.add(blockData);
 
                                     multiBlockTask.setBlock(block.getLocation(), WBlockData.AIR, tileEntities.contains(block.getLocation()));
