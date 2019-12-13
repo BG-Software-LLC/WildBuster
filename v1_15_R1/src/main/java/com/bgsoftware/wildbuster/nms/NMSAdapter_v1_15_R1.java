@@ -47,6 +47,7 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
             chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
 
         chunkSection.setType(location.getBlockX() & 15, location.getBlockY() & 15, location.getBlockZ() & 15, Block.getByCombinedId(blockData.getCombinedId()));
+        chunk.world.getChunkProvider().getLightEngine().a(new BlockPosition(location.getBlockX() & 15, location.getBlockY(), location.getBlockZ() & 15), chunkSection.c());
     }
 
     @Override
@@ -56,6 +57,11 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
             EntityPlayer entityPlayer = (EntityPlayer) entityHuman;
             entityPlayer.playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, 65535));
         }
+    }
+
+    @Override
+    public void refreshLight(org.bukkit.Chunk chunk) {
+
     }
 
     @Override

@@ -16,6 +16,8 @@ public interface NMSAdapter {
 
     void refreshChunk(Chunk chunk);
 
+    void refreshLight(Chunk chunk);
+
     void sendActionBar(Player player, String message);
 
     int getMaterialId(Material type);

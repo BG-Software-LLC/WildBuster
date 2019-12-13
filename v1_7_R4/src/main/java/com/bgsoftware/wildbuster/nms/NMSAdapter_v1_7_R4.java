@@ -53,6 +53,11 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
     }
 
     @Override
+    public void refreshLight(org.bukkit.Chunk chunk) {
+        ((CraftChunk) chunk).getHandle().initLighting();
+    }
+
+    @Override
     public void sendActionBar(Player pl, String message) {
         //No action bar in 1.7
     }

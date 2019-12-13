@@ -57,6 +57,11 @@ public final class NMSAdapter_v1_10_R1 implements NMSAdapter {
     }
 
     @Override
+    public void refreshLight(org.bukkit.Chunk chunk) {
+        ((CraftChunk) chunk).getHandle().initLighting();
+    }
+
+    @Override
     public void sendActionBar(Player pl, String message) {
         IChatBaseComponent chatBaseComponent = IChatBaseComponent.ChatSerializer.a("{\"text\":\"" + message + "\"}");
         PacketPlayOutChat packet = new PacketPlayOutChat(chatBaseComponent, (byte) 2);

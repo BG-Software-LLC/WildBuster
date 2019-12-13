@@ -5,6 +5,7 @@ import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.hooks.CoreProtectHook_CoreProtect;
 import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -72,7 +73,10 @@ public final class MultiBlockTask {
                            ((InventoryHolder) pair.key.getBlock().getState()).getInventory().setContents(pair.value.getContents());
                    });
 
-                   plugin.getNMSAdapter().refreshChunk(Bukkit.getWorld(chunkPosition.getWorld()).getChunkAt(chunkPosition.getX(), chunkPosition.getZ()));
+                   Chunk chunk = Bukkit.getWorld(chunkPosition.getWorld()).getChunkAt(chunkPosition.getX(), chunkPosition.getZ());
+
+                   plugin.getNMSAdapter().refreshLight(chunk);
+                   plugin.getNMSAdapter().refreshChunk(chunk);
                });
 
                blocksCache.clear();
