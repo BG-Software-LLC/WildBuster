@@ -58,7 +58,7 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
 
     @Override
     public void refreshLight(org.bukkit.Chunk chunk) {
-
+        ((CraftChunk) chunk).getHandle().e().a();
     }
 
     @Override
