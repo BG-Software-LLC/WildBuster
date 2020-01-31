@@ -23,6 +23,7 @@ import com.bgsoftware.wildbuster.listeners.PlayersListener;
 import com.bgsoftware.wildbuster.metrics.Metrics;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
 import org.bukkit.Bukkit;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
@@ -41,6 +42,8 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
     private BlockBreakProvider blockBreakProvider;
     private CoreProtectHook coreProtectHook;
 
+    private Enchantment glowEnchant;
+
     @Override
     public void onEnable() {
         plugin = this;
@@ -57,6 +60,7 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         getCommand("buster").setTabCompleter(commandsHandler);
 
         loadNMSAdapter();
+        registerGlowEnchantment();
 
         bustersManager = new BustersHandler();
         settingsHandler = new SettingsHandler(this);
@@ -142,6 +146,21 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         }
     }
 
+    private void registerGlowEnchantment(){
+        glowEnchant = nmsAdapter.getGlowEnchant();
+
+        try{
+            Field field = Enchantment.class.getDeclaredField("acceptingNew");
+            field.setAccessible(true);
+            field.set(null, true);
+            field.setAccessible(false);
+        }catch(Exception ignored){}
+
+        try{
+            Enchantment.registerEnchantment(glowEnchant);
+        }catch(Exception ignored){}
+    }
+
     @Override
     public BustersManager getBustersManager() {
         return bustersManager;
@@ -169,6 +188,10 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
 
     public CoreProtectHook getCoreProtectHook() {
         return coreProtectHook;
+    }
+
+    public Enchantment getGlowEnchant() {
+        return glowEnchant;
     }
 
     public static void log(String message){

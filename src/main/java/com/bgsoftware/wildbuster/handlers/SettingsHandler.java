@@ -80,6 +80,10 @@ public final class SettingsHandler {
                     }
                 }
 
+                if(cfg.getBoolean("chunkbusters." + name + ".glow", false)) {
+                    itemBuilder.addEnchant(plugin.getGlowEnchant(), 1);
+                }
+
                 if(cfg.contains("chunkbusters." + name + ".skull")) {
                     itemBuilder.setTexture(cfg.getString("chunkbusters." + name + ".skull"));
                 }

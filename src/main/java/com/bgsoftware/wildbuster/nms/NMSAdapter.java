@@ -5,6 +5,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -38,4 +39,5 @@ public interface NMSAdapter {
 
     boolean isInsideBorder(Location location);
 
+    Enchantment getGlowEnchant();
 }
