@@ -57,7 +57,8 @@ public final class WPlayerBuster implements PlayerBuster {
     private Map<Location, InventoryHolder> blockStateMap = new HashMap<>();
 
     public WPlayerBuster(Player player, Location placedLocation, ChunkBuster buster){
-        this(buster.getName(), player.getUniqueId(), placedLocation.getWorld(), false, true, plugin.getSettings().startingLevel,
+        this(buster.getName(), player.getUniqueId(), placedLocation.getWorld(), false, true,
+                plugin.getSettings().startingLevel == -1 ? placedLocation.getBlockY() : plugin.getSettings().startingLevel,
                 getChunks(player, placedLocation.getChunk(), buster.getRadius()), new ArrayList<>(), placedLocation.getChunk());
     }
 

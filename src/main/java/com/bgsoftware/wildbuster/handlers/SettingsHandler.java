@@ -1,6 +1,7 @@
 package com.bgsoftware.wildbuster.handlers;
 
 import com.bgsoftware.wildbuster.WildBusterPlugin;
+import com.bgsoftware.wildbuster.config.CommentedConfiguration;
 import com.bgsoftware.wildbuster.utils.items.ItemBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -28,13 +29,12 @@ public final class SettingsHandler {
         if(!file.exists())
             plugin.saveResource("config.yml", false);
 
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         oldDataConvertor(cfg);
+        cfg.syncWithConfig(file, plugin.getResource("config.yml"));
 
         bustingInterval = cfg.getLong("busting-interval", 10);
-        int startingLevel = cfg.getInt("starting-level", 255);
-        this.startingLevel = startingLevel > 255 ? 255 : startingLevel;
+        startingLevel = Math.min(cfg.getInt("starting-level", 255), 255);
         stoppingLevel = cfg.getInt("stopping-level", 1);
         bustingLevelsAmount = cfg.getInt("busting-levels-amount", 1);
         defaultLimit = cfg.getInt("default-limit", 2);
@@ -75,7 +75,7 @@ public final class SettingsHandler {
                 if(cfg.contains("chunkbusters." + name + ".enchants")) {
                     for(String line : cfg.getStringList("chunkbusters." + name + ".enchants")){
                         Enchantment enchantment = Enchantment.getByName(line.split(":")[0]);
-                        int level = Integer.valueOf(line.split(":")[1]);
+                        int level = Integer.parseInt(line.split(":")[1]);
                         itemBuilder.addEnchant(enchantment, level);
                     }
                 }
