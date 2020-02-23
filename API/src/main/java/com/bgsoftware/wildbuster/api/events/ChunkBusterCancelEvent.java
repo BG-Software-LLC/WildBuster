@@ -7,6 +7,9 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 
 @SuppressWarnings("unused")
+/**
+ * ChunkBusterCancelEvent is called when a chunk buster is cancelled.
+ */
 public final class ChunkBusterCancelEvent extends PlayerEvent implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
@@ -15,12 +18,20 @@ public final class ChunkBusterCancelEvent extends PlayerEvent implements Cancell
 
     private boolean cancelled;
 
+    /**
+     * The constructor of the event.
+     * @param player The player who cancelled the chunk buster.
+     * @param playerBuster The chunk buster that was cancelled.
+     */
     public ChunkBusterCancelEvent(Player player, PlayerBuster playerBuster){
         super(player);
         this.playerBuster = playerBuster;
         this.cancelled = false;
     }
 
+    /**
+     * Get the chunk buster that was cancelled.
+     */
     public PlayerBuster getPlayerBuster() {
         return playerBuster;
     }

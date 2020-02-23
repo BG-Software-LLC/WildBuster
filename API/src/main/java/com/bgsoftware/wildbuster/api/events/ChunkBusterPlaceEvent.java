@@ -8,6 +8,9 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 
 @SuppressWarnings("unused")
+/**
+ * ChunkBusterPlaceEvent is called when a new chunk buster is placed.
+ */
 public final class ChunkBusterPlaceEvent extends PlayerEvent implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
@@ -17,6 +20,12 @@ public final class ChunkBusterPlaceEvent extends PlayerEvent implements Cancella
 
     private boolean cancelled;
 
+    /**
+     * The constructor of the event.
+     * @param location The location where the chunk buster was placed at.
+     * @param player The player who placed the chunk buster.
+     * @param chunkBuster The chunk buster that was placed.
+     */
     public ChunkBusterPlaceEvent(Location location, Player player, ChunkBuster chunkBuster){
         super(player);
         this.location = location;
@@ -24,10 +33,16 @@ public final class ChunkBusterPlaceEvent extends PlayerEvent implements Cancella
         this.cancelled = false;
     }
 
+    /**
+     * Get the location where the chunk buster was placed at.
+     */
     public Location getLocation() {
         return location.clone();
     }
 
+    /**
+     * Get the chunk buster that was placed.
+     */
     public ChunkBuster getChunkBuster(){
         return chunkBuster;
     }
