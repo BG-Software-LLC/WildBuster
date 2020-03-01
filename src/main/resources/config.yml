@@ -56,6 +56,7 @@ blocked-materials:
 #    type: SPONGE                               The item type of the chunk-buster.
 #    data: 1                                    The item data value of the chunk-buster.
 #    name: '&6Chunk Buster &7(Place to bust)'   The name of the item.
+#    glow: true                                 A glow effect for the chunk-buster item.
 #    lore:                                      A lore of the item.
 #      - '&7Place this chunk buster'
 #      - '&7to bust the chunk!'
