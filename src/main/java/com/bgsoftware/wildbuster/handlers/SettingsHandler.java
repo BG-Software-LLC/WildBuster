@@ -31,7 +31,7 @@ public final class SettingsHandler {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         oldDataConvertor(cfg);
-        cfg.syncWithConfig(file, plugin.getResource("config.yml"));
+        cfg.syncWithConfig(file, plugin.getResource("config.yml"), "chunkbusters");
 
         bustingInterval = cfg.getLong("busting-interval", 10);
         startingLevel = Math.min(cfg.getInt("starting-level", 255), 255);
