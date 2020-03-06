@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -69,7 +70,7 @@ public final class PlayersBustersMenu extends WildMenu {
     private Inventory buildInventory(int page){
         List<PlayerBuster> playerBusters = plugin.getBustersManager().getPlayerBusters(player);
 
-        inventory = Bukkit.createInventory(this, 9 * 5, ChatColor.BOLD + "Player's Active Busters");
+        inventory = createInventory(InventoryType.CHEST, 9 * 5, ChatColor.BOLD + "Player's Active Busters");
 
         //Set busters
         for(int slot = 0; slot < 36 && (page * 36 + slot) < playerBusters.size(); slot++){

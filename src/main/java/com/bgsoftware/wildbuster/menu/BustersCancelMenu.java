@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public final class BustersCancelMenu extends WildMenu {
     }
 
     private Inventory buildInventory(int page){
-        inventory = Bukkit.createInventory(this, 9 * 5, ChatColor.BOLD + "Cancelling Menu");
+        inventory = createInventory(InventoryType.CHEST, 9 * 5, ChatColor.BOLD + "Cancelling Menu");
 
         List<OfflinePlayer> players = new ArrayList<>();
         plugin.getBustersManager().getPlayerBusters().forEach(playerBuster -> {

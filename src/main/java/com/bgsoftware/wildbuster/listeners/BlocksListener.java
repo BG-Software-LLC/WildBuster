@@ -2,13 +2,11 @@ package com.bgsoftware.wildbuster.listeners;
 
 import com.bgsoftware.wildbuster.Locale;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
-import com.bgsoftware.wildbuster.api.events.ChunkBusterPlaceEvent;
 import com.bgsoftware.wildbuster.api.objects.ChunkBuster;
 import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
+import com.bgsoftware.wildbuster.menu.BustersConfirmMenu;
 import com.bgsoftware.wildbuster.utils.PlayerUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -65,20 +63,13 @@ public final class BlocksListener implements Listener {
             return;
         }
 
-        ChunkBusterPlaceEvent event = new ChunkBusterPlaceEvent(e.getBlockPlaced().getLocation(), e.getPlayer(), chunkBuster);
-        Bukkit.getPluginManager().callEvent(event);
+        if(plugin.getSettings().confirmPlacement){
+            BustersConfirmMenu.open(e.getPlayer(), e.getBlockPlaced().getLocation(), chunkBuster);
+        }
+        else{
+            plugin.getBustersManager().handleBusterPlacement(e.getPlayer(), e.getBlockPlaced().getLocation(), chunkBuster);
+        }
 
-        if(event.isCancelled())
-            return;
-
-        //Remove the item from the inventory of the player
-        if(e.getPlayer().getGameMode() != GameMode.CREATIVE)
-            e.getPlayer().getInventory().removeItem(chunkBuster.getBusterItem());
-
-        //Register the player-buster in the system
-        plugin.getBustersManager().createPlayerBuster(e.getPlayer(), e.getBlockPlaced().getLocation(), chunkBuster);
-
-        Locale.PLACED_BUSTER.send(e.getPlayer(), plugin.getSettings().timeBeforeRunning / 20);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

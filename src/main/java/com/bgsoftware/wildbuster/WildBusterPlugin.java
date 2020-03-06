@@ -62,7 +62,7 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         loadNMSAdapter();
         registerGlowEnchantment();
 
-        bustersManager = new BustersHandler();
+        bustersManager = new BustersHandler(this);
         settingsHandler = new SettingsHandler(this);
         dataHandler = new DataHandler(this);
 

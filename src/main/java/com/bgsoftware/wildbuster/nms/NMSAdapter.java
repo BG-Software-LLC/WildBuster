@@ -7,6 +7,8 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -40,4 +42,8 @@ public interface NMSAdapter {
     boolean isInsideBorder(Location location);
 
     Enchantment getGlowEnchant();
+
+    default Object getCustomHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title){
+        return defaultHolder;
+    }
 }

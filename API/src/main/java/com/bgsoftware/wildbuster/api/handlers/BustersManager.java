@@ -119,4 +119,14 @@ public interface BustersManager {
      */
     BlockData getBlockData(Block block);
 
+    /**
+     * Handle placement of chunk buster.
+     * This method will not check for existing busters, permissions and such.
+     * It will only handle the chunk placement event.
+     * @param player The player who placed the chunk buster.
+     * @param location The location the buster was placed at.
+     * @param chunkBuster The chunk buster that was placed.
+     */
+    void handleBusterPlacement(Player player, Location location, ChunkBuster chunkBuster);
+
 }

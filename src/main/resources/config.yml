@@ -47,6 +47,9 @@ time-before-running: 0
 blocked-materials:
 - BEDROCK
 
+# Should a confirm menu be opened when placing a new chunk buster?
+confirm-placement: false
+
 # List of all the chunk-bunkers
 # Do not name 2 chunkbusters the same
 # Example:

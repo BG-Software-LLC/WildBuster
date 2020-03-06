@@ -3,6 +3,7 @@ package com.bgsoftware.wildbuster.nms;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import net.minecraft.server.v1_15_R1.Block;
 import net.minecraft.server.v1_15_R1.BlockPosition;
+import net.minecraft.server.v1_15_R1.ChatMessage;
 import net.minecraft.server.v1_15_R1.ChatMessageType;
 import net.minecraft.server.v1_15_R1.Chunk;
 import net.minecraft.server.v1_15_R1.ChunkSection;
@@ -13,6 +14,7 @@ import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagList;
 import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
 import net.minecraft.server.v1_15_R1.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_15_R1.TileEntityHopper;
 import net.minecraft.server.v1_15_R1.World;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,6 +29,8 @@ import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.InventoryHolder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -185,6 +189,26 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
                 return false;
             }
         };
+    }
+
+    @Override
+    public Object getCustomHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title) {
+        return new CustomTileEntityHopper(defaultHolder, title);
+    }
+
+    private static class CustomTileEntityHopper extends TileEntityHopper {
+
+        private InventoryHolder holder;
+
+        CustomTileEntityHopper(InventoryHolder holder, String title){
+            this.holder = holder;
+            this.setCustomName(new ChatMessage(title));
+        }
+
+        @Override
+        public InventoryHolder getOwner() {
+            return holder;
+        }
     }
 
 }

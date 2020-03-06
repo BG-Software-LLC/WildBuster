@@ -1,5 +1,8 @@
 package com.bgsoftware.wildbuster.handlers;
 
+import com.bgsoftware.wildbuster.Locale;
+import com.bgsoftware.wildbuster.WildBusterPlugin;
+import com.bgsoftware.wildbuster.api.events.ChunkBusterPlaceEvent;
 import com.bgsoftware.wildbuster.api.handlers.BustersManager;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.api.objects.ChunkBuster;
@@ -8,7 +11,9 @@ import com.bgsoftware.wildbuster.objects.WBlockData;
 import com.bgsoftware.wildbuster.objects.WChunkBuster;
 import com.bgsoftware.wildbuster.objects.WPlayerBuster;
 import com.bgsoftware.wildbuster.utils.blocks.ChunkPosition;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -32,6 +37,11 @@ public final class BustersHandler implements BustersManager {
     private final Set<PlayerBuster> playerBusters = new HashSet<>();
     private final Map<ChunkPosition, PlayerBuster> chunksToPlayerBusters = new HashMap<>();
     private final Map<UUID, PlayerBuster> notifyBusters = new HashMap<>();
+    private final WildBusterPlugin plugin;
+
+    public BustersHandler(WildBusterPlugin plugin){
+        this.plugin = plugin;
+    }
 
     @Override
     public ChunkBuster getChunkBuster(String name){
@@ -120,4 +130,21 @@ public final class BustersHandler implements BustersManager {
         return new WBlockData(block, block.getState() instanceof InventoryHolder ? (InventoryHolder) block.getState() : null);
     }
 
+    @Override
+    public void handleBusterPlacement(Player player, Location location, ChunkBuster chunkBuster) {
+        ChunkBusterPlaceEvent event = new ChunkBusterPlaceEvent(location, player, chunkBuster);
+        Bukkit.getPluginManager().callEvent(event);
+
+        if(event.isCancelled())
+            return;
+
+        //Remove the item from the inventory of the player
+        if(player.getGameMode() != GameMode.CREATIVE)
+            player.getInventory().removeItem(chunkBuster.getBusterItem());
+
+        //Register the player-buster in the system
+        createPlayerBuster(player, location, chunkBuster);
+
+        Locale.PLACED_BUSTER.send(player, plugin.getSettings().timeBeforeRunning / 20);
+    }
 }

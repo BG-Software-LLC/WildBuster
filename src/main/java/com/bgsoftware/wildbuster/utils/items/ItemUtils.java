@@ -1,5 +1,6 @@
 package com.bgsoftware.wildbuster.utils.items;
 
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -48,6 +49,15 @@ public final class ItemUtils {
         if(location != null && !additionalItems.isEmpty()){
             for(ItemStack additional : additionalItems.values())
                 location.getWorld().dropItemNaturally(location, additional);
+        }
+    }
+
+    public static ItemStack getWool(DyeColor dyeColor){
+        try{
+            return new ItemStack(Material.valueOf(dyeColor.name() + "_WOOL"));
+        }catch(Exception ex){
+            //noinspection deprecation
+            return new ItemStack(Material.WOOL, 1, dyeColor.getWoolData());
         }
     }
 

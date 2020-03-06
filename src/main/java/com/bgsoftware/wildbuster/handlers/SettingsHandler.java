@@ -17,7 +17,7 @@ public final class SettingsHandler {
 
     public final long bustingInterval, timeBeforeRunning;
     public final int startingLevel, stoppingLevel, bustingLevelsAmount, defaultLimit, minimumCancelLevel;
-    public final boolean onlyInsideClaim, skipAirLevels, reverseMode, cancelGUI;
+    public final boolean onlyInsideClaim, skipAirLevels, reverseMode, cancelGUI, confirmPlacement;
     public final List<String> blockedMaterials;
 
     public SettingsHandler(WildBusterPlugin plugin){
@@ -45,6 +45,7 @@ public final class SettingsHandler {
         minimumCancelLevel = cfg.getInt("minimum-cancel-level", 0);
         timeBeforeRunning = cfg.getLong("time-before-running", 0);
         blockedMaterials = cfg.getStringList("blocked-materials");
+        confirmPlacement = cfg.getBoolean("confirm-placement", false);
 
         plugin.getBustersManager().removeChunkBusters();
 
