@@ -4,6 +4,7 @@ import com.bgsoftware.wildbuster.Locale;
 import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 import com.bgsoftware.wildbuster.utils.items.ItemBuilder;
 import com.bgsoftware.wildbuster.utils.legacy.Materials;
+import com.bgsoftware.wildbuster.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -109,14 +110,14 @@ public final class PlayersBustersMenu extends WildMenu {
 
     public static void open(Player player, OfflinePlayer targetPlayer, int page){
         if(Bukkit.isPrimaryThread()){
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> open(player, targetPlayer, page));
+            Executor.async(() -> open(player, targetPlayer, page));
             return;
         }
 
         PlayersBustersMenu bustersCancelMenu = new PlayersBustersMenu(targetPlayer);
         Inventory inventory = bustersCancelMenu.buildInventory(page);
 
-        Bukkit.getScheduler().runTask(plugin, () -> player.openInventory(inventory));
+        Executor.sync(() -> player.openInventory(inventory));
     }
 
 }

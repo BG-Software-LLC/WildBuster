@@ -2,6 +2,7 @@ package com.bgsoftware.wildbuster.menu;
 
 import com.bgsoftware.wildbuster.utils.items.ItemBuilder;
 import com.bgsoftware.wildbuster.utils.legacy.Materials;
+import com.bgsoftware.wildbuster.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -97,14 +98,14 @@ public final class BustersCancelMenu extends WildMenu {
 
     public static void open(Player player, int page){
         if(Bukkit.isPrimaryThread()){
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> open(player, page));
+            Executor.async(() -> open(player, page));
             return;
         }
 
         BustersCancelMenu bustersCancelMenu = new BustersCancelMenu();
         Inventory inventory = bustersCancelMenu.buildInventory(page);
 
-        Bukkit.getScheduler().runTask(plugin, () -> player.openInventory(inventory));
+        Executor.sync(() -> player.openInventory(inventory));
     }
 
 }

@@ -1,8 +1,7 @@
 package com.bgsoftware.wildbuster.listeners;
 
-import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.menu.WildMenu;
-import org.bukkit.Bukkit;
+import com.bgsoftware.wildbuster.utils.threads.Executor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,12 +17,6 @@ import java.util.UUID;
 
 @SuppressWarnings("unused")
 public final class MenusListener implements Listener {
-
-    private WildBusterPlugin plugin;
-
-    public MenusListener(WildBusterPlugin plugin){
-        this.plugin = plugin;
-    }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onMenuClick(InventoryClickEvent e){
@@ -56,7 +49,7 @@ public final class MenusListener implements Listener {
         Inventory topInventory = e.getView().getTopInventory();
         if(e.getCurrentItem() != null && e.isCancelled() && topInventory != null && topInventory.getHolder() instanceof WildMenu){
             latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
-            Bukkit.getScheduler().runTaskLater(plugin, () -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
+            Executor.sync(() -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
         }
     }
 
@@ -64,7 +57,7 @@ public final class MenusListener implements Listener {
     public void onMenuCloseMonitor(InventoryCloseEvent e){
         if(latestClickedItem.containsKey(e.getPlayer().getUniqueId())){
             ItemStack clickedItem = latestClickedItem.get(e.getPlayer().getUniqueId());
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            Executor.sync(() -> {
                 e.getPlayer().getInventory().removeItem(clickedItem);
                 //noinspection deprecation
                 ((Player) e.getPlayer()).updateInventory();

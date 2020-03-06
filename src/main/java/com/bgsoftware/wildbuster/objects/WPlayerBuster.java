@@ -11,6 +11,7 @@ import com.bgsoftware.wildbuster.utils.PlayerUtils;
 import com.bgsoftware.wildbuster.utils.TimerUtils;
 import com.bgsoftware.wildbuster.utils.blocks.MultiBlockTask;
 import com.bgsoftware.wildbuster.utils.items.ItemUtils;
+import com.bgsoftware.wildbuster.utils.threads.Executor;
 import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -86,7 +87,7 @@ public final class WPlayerBuster implements PlayerBuster {
         }
 
         else{
-            Bukkit.getScheduler().runTaskLater(plugin, this::runRegularTask, plugin.getSettings().timeBeforeRunning);
+            Executor.sync(this::runRegularTask, plugin.getSettings().timeBeforeRunning);
         }
     }
 
@@ -200,7 +201,7 @@ public final class WPlayerBuster implements PlayerBuster {
         List<ChunkSnapshot> chunkSnapshots = new ArrayList<>();
         chunks.forEach(chunk -> chunkSnapshots.add(chunk.getChunkSnapshot(true, false, false)));
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        Executor.async(() -> {
             if(plugin.getSettings().skipAirLevels) {
                 int startingLevel = 0;
 
@@ -355,8 +356,7 @@ public final class WPlayerBuster implements PlayerBuster {
         List<Player> playerList = getNearbyPlayers();
 
         //Refreshing the chunks
-        Bukkit.getScheduler().runTaskLater(plugin, () ->
-                chunks.forEach(chunk -> plugin.getNMSAdapter().refreshChunk(playerList, chunk)), plugin.getSettings().bustingInterval);
+        Executor.async(() -> chunks.forEach(chunk -> plugin.getNMSAdapter().refreshChunk(playerList, chunk)), plugin.getSettings().bustingInterval);
 
         timer.cancel();
         plugin.getBustersManager().removePlayerBuster(this);

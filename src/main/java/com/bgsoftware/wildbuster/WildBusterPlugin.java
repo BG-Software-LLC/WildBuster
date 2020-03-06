@@ -22,7 +22,7 @@ import com.bgsoftware.wildbuster.listeners.MenusListener;
 import com.bgsoftware.wildbuster.listeners.PlayersListener;
 import com.bgsoftware.wildbuster.metrics.Metrics;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
-import org.bukkit.Bukkit;
+import com.bgsoftware.wildbuster.utils.threads.Executor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -53,7 +53,7 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
 
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayersListener(this), this);
-        getServer().getPluginManager().registerEvents(new MenusListener(this), this);
+        getServer().getPluginManager().registerEvents(new MenusListener(), this);
 
         CommandsHandler commandsHandler = new CommandsHandler(this);
         getCommand("buster").setExecutor(commandsHandler);
@@ -79,7 +79,7 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         log("******** ENABLE DONE ********");
 
         //Load hooks on first tick
-        Bukkit.getScheduler().runTask(plugin, this::loadHooks);
+        Executor.sync(this::loadHooks);
     }
 
     @Override

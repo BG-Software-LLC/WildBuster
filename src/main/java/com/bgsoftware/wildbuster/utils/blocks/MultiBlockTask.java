@@ -4,6 +4,7 @@ import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 import com.bgsoftware.wildbuster.hooks.CoreProtectHook_CoreProtect;
+import com.bgsoftware.wildbuster.utils.threads.Executor;
 import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -64,7 +65,7 @@ public final class MultiBlockTask {
             });
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        Executor.async(() -> {
            try{
                executor.shutdown();
                executor.awaitTermination(1, TimeUnit.MINUTES);
@@ -73,7 +74,7 @@ public final class MultiBlockTask {
                return;
            }
 
-           Bukkit.getScheduler().runTask(plugin, () -> {
+           Executor.sync(() -> {
                List<Player> playerList = playerBuster.getNearbyPlayers();
                blocksCache.keySet().forEach(chunkPosition -> {
                    blocksCache.get(chunkPosition).forEach(pair -> {

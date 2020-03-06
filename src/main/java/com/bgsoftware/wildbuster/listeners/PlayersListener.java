@@ -1,12 +1,12 @@
 package com.bgsoftware.wildbuster.listeners;
 
-import org.bukkit.Bukkit;
+import com.bgsoftware.wildbuster.Updater;
+import com.bgsoftware.wildbuster.WildBusterPlugin;
+import com.bgsoftware.wildbuster.utils.threads.Executor;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import com.bgsoftware.wildbuster.Updater;
-import com.bgsoftware.wildbuster.WildBusterPlugin;
 
 @SuppressWarnings("unused")
 public final class PlayersListener implements Listener {
@@ -15,22 +15,22 @@ public final class PlayersListener implements Listener {
     Just notifies me if the server is using WildBuster
      */
 
-    private WildBusterPlugin instance;
+    private WildBusterPlugin plugin;
 
-    public PlayersListener(WildBusterPlugin instance){
-        this.instance = instance;
+    public PlayersListener(WildBusterPlugin plugin){
+        this.plugin = plugin;
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
         if(e.getPlayer().getUniqueId().toString().equals("45713654-41bf-45a1-aa6f-00fe6598703b")){
-            Bukkit.getScheduler().runTaskLater(instance, () ->
+            Executor.sync(() ->
                 e.getPlayer().sendMessage(ChatColor.DARK_GRAY + "[" + ChatColor.WHITE + "WildSeries" + ChatColor.DARK_GRAY + "] " +
-                        ChatColor.GRAY + "This server is using WildBuster v" + instance.getDescription().getVersion()), 5L);
+                        ChatColor.GRAY + "This server is using WildBuster v" + plugin.getDescription().getVersion()), 5L);
         }
 
         if(e.getPlayer().isOp() && Updater.isOutdated()){
-            Bukkit.getScheduler().runTaskLater(instance, () ->
+            Executor.sync(() ->
                 e.getPlayer().sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "WildBuster" +
                         ChatColor.GRAY + " A new version is available (v" + Updater.getLatestVersion() + ")!"), 20L);
         }
