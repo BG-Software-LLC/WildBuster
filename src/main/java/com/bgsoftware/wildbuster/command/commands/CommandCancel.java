@@ -4,7 +4,8 @@ import com.bgsoftware.wildbuster.Locale;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 import com.bgsoftware.wildbuster.command.ICommand;
-import com.bgsoftware.wildbuster.utils.items.ItemUtils;
+import com.bgsoftware.wildbuster.menu.BustersCancelMenu;
+import com.bgsoftware.wildbuster.menu.PlayersBustersMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -61,9 +62,9 @@ public final class CommandCancel implements ICommand {
 
             if(plugin.getSettings().cancelGUI){
                 if(!sender.hasPermission(getPermission() + ".other"))
-                    ((Player) sender).openInventory(ItemUtils.getPlayerMenu((Player) sender,0));
+                    PlayersBustersMenu.open((Player) sender, (Player) sender);
                 else
-                    ((Player) sender).openInventory(ItemUtils.getCancelMenu(0));
+                    BustersCancelMenu.open((Player) sender);
                 return;
             }
 
@@ -86,9 +87,9 @@ public final class CommandCancel implements ICommand {
 
                 try {
                     invalidNumber = chunkSections[1];
-                    chunkX = Integer.valueOf(chunkSections[1]);
+                    chunkX = Integer.parseInt(chunkSections[1]);
                     invalidNumber = chunkSections[2];
-                    chunkZ = Integer.valueOf(chunkSections[2]);
+                    chunkZ = Integer.parseInt(chunkSections[2]);
                 } catch (NumberFormatException ex) {
                     Locale.INVALID_NUMBER.send(sender, invalidNumber);
                     return;
