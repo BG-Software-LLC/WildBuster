@@ -170,6 +170,10 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         return settingsHandler;
     }
 
+    public void setSettings(SettingsHandler settingsHandler){
+        this.settingsHandler = settingsHandler;
+    }
+
     public DataHandler getDataHandler(){
         return dataHandler;
     }

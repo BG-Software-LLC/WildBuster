@@ -9,7 +9,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,14 +103,8 @@ public final class SettingsHandler {
     }
 
     public static void reload(){
-        try{
-            WildBusterPlugin plugin = WildBusterPlugin.getPlugin();
-            Field settings = WildBusterPlugin.class.getDeclaredField("settingsHandler");
-            settings.setAccessible(true);
-            settings.set(plugin, new SettingsHandler(plugin));
-        } catch(NoSuchFieldException | IllegalAccessException ex){
-            ex.printStackTrace();
-        }
+        WildBusterPlugin plugin = WildBusterPlugin.getPlugin();
+        plugin.setSettings(new SettingsHandler(plugin));
     }
 
     private void oldDataConvertor(YamlConfiguration cfg){
