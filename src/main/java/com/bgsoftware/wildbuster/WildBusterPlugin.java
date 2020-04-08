@@ -8,7 +8,7 @@ import com.bgsoftware.wildbuster.handlers.BustersHandler;
 import com.bgsoftware.wildbuster.handlers.DataHandler;
 import com.bgsoftware.wildbuster.handlers.SettingsHandler;
 import com.bgsoftware.wildbuster.hooks.BlockBreakProvider;
-import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_Default;
+import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_GriefPrevention;
 import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_WorldGuard;
 import com.bgsoftware.wildbuster.hooks.CoreProtectHook;
 import com.bgsoftware.wildbuster.hooks.CoreProtectHook_CoreProtect;
@@ -23,10 +23,14 @@ import com.bgsoftware.wildbuster.listeners.PlayersListener;
 import com.bgsoftware.wildbuster.metrics.Metrics;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
 import com.bgsoftware.wildbuster.utils.threads.Executor;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 
 public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
@@ -37,9 +41,9 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
     private SettingsHandler settingsHandler;
     private DataHandler dataHandler;
 
+    private Set<BlockBreakProvider> blockBreakProviders = new HashSet<>();
     private NMSAdapter nmsAdapter;
     private FactionsProvider factionsProvider;
-    private BlockBreakProvider blockBreakProvider;
     private CoreProtectHook coreProtectHook;
 
     private Enchantment glowEnchant;
@@ -115,13 +119,15 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
             factionsProvider = new FactionsProvider_Default();
             log(" - Couldn't find any factions providers, using default one.");
         }
-        //Load block-break provider
+
+        //Load block-break providers
         if(getServer().getPluginManager().isPluginEnabled("WorldGuard")){
-            blockBreakProvider = new BlockBreakProvider_WorldGuard();
+            blockBreakProviders.add(new BlockBreakProvider_WorldGuard());
             log(" - Using WorldGuard as BlockBreakProvider.");
-        }else{
-            blockBreakProvider = new BlockBreakProvider_Default();
-            log(" - Couldn't find any block-break providers, using default one.");
+        }
+        if(getServer().getPluginManager().isPluginEnabled("GriefPrevention")){
+            blockBreakProviders.add(new BlockBreakProvider_GriefPrevention());
+            log(" - Using GriefPrevention as BlockBreakProvider.");
         }
 
         //Load CoreProtect hook
@@ -186,8 +192,8 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         return factionsProvider;
     }
 
-    public BlockBreakProvider getBlockBreakProvider(){
-        return blockBreakProvider;
+    public boolean canBuild(OfflinePlayer player, Block block){
+        return blockBreakProviders.stream().allMatch(p -> p.canBuild(player, block));
     }
 
     public CoreProtectHook getCoreProtectHook() {

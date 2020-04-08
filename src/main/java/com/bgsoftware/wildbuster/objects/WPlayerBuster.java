@@ -236,7 +236,7 @@ public final class WPlayerBuster implements PlayerBuster {
 
                                     if (block.getType() == Material.AIR || blockedMaterials.contains(block.getType().name()) ||
                                             !plugin.getNMSAdapter().isInsideBorder(block.getLocation()) ||
-                                            !plugin.getBlockBreakProvider().canBuild(Bukkit.getPlayer(uuid), block))
+                                            !plugin.canBuild(Bukkit.getPlayer(uuid), block))
                                         continue;
 
                                     InventoryHolder inventoryHolder = blockStateMap.get(block.getLocation());
