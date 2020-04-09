@@ -16,6 +16,7 @@ import com.bgsoftware.wildbuster.hooks.CoreProtectHook_Default;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider_Default;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider_FactionsUUID;
+import com.bgsoftware.wildbuster.hooks.FactionsProvider_FactionsX;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider_MassiveCore;
 import com.bgsoftware.wildbuster.listeners.BlocksListener;
 import com.bgsoftware.wildbuster.listeners.MenusListener;
@@ -107,14 +108,17 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         log(" - Using " + nmsAdapter.getVersion() + " adapter.");
 
         //Load factions provider
-        if(getServer().getPluginManager().isPluginEnabled("Factions")){
-            if(!getServer().getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("drtshock")){
+        if(getServer().getPluginManager().isPluginEnabled("Factions")) {
+            if (!getServer().getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("drtshock")) {
                 factionsProvider = new FactionsProvider_MassiveCore();
                 log(" - Using MassiveCore as FactionsProvider.");
-            }else{
+            } else {
                 factionsProvider = new FactionsProvider_FactionsUUID();
                 log(" - Using FactionsUUID as FactionsProvider.");
             }
+        }else if(getServer().getPluginManager().isPluginEnabled("FactionsX")){
+            factionsProvider = new FactionsProvider_FactionsX();
+            log(" - Using FactionsX as FactionsProvider.");
         }else{
             factionsProvider = new FactionsProvider_Default();
             log(" - Couldn't find any factions providers, using default one.");
