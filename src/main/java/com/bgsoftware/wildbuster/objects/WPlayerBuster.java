@@ -40,7 +40,9 @@ import java.util.stream.Collectors;
 
 public final class WPlayerBuster implements PlayerBuster {
 
-    private static WildBusterPlugin plugin = WildBusterPlugin.getPlugin();
+    private final static WildBusterPlugin plugin = WildBusterPlugin.getPlugin();
+
+    private final Map<Location, InventoryHolder> blockStateMap = new HashMap<>();
 
     private final String busterName;
     private final UUID uuid;
@@ -54,8 +56,6 @@ public final class WPlayerBuster implements PlayerBuster {
     private Timer timer = null;
     private int currentLevel;
     private boolean cancelStatus;
-
-    private Map<Location, InventoryHolder> blockStateMap = new HashMap<>();
 
     public WPlayerBuster(Player player, Location placedLocation, ChunkBuster buster){
         this(buster.getName(), player.getUniqueId(), placedLocation.getWorld(), false, true,
@@ -352,11 +352,6 @@ public final class WPlayerBuster implements PlayerBuster {
         Player pl = Bukkit.getPlayer(uuid);
         if(giveBusterItem && pl != null)
             ItemUtils.addItem(plugin.getBustersManager().getChunkBuster(busterName).getBusterItem(), pl.getInventory(), pl.getLocation());
-
-        List<Player> playerList = getNearbyPlayers();
-
-        //Refreshing the chunks
-        Executor.async(() -> chunks.forEach(chunk -> plugin.getNMSAdapter().refreshChunk(playerList, chunk)), plugin.getSettings().bustingInterval);
 
         timer.cancel();
         plugin.getBustersManager().removePlayerBuster(this);
