@@ -5,11 +5,10 @@ import net.minecraft.server.v1_7_R4.Block;
 import net.minecraft.server.v1_7_R4.Chunk;
 import net.minecraft.server.v1_7_R4.ChunkPosition;
 import net.minecraft.server.v1_7_R4.ChunkSection;
-import net.minecraft.server.v1_7_R4.EntityPlayer;
 import net.minecraft.server.v1_7_R4.ItemStack;
 import net.minecraft.server.v1_7_R4.NBTTagCompound;
 import net.minecraft.server.v1_7_R4.NBTTagList;
-import net.minecraft.server.v1_7_R4.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_7_R4.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.v1_7_R4.TileEntity;
 import net.minecraft.server.v1_7_R4.World;
 import org.bukkit.Location;
@@ -52,12 +51,25 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
     }
 
     @Override
-    public void refreshChunk(List<Player> playerList, org.bukkit.Chunk bukkitChunk) {
+    public void refreshChunk(org.bukkit.Chunk bukkitChunk, List<Location> blocksList, List<Player> playerList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        for(Player player : playerList) {
-            EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
-            entityPlayer.playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 65535, entityPlayer.playerConnection.networkManager.getVersion()));
+        int blocksAmount = blocksList.size();
+        short[] values = new short[blocksAmount];
+
+        Location firstLocation = null;
+
+        int counter = 0;
+        for(Location location : blocksList) {
+            if(firstLocation == null)
+                firstLocation = location;
+
+            values[counter++] = (short) ((location.getBlockX() & 15) << 12 | (location.getBlockZ() & 15) << 8 | location.getBlockY());
         }
+
+        PacketPlayOutMultiBlockChange multiBlockChange = new PacketPlayOutMultiBlockChange(blocksAmount, values, chunk);
+
+        for(Player player : playerList)
+            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(multiBlockChange);
     }
 
     @Override

@@ -11,7 +11,7 @@ import net.minecraft.server.v1_11_R1.ItemStack;
 import net.minecraft.server.v1_11_R1.NBTTagCompound;
 import net.minecraft.server.v1_11_R1.NBTTagList;
 import net.minecraft.server.v1_11_R1.PacketPlayOutChat;
-import net.minecraft.server.v1_11_R1.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_11_R1.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.v1_11_R1.World;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -50,10 +50,25 @@ public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
     }
 
     @Override
-    public void refreshChunk(List<Player> playerList, org.bukkit.Chunk bukkitChunk) {
+    public void refreshChunk(org.bukkit.Chunk bukkitChunk, List<Location> blocksList, List<Player> playerList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        int blocksAmount = blocksList.size();
+        short[] values = new short[blocksAmount];
+
+        Location firstLocation = null;
+
+        int counter = 0;
+        for(Location location : blocksList) {
+            if(firstLocation == null)
+                firstLocation = location;
+
+            values[counter++] = (short) ((location.getBlockX() & 15) << 12 | (location.getBlockZ() & 15) << 8 | location.getBlockY());
+        }
+
+        PacketPlayOutMultiBlockChange multiBlockChange = new PacketPlayOutMultiBlockChange(blocksAmount, values, chunk);
+
         for(Player player : playerList)
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, 65535));
+            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(multiBlockChange);
     }
 
     @Override

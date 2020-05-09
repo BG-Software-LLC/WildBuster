@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public final class MultiBlockTask {
 
@@ -76,21 +77,24 @@ public final class MultiBlockTask {
 
            Executor.sync(() -> {
                List<Player> playerList = playerBuster.getNearbyPlayers();
-               blocksCache.keySet().forEach(chunkPosition -> {
-                   blocksCache.get(chunkPosition).forEach(pair -> {
-                       if(plugin.getCoreProtectHook() instanceof CoreProtectHook_CoreProtect)
+               blocksCache.forEach((chunkPosition, blockDatas) -> {
+                   blockDatas.forEach(pair -> {
+                       if (plugin.getCoreProtectHook() instanceof CoreProtectHook_CoreProtect)
                            plugin.getCoreProtectHook().recordBlockChange(offlinePlayer, pair.key, pair.value, pair.value.getType() != Material.AIR);
 
-                       if(pair.value.hasContents())
+                       if (pair.value.hasContents())
                            ((InventoryHolder) pair.key.getBlock().getState()).getInventory().setContents(pair.value.getContents());
                    });
 
                    Chunk chunk = Bukkit.getWorld(chunkPosition.getWorld()).getChunkAt(chunkPosition.getX(), chunkPosition.getZ());
 
                    plugin.getNMSAdapter().refreshLight(chunk);
-                   plugin.getNMSAdapter().refreshChunk(playerList, chunk);
-                   if(remover && tileEntities.containsKey(chunkPosition))
-                       plugin.getNMSAdapter().clearTileEntities(chunk, tileEntities.get(chunkPosition));
+                   plugin.getNMSAdapter().refreshChunk(chunk, blockDatas.stream().map(Pair::getKey).collect(Collectors.toList()), playerList);
+
+                   List<Location> tileEntities = this.tileEntities.remove(chunkPosition);
+
+                   if (remover && tileEntities != null)
+                       plugin.getNMSAdapter().clearTileEntities(chunk, tileEntities);
                });
 
                blocksCache.clear();
@@ -104,14 +108,17 @@ public final class MultiBlockTask {
 
     private static class Pair<K, V>{
 
-        private K key;
-        private V value;
+        private final K key;
+        private final V value;
 
         Pair(K key, V value){
             this.key = key;
             this.value = value;
         }
 
+        public K getKey() {
+            return key;
+        }
     }
 
 }
