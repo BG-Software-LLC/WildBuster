@@ -84,7 +84,7 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         log("******** ENABLE DONE ********");
 
         //Load hooks on first tick
-        Executor.sync(this::loadHooks);
+        Executor.sync(this::loadHooks, 1L);
     }
 
     @Override
