@@ -1,8 +1,8 @@
 package com.bgsoftware.wildbuster.hooks;
 
-import net.prosavage.manager.GridManager;
-import net.prosavage.manager.PlayerManager;
-import net.prosavage.persist.data.FactionsKt;
+import net.prosavage.factionsx.manager.GridManager;
+import net.prosavage.factionsx.manager.PlayerManager;
+import net.prosavage.factionsx.persist.data.FactionsKt;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
