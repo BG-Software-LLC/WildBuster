@@ -76,7 +76,7 @@ public final class CommandGive implements ICommand {
 
         if(args.length == 4){
             try{
-                amount = Integer.valueOf(args[3]);
+                amount = Integer.parseInt(args[3]);
             } catch (IllegalArgumentException e){
                 Locale.INVALID_NUMBER.send(sender, args[3]);
                 return;
@@ -98,8 +98,9 @@ public final class CommandGive implements ICommand {
 
         if (args.length == 3) {
             List<String> list = new ArrayList<>();
+            String busterName = args[2].toLowerCase();
             for(ChunkBuster chunkBuster : plugin.getBustersManager().getChunkBusters())
-                if(chunkBuster.getName().startsWith(args[2]))
+                if(chunkBuster.getName().toLowerCase().startsWith(busterName))
                     list.add(chunkBuster.getName());
             return list;
         }

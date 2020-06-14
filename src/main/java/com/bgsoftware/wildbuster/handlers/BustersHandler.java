@@ -83,7 +83,7 @@ public final class BustersHandler implements BustersManager {
     @Override
     public ChunkBuster createChunkBuster(String name, int radius, ItemStack busterItem) {
         ChunkBuster chunkBuster = new WChunkBuster(name, radius, busterItem);
-        chunkBusters.put(name, chunkBuster);
+        chunkBusters.put(name.toLowerCase(), chunkBuster);
         return chunkBuster;
     }
 
