@@ -11,6 +11,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 
@@ -45,6 +46,11 @@ public final class MultiBlockTask {
             throw new IllegalArgumentException("This MultiBlockChange was already submitted.");
 
         ChunkPosition chunkPosition = ChunkPosition.of(location);
+        Block upperBlock = location.clone().add(0, 1, 0).getBlock();
+
+        if(plugin.getNMSAdapter().isTallGrass(upperBlock.getType()))
+            blocksCache.computeIfAbsent(chunkPosition, pairs -> new ArrayList<>()).add(new Pair<>(upperBlock.getLocation(), blockData));
+
         blocksCache.computeIfAbsent(chunkPosition, pairs -> new ArrayList<>()).add(new Pair<>(location, blockData));
 
         if(tileEntity)

@@ -207,6 +207,22 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
     }
 
     @Override
+    public boolean isTallGrass(Material type) {
+        switch (type){
+            case SUNFLOWER:
+            case LILAC:
+            case TALL_GRASS:
+            case LARGE_FERN:
+            case ROSE_BUSH:
+            case PEONY:
+            case TALL_SEAGRASS:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    @Override
     public Object getCustomHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title) {
         return new CustomTileEntityHopper(defaultHolder, title);
     }

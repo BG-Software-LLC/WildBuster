@@ -41,6 +41,10 @@ public interface NMSAdapter {
 
     Enchantment getGlowEnchant();
 
+    default boolean isTallGrass(Material type){
+        return type == Material.LONG_GRASS;
+    }
+
     default Object getCustomHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title){
         return defaultHolder;
     }
