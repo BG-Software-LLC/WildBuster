@@ -86,7 +86,7 @@ public final class CommandGive implements ICommand {
         ItemStack item = buster.getBusterItem();
         item.setAmount(amount);
 
-        ItemUtils.addItem(item, target.getInventory(), null);
+        ItemUtils.addItem(item, target.getInventory(), target.getLocation());
 
         Locale.GIVE_SUCCESS.send(sender, amount, buster.getName(), target.getName());
     }
