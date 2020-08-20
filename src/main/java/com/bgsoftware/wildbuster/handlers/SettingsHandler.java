@@ -48,6 +48,9 @@ public final class SettingsHandler {
 
         plugin.getBustersManager().removeChunkBusters();
 
+        if(cfg.hasFailed())
+            return;
+
         for (String name : cfg.getConfigurationSection("chunkbusters").getKeys(false)) {
             int radius = cfg.getInt("chunkbusters." + name + ".radius", 0);
 
