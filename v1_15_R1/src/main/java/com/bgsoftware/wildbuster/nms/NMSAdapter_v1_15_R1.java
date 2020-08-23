@@ -6,6 +6,7 @@ import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.ChatMessage;
 import net.minecraft.server.v1_15_R1.ChatMessageType;
 import net.minecraft.server.v1_15_R1.Chunk;
+import net.minecraft.server.v1_15_R1.ChunkProviderServer;
 import net.minecraft.server.v1_15_R1.ChunkSection;
 import net.minecraft.server.v1_15_R1.IBlockData;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent;
@@ -46,14 +47,19 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
 
     @Override
     public void setFastBlock(Location location, BlockData blockData) {
-        Chunk chunk = ((CraftWorld) location.getWorld()).getHandle().getChunkAt(location.getBlockX() >> 4, location.getBlockZ() >> 4);
-        int indexY = location.getBlockY() >> 4;
+        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        Chunk chunk = ((CraftWorld) location.getWorld()).getHandle().getChunkAtWorldCoords(blockPosition);
+        int indexY = blockPosition.getY() >> 4;
         ChunkSection chunkSection = chunk.getSections()[indexY];
 
         if(chunkSection == null)
             chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
 
-        chunkSection.setType(location.getBlockX() & 15, location.getBlockY() & 15, location.getBlockZ() & 15, Block.getByCombinedId(blockData.getCombinedId()), false);
+        chunkSection.setType(blockPosition.getX() & 15, blockPosition.getY() & 15, blockPosition.getZ() & 15, Block.getByCombinedId(blockData.getCombinedId()), false);
+
+        ChunkProviderServer chunkProviderServer = (ChunkProviderServer) chunk.world.getChunkProvider();
+        chunkProviderServer.getLightEngine().a(blockPosition);
+        chunkProviderServer.flagDirty(blockPosition);
     }
 
     @Override
@@ -80,7 +86,7 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
 
     @Override
     public void refreshLight(org.bukkit.Chunk chunk) {
-        ((CraftChunk) chunk).getHandle().e().a();
+
     }
 
     @Override
