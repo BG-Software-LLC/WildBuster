@@ -15,32 +15,42 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.Method;
+
 public final class BlockBreakProvider_WorldGuard implements BlockBreakProvider {
 
-    private WorldGuardPlugin worldGuard = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
+    private static final WorldGuardPlugin worldGuard = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
+    private static Method canBuildMethod = null;
+
+    static {
+        try{
+            canBuildMethod = worldGuard.getClass().getMethod("canBuild", Player.class, Block.class);
+        }catch (Throwable ignored){}
+    }
 
     @Override
     public boolean canBuild(OfflinePlayer player, Block block) {
-        try {
-            WorldGuardPlatform worldGuardPlatform = WorldGuard.getInstance().getPlatform();
-            RegionContainer regionContainer = worldGuardPlatform.getRegionContainer();
-            com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(block.getWorld());
-            RegionManager regionManager = regionContainer.get(world);
+        if(canBuildMethod != null){
+            try{
+                return (boolean) canBuildMethod.invoke(worldGuard, player, block);
+            }catch (Throwable ignored){}
 
-            if(regionManager == null)
-                return false;
-
-            LocalPlayer localPlayer = worldGuard.wrapOfflinePlayer(player);
-            BlockVector3 blockVector3 = BlockVector3.at(block.getX(), block.getY(), block.getZ());
-            ApplicableRegionSet set = regionManager.getApplicableRegions(blockVector3);
-            return worldGuardPlatform.getSessionManager().hasBypass(localPlayer, world) ||
-                    set.testState(localPlayer, Flags.BUILD) || set.testState(localPlayer, Flags.BLOCK_BREAK);
-        }catch(Throwable ex){
-            try {
-                return (boolean) worldGuard.getClass().getMethod("canBuild", Player.class, Block.class).invoke(worldGuard, player, block);
-            }catch(Exception ignored){}
+            return false;
         }
-        return false;
+
+        WorldGuardPlatform worldGuardPlatform = WorldGuard.getInstance().getPlatform();
+        RegionContainer regionContainer = worldGuardPlatform.getRegionContainer();
+        com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(block.getWorld());
+        RegionManager regionManager = regionContainer.get(world);
+
+        if(regionManager == null)
+            return false;
+
+        LocalPlayer localPlayer = worldGuard.wrapOfflinePlayer(player);
+        BlockVector3 blockVector3 = BlockVector3.at(block.getX(), block.getY(), block.getZ());
+        ApplicableRegionSet set = regionManager.getApplicableRegions(blockVector3);
+
+        return set.testState(localPlayer, Flags.BUILD) || set.testState(localPlayer, Flags.BLOCK_BREAK);
     }
 
 }
