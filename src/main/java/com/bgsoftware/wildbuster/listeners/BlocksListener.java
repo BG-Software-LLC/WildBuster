@@ -18,7 +18,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public final class BlocksListener implements Listener {
 
-    private WildBusterPlugin plugin;
+    private final WildBusterPlugin plugin;
 
     public BlocksListener(WildBusterPlugin plugin){
         this.plugin = plugin;
@@ -74,9 +74,11 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onChunkUnload(ChunkUnloadEvent e){
-        PlayerBuster playerBuster = plugin.getBustersManager().getPlayerBuster(e.getChunk());
-        if(playerBuster != null)
-            e.setCancelled(true);
+        try {
+            PlayerBuster playerBuster = plugin.getBustersManager().getPlayerBuster(e.getChunk());
+            if (playerBuster != null)
+                e.setCancelled(true);
+        }catch (Exception ignored){}
     }
 
 }

@@ -97,6 +97,7 @@ public final class BustersHandler implements BustersManager {
         PlayerBuster playerBuster = new WPlayerBuster(player, placedLocation, buster);
         playerBusters.add(playerBuster);
         playerBuster.getChunks().forEach(chunk -> chunksToPlayerBusters.put(ChunkPosition.of(chunk), playerBuster));
+        plugin.getNMSAdapter().handleChunkUnload(placedLocation.getWorld(), playerBuster.getChunks(), plugin, false);
         return playerBuster;
     }
 
@@ -105,14 +106,16 @@ public final class BustersHandler implements BustersManager {
         PlayerBuster playerBuster = new WPlayerBuster(busterName, uuid, world, cancelStatus, notifyStatus, currentLevel, chunksList, removedBlocks, null);
         playerBusters.add(playerBuster);
         chunksList.forEach(chunk -> chunksToPlayerBusters.put(ChunkPosition.of(chunk), playerBuster));
+        plugin.getNMSAdapter().handleChunkUnload(world, playerBuster.getChunks(), plugin, false);
         return playerBuster;
     }
 
     @Override
-    public void removePlayerBuster(PlayerBuster buster){
-        playerBusters.remove(buster);
-        buster.getChunks().forEach(chunk -> chunksToPlayerBusters.remove(ChunkPosition.of(chunk)));
-        notifyBusters.remove(buster.getUniqueID());
+    public void removePlayerBuster(PlayerBuster playerBuster){
+        playerBusters.remove(playerBuster);
+        playerBuster.getChunks().forEach(chunk -> chunksToPlayerBusters.remove(ChunkPosition.of(chunk)));
+        notifyBusters.remove(playerBuster.getUniqueID());
+        plugin.getNMSAdapter().handleChunkUnload(playerBuster.getWorld(), playerBuster.getChunks(), plugin, true);
     }
 
     @Override

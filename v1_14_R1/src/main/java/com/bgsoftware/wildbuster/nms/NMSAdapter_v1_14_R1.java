@@ -1,5 +1,6 @@
 package com.bgsoftware.wildbuster.nms;
 
+import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockPosition;
@@ -231,6 +232,14 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
     @Override
     public Object getCustomHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title) {
         return new CustomTileEntityHopper(defaultHolder, title);
+    }
+
+    @Override
+    public void handleChunkUnload(org.bukkit.World world, List<org.bukkit.Chunk> chunks, WildBusterPlugin plugin, boolean unload) {
+        if(unload)
+            chunks.forEach(chunk -> world.removePluginChunkTicket(chunk.getX(), chunk.getZ(), plugin));
+        else
+            chunks.forEach(chunk -> world.addPluginChunkTicket(chunk.getX(), chunk.getZ(), plugin));
     }
 
     private static class CustomTileEntityHopper extends TileEntityHopper {

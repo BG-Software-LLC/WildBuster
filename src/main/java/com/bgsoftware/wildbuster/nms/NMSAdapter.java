@@ -1,5 +1,6 @@
 package com.bgsoftware.wildbuster.nms;
 
+import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -48,4 +49,9 @@ public interface NMSAdapter {
     default Object getCustomHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title){
         return defaultHolder;
     }
+
+    default void handleChunkUnload(org.bukkit.World world, List<org.bukkit.Chunk> chunks, WildBusterPlugin plugin, boolean unload){
+
+    }
+
 }
