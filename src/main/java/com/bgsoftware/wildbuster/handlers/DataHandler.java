@@ -5,6 +5,7 @@ import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 import com.bgsoftware.wildbuster.objects.WBlockData;
 import com.bgsoftware.wildbuster.utils.items.ItemUtils;
+import com.bgsoftware.wildbuster.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -143,9 +144,10 @@ public final class DataHandler {
                 }
             }
 
-            //Load player-buster to database
+            // Load player-buster to database
+            // We load it on the second tick of the game so all the plugins can initliaze themselves
+            Executor.sync(() -> plugin.getBustersManager().loadPlayerBuster(busterName, uuid, world, cancelStatus, notifyStatus, currentLevel, chunksList, removedBlocks), 1L);
 
-            plugin.getBustersManager().loadPlayerBuster(busterName, uuid, world, cancelStatus, notifyStatus, currentLevel, chunksList, removedBlocks);
             bustersAmount++;
         }
 
