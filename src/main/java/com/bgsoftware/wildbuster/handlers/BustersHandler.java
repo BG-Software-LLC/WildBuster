@@ -11,6 +11,7 @@ import com.bgsoftware.wildbuster.objects.WBlockData;
 import com.bgsoftware.wildbuster.objects.WChunkBuster;
 import com.bgsoftware.wildbuster.objects.WPlayerBuster;
 import com.bgsoftware.wildbuster.utils.blocks.ChunkPosition;
+import com.bgsoftware.wildbuster.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
@@ -112,10 +113,12 @@ public final class BustersHandler implements BustersManager {
 
     @Override
     public void removePlayerBuster(PlayerBuster playerBuster){
-        playerBusters.remove(playerBuster);
-        playerBuster.getChunks().forEach(chunk -> chunksToPlayerBusters.remove(ChunkPosition.of(chunk)));
-        notifyBusters.remove(playerBuster.getUniqueID());
-        plugin.getNMSAdapter().handleChunkUnload(playerBuster.getWorld(), playerBuster.getChunks(), plugin, true);
+        Executor.sync(() -> {
+            playerBusters.remove(playerBuster);
+            playerBuster.getChunks().forEach(chunk -> chunksToPlayerBusters.remove(ChunkPosition.of(chunk)));
+            notifyBusters.remove(playerBuster.getUniqueID());
+            plugin.getNMSAdapter().handleChunkUnload(playerBuster.getWorld(), playerBuster.getChunks(), plugin, true);
+        });
     }
 
     @Override
