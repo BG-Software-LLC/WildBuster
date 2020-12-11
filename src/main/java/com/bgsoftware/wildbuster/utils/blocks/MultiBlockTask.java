@@ -3,7 +3,7 @@ package com.bgsoftware.wildbuster.utils.blocks;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
-import com.bgsoftware.wildbuster.hooks.CoreProtectHook_CoreProtect;
+import com.bgsoftware.wildbuster.objects.WBlockData;
 import com.bgsoftware.wildbuster.utils.threads.Executor;
 import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 public final class MultiBlockTask {
 
-    private final Map<ChunkPosition, List<Pair<Location, BlockData>>> blocksCache = Maps.newConcurrentMap();
+    private final Map<ChunkPosition, List<BlockCache>> blocksCache = Maps.newConcurrentMap();
     private final Map<ChunkPosition, List<Location>> tileEntities = Maps.newConcurrentMap();
     private final WildBusterPlugin plugin;
     private final OfflinePlayer offlinePlayer;
@@ -48,10 +48,12 @@ public final class MultiBlockTask {
         ChunkPosition chunkPosition = ChunkPosition.of(location);
         Block upperBlock = location.clone().add(0, 1, 0).getBlock();
 
-        if(plugin.getNMSAdapter().isTallGrass(upperBlock.getType()))
-            blocksCache.computeIfAbsent(chunkPosition, pairs -> new ArrayList<>()).add(new Pair<>(upperBlock.getLocation(), blockData));
+        List<BlockCache> blockCaches = blocksCache.computeIfAbsent(chunkPosition, pairs -> new ArrayList<>());
 
-        blocksCache.computeIfAbsent(chunkPosition, pairs -> new ArrayList<>()).add(new Pair<>(location, blockData));
+        if(plugin.getNMSAdapter().isTallGrass(upperBlock.getType()))
+            blockCaches.add(new BlockCache(upperBlock.getLocation(), blockData));
+
+        blockCaches.add(new BlockCache(location, blockData));
 
         if(tileEntity)
             tileEntities.computeIfAbsent(chunkPosition, list -> new ArrayList<>()).add(location);
@@ -64,10 +66,10 @@ public final class MultiBlockTask {
         submitted = true;
 
         ExecutorService executor = Executors.newCachedThreadPool();
-        for(Map.Entry<ChunkPosition, List<Pair<Location, BlockData>>> entry : blocksCache.entrySet()){
+        for(Map.Entry<ChunkPosition, List<BlockCache>> entry : blocksCache.entrySet()){
             executor.execute(() -> {
-                for(Pair<Location, BlockData> pair : entry.getValue()) {
-                    plugin.getNMSAdapter().setFastBlock(pair.key, pair.value);
+                for(BlockCache blockCache : entry.getValue()) {
+                    plugin.getNMSAdapter().setFastBlock(blockCache.location, blockCache.newData);
                 }
             });
         }
@@ -84,18 +86,21 @@ public final class MultiBlockTask {
            Executor.sync(() -> {
                List<Player> playerList = playerBuster.getNearbyPlayers();
                blocksCache.forEach((chunkPosition, blockDatas) -> {
-                   blockDatas.forEach(pair -> {
-                       if (plugin.getCoreProtectHook() instanceof CoreProtectHook_CoreProtect)
-                           plugin.getCoreProtectHook().recordBlockChange(offlinePlayer, pair.key, pair.value, pair.value.getType() != Material.AIR);
+                   blockDatas.forEach(blockCache -> {
+                       plugin.getCoreProtectHook().recordBlockChange(offlinePlayer, blockCache.location,
+                               blockCache.oldData, blockCache.newData.getType() != Material.AIR);
 
-                       if (pair.value.hasContents())
-                           ((InventoryHolder) pair.key.getBlock().getState()).getInventory().setContents(pair.value.getContents());
+                       if (blockCache.newData.hasContents()) {
+                           ((InventoryHolder) blockCache.location.getBlock().getState())
+                                   .getInventory().setContents(blockCache.newData.getContents());
+                       }
                    });
 
                    Chunk chunk = Bukkit.getWorld(chunkPosition.getWorld()).getChunkAt(chunkPosition.getX(), chunkPosition.getZ());
 
                    plugin.getNMSAdapter().refreshLight(chunk);
-                   plugin.getNMSAdapter().refreshChunk(chunk, blockDatas.stream().map(Pair::getKey).collect(Collectors.toList()), playerList);
+                   plugin.getNMSAdapter().refreshChunk(chunk, blockDatas.stream()
+                           .map(BlockCache::getLocation).collect(Collectors.toList()), playerList);
 
                    List<Location> tileEntities = this.tileEntities.remove(chunkPosition);
 
@@ -112,18 +117,19 @@ public final class MultiBlockTask {
 
     }
 
-    private static class Pair<K, V>{
+    private static class BlockCache{
 
-        private final K key;
-        private final V value;
+        private final Location location;
+        private final BlockData oldData, newData;
 
-        Pair(K key, V value){
-            this.key = key;
-            this.value = value;
+        BlockCache(Location location, BlockData newData){
+            this.location = location;
+            this.oldData = new WBlockData(location.getBlock(), null);
+            this.newData = newData;
         }
 
-        public K getKey() {
-            return key;
+        public Location getLocation() {
+            return location;
         }
     }
 
