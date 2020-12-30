@@ -18,9 +18,6 @@ import org.bukkit.inventory.InventoryHolder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public final class MultiBlockTask {
@@ -60,61 +57,50 @@ public final class MultiBlockTask {
     }
 
     public void submitUpdate(Runnable onFinish){
+        if(!Bukkit.isPrimaryThread()){
+            Executor.sync(() -> submitUpdate(onFinish));
+            return;
+        }
+
         if(submitted)
             throw new IllegalArgumentException("This MultiBlockChange was already submitted.");
 
         submitted = true;
 
-        ExecutorService executor = Executors.newCachedThreadPool();
         for(Map.Entry<ChunkPosition, List<BlockCache>> entry : blocksCache.entrySet()){
-            executor.execute(() -> {
-                for(BlockCache blockCache : entry.getValue()) {
-                    plugin.getNMSAdapter().setFastBlock(blockCache.location, blockCache.newData);
-                }
-            });
+            for(BlockCache blockCache : entry.getValue()) {
+                plugin.getNMSAdapter().setFastBlock(blockCache.location, blockCache.newData);
+            }
         }
 
-        Executor.async(() -> {
-           try{
-               executor.shutdown();
-               executor.awaitTermination(1, TimeUnit.MINUTES);
-           }catch(Exception ex){
-               ex.printStackTrace();
-               return;
-           }
+        List<Player> playerList = playerBuster.getNearbyPlayers();
+        blocksCache.forEach((chunkPosition, blockDatas) -> {
+            blockDatas.forEach(blockCache -> {
+                plugin.getCoreProtectHook().recordBlockChange(offlinePlayer, blockCache.location,
+                        blockCache.oldData, blockCache.newData.getType() != Material.AIR);
 
-           Executor.sync(() -> {
-               List<Player> playerList = playerBuster.getNearbyPlayers();
-               blocksCache.forEach((chunkPosition, blockDatas) -> {
-                   blockDatas.forEach(blockCache -> {
-                       plugin.getCoreProtectHook().recordBlockChange(offlinePlayer, blockCache.location,
-                               blockCache.oldData, blockCache.newData.getType() != Material.AIR);
+                if (blockCache.newData.hasContents()) {
+                    ((InventoryHolder) blockCache.location.getBlock().getState())
+                            .getInventory().setContents(blockCache.newData.getContents());
+                }
+            });
 
-                       if (blockCache.newData.hasContents()) {
-                           ((InventoryHolder) blockCache.location.getBlock().getState())
-                                   .getInventory().setContents(blockCache.newData.getContents());
-                       }
-                   });
+            Chunk chunk = Bukkit.getWorld(chunkPosition.getWorld()).getChunkAt(chunkPosition.getX(), chunkPosition.getZ());
 
-                   Chunk chunk = Bukkit.getWorld(chunkPosition.getWorld()).getChunkAt(chunkPosition.getX(), chunkPosition.getZ());
+            plugin.getNMSAdapter().refreshLight(chunk);
+            plugin.getNMSAdapter().refreshChunk(chunk, blockDatas.stream()
+                    .map(BlockCache::getLocation).collect(Collectors.toList()), playerList);
 
-                   plugin.getNMSAdapter().refreshLight(chunk);
-                   plugin.getNMSAdapter().refreshChunk(chunk, blockDatas.stream()
-                           .map(BlockCache::getLocation).collect(Collectors.toList()), playerList);
+            List<Location> tileEntities = this.tileEntities.remove(chunkPosition);
 
-                   List<Location> tileEntities = this.tileEntities.remove(chunkPosition);
-
-                   if (remover && tileEntities != null)
-                       plugin.getNMSAdapter().clearTileEntities(chunk, tileEntities);
-               });
-
-               blocksCache.clear();
-
-               if(onFinish != null)
-                   onFinish.run();
-           });
+            if (remover && tileEntities != null)
+                plugin.getNMSAdapter().clearTileEntities(chunk, tileEntities);
         });
 
+        blocksCache.clear();
+
+        if(onFinish != null)
+            onFinish.run();
     }
 
     private static class BlockCache{
