@@ -108,7 +108,11 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         log(" - Using " + nmsAdapter.getVersion() + " adapter.");
 
         //Load factions provider
-        if(getServer().getPluginManager().isPluginEnabled("Factions")) {
+        if(getServer().getPluginManager().isPluginEnabled("FactionsX")){
+            factionsProvider = new FactionsProvider_FactionsX();
+            log(" - Using FactionsX as FactionsProvider.");
+        }
+        else if(getServer().getPluginManager().isPluginEnabled("Factions")) {
             if (!getServer().getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("drtshock")) {
                 factionsProvider = new FactionsProvider_MassiveCore();
                 log(" - Using MassiveCore as FactionsProvider.");
@@ -116,9 +120,6 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
                 factionsProvider = new FactionsProvider_FactionsUUID();
                 log(" - Using FactionsUUID as FactionsProvider.");
             }
-        }else if(getServer().getPluginManager().isPluginEnabled("FactionsX")){
-            factionsProvider = new FactionsProvider_FactionsX();
-            log(" - Using FactionsX as FactionsProvider.");
         }else{
             factionsProvider = new FactionsProvider_Default();
             log(" - Couldn't find any factions providers, using default one.");
