@@ -9,6 +9,7 @@ import com.bgsoftware.wildbuster.handlers.DataHandler;
 import com.bgsoftware.wildbuster.handlers.SettingsHandler;
 import com.bgsoftware.wildbuster.hooks.BlockBreakProvider;
 import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_GriefPrevention;
+import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_RedProtect;
 import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_WorldGuard;
 import com.bgsoftware.wildbuster.hooks.CoreProtectHook;
 import com.bgsoftware.wildbuster.hooks.CoreProtectHook_CoreProtect;
@@ -133,6 +134,10 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         if(getServer().getPluginManager().isPluginEnabled("GriefPrevention")){
             blockBreakProviders.add(new BlockBreakProvider_GriefPrevention());
             log(" - Using GriefPrevention as BlockBreakProvider.");
+        }
+        if(getServer().getPluginManager().isPluginEnabled("RedProtect")){
+            blockBreakProviders.add(new BlockBreakProvider_RedProtect());
+            log(" - Using RedProtect as BlockBreakProvider.");
         }
 
         //Load CoreProtect hook

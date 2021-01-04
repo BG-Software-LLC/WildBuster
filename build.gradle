@@ -56,6 +56,7 @@ dependencies {
     compileOnly 'com.drtshock:FactionsUUID:latest'
     compileOnly 'net.prosavage:FactionsX:latest'
     compileOnly 'me.ryanhamshire:GriefPrevention:latest'
+    compileOnly 'net.fabiozumbi12:RedProtect:latest'
     compileOnly 'com.bgsoftware:WildStackerAPI:latest'
     compileOnly 'com.sk89q:WorldEdit-7:latest'
     compileOnly 'com.sk89q:WorldGuard-7:latest'
