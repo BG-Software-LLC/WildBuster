@@ -30,6 +30,19 @@ repositories {
     maven { url 'https://repo.bg-software.com/repository/nms/' }
     maven { url 'https://repo.bg-software.com/repository/api/' }
     maven { url 'https://repo.bg-software.com/repository/public-libs/' }
+
+    String mavenUsername = project.hasProperty('mavenUsername') ? project.mavenUsername : System.getenv('mavenUsername');
+    String mavenPassword = project.hasProperty('mavenPassword') ? project.mavenPassword : System.getenv('mavenPassword');
+
+    if(mavenUsername != null && mavenPassword != null) {
+        maven {
+            url 'https://repo.bg-software.com/repository/private-libs/'
+            credentials {
+                username mavenUsername
+                password mavenPassword
+            }
+        }
+    }
 }
 
 dependencies {
@@ -51,6 +64,7 @@ dependencies {
     compileOnly 'com.bgsoftware:WildStackerAPI:latest'
     compileOnly 'com.sk89q:WorldEdit-7:latest'
     compileOnly 'com.sk89q:WorldGuard-7:latest'
+    compileOnly 'me.angeschossen:Lands:latest'
 }
 
 jar {

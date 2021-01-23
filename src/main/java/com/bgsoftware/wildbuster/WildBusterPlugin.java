@@ -9,6 +9,7 @@ import com.bgsoftware.wildbuster.handlers.DataHandler;
 import com.bgsoftware.wildbuster.handlers.SettingsHandler;
 import com.bgsoftware.wildbuster.hooks.BlockBreakProvider;
 import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_GriefPrevention;
+import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_Lands;
 import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_RedProtect;
 import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_WorldGuard;
 import com.bgsoftware.wildbuster.hooks.CoreProtectHook;
@@ -43,7 +44,7 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
     private SettingsHandler settingsHandler;
     private DataHandler dataHandler;
 
-    private Set<BlockBreakProvider> blockBreakProviders = new HashSet<>();
+    private final Set<BlockBreakProvider> blockBreakProviders = new HashSet<>();
     private NMSAdapter nmsAdapter;
     private FactionsProvider factionsProvider;
     private CoreProtectHook coreProtectHook;
@@ -134,6 +135,10 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         if(getServer().getPluginManager().isPluginEnabled("GriefPrevention")){
             blockBreakProviders.add(new BlockBreakProvider_GriefPrevention());
             log(" - Using GriefPrevention as BlockBreakProvider.");
+        }
+        if(getServer().getPluginManager().isPluginEnabled("Lands")){
+            blockBreakProviders.add(new BlockBreakProvider_Lands());
+            log(" - Using Lands as BlockBreakProvider.");
         }
         if(getServer().getPluginManager().isPluginEnabled("RedProtect")){
             blockBreakProviders.add(new BlockBreakProvider_RedProtect());
