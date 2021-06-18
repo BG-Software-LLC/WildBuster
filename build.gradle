@@ -76,7 +76,7 @@ jar {
 
 processResources {
     outputs.upToDateWhen {false}
-    String versionNumber = System.getenv("BUILD_NUMBER") == null ? version + "-1.17" : version + "-1.17-DEVb" + System.getenv("BUILD_NUMBER")
+    String versionNumber = System.getenv("BUILD_NUMBER") == null ? version : version + "-DEVb" + System.getenv("BUILD_NUMBER")
     eachFile { details ->
         if (details.name.contentEquals('plugin.yml')) {
             filter { String line ->
