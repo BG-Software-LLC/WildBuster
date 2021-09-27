@@ -25,7 +25,7 @@ public final class DataHandler {
 
     public DataHandler(WildBusterPlugin plugin){
         this.plugin = plugin;
-        loadBusters();
+        Executor.sync(this::loadBusters, 1L);
     }
 
     public void saveBusters(){
