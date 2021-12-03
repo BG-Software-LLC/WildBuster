@@ -5,6 +5,7 @@ import com.bgsoftware.wildbuster.api.objects.BlockData;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -52,6 +53,10 @@ public interface NMSAdapter {
 
     default void handleChunkUnload(org.bukkit.World world, List<org.bukkit.Chunk> chunks, WildBusterPlugin plugin, boolean unload){
 
+    }
+
+    default int getWorldMinHeight(World world) {
+        return 0;
     }
 
 }

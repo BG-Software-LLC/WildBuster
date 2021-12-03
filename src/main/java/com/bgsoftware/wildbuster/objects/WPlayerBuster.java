@@ -204,7 +204,7 @@ public final class WPlayerBuster implements PlayerBuster {
 
         Executor.async(() -> {
             if(plugin.getSettings().skipAirLevels) {
-                int startingLevel = 0;
+                int startingLevel = plugin.getNMSAdapter().getWorldMinHeight(world);
 
                 for (ChunkSnapshot chunkSnapshot : chunkSnapshots) {
                     for (int x = 0; x < 16; x++) {
@@ -229,7 +229,7 @@ public final class WPlayerBuster implements PlayerBuster {
 
                 MultiBlockTask multiBlockTask = new MultiBlockTask(plugin, offlinePlayer, this, true);
 
-                for (int y = 0; y < levelsAmount; y++) {
+                for (int y = plugin.getNMSAdapter().getWorldMinHeight(world); y < levelsAmount; y++) {
                     //Making sure the buster hasn't reached the stop level
                     if (currentLevel - y >= stopLevel) {
                         for(Chunk chunk : chunks) {

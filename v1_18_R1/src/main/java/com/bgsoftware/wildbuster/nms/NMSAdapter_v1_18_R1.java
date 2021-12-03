@@ -302,6 +302,11 @@ public final class NMSAdapter_v1_18_R1 implements NMSAdapter {
             chunks.forEach(chunk -> world.addPluginChunkTicket(chunk.getX(), chunk.getZ(), plugin));
     }
 
+    @Override
+    public int getWorldMinHeight(org.bukkit.World world) {
+        return world.getMinHeight();
+    }
+
     private static class CustomTileEntityHopper extends TileEntityHopper {
 
         private final InventoryHolder holder;
