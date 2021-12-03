@@ -99,7 +99,7 @@ public final class NMSAdapter_v1_18_R1 implements NMSAdapter {
         Map<Integer, Set<Short>> blocks = new HashMap<>();
 
         for (Location location : blocksList) {
-            Set<Short> shortSet = blocks.computeIfAbsent(location.getBlockY() >> 4, i -> createShortSet());
+            Set<Short> shortSet = blocks.computeIfAbsent(getSectionIndex(getWorld(chunk), location.getBlockY()), i -> createShortSet());
             shortSet.add((short) ((location.getBlockX() & 15) << 8 | (location.getBlockZ() & 15) << 4 | (location.getBlockY() & 15)));
         }
 
