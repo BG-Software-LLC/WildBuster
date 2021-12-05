@@ -29,8 +29,13 @@ public final class SettingsHandler {
 
         File file = new File(plugin.getDataFolder(), "config.yml");
 
-        if(!file.exists())
+        if(!file.exists()) {
             plugin.saveResource(configName, false);
+            if(!configName.equals("config.yml")) {
+                File newFile = new File(plugin.getDataFolder(), configName);
+                newFile.renameTo(file);
+            }
+        }
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         oldDataConvertor(cfg);
