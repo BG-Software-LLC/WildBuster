@@ -1,0 +1,83 @@
+#######################################################
+##                                                   ##
+##             WildBuster Configuration              ##
+##                Developed by Ome_R                 ##
+##                                                   ##
+#######################################################
+
+# How much time should the buster wait between each level (in ticks)?
+busting-interval: 10
+
+# The highest y of the buster (The first Y level)
+# If you want the starting level to be chunk-buster's level, use -1.
+starting-level: 320
+
+# The highest y of the buster (The last Y level)
+stopping-level: -63
+
+# How many levels will be busted every run?
+busting-levels-amount: 1
+
+# How many handlers can one player run together?
+# You can change this limit per player by giving them wildbuster.limit.#
+# Set to 0 to disable this feature
+default-limit: 2
+
+# If you have a Factions plugins, will the buster can be placed inside own claims?
+only-inside-claim: false
+
+# If there is a level without any blocks, it will skip it and continue to the next level without waiting.
+skip-air-levels: true
+
+# When running cancel command, should a gui be opened for the player?
+cancel-gui: true
+
+# When cancelling a buster, should the buster reverse all the blocks that it broke?
+# Note: When this option is disabled, the buster won't save data for the blocks!
+reverse-mode: true
+
+# What is the minimum level to cancel the buster (won't be able to cancel buster if it busted levels below this one)
+minimum-cancel-level: -64
+
+# How much time should be passed before starting to bust the chunk? (in ticks)
+time-before-running: 0
+
+# Blocked block types, which won't be busted by the handlers
+# https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+blocked-materials:
+- BEDROCK
+
+# Should a confirm menu be opened when placing a new chunk buster?
+confirm-placement: false
+
+# List of all the chunk-bunkers
+# Do not name 2 chunkbusters the same
+# Example:
+# chunkbusters:
+#  <buster-name>:
+#    radius: 1                                  The radius of the buster. 1 stands for 1x1 chunks, 3 for 3x3 and so on.
+#    type: SPONGE                               The item type of the chunk-buster.
+#    data: 1                                    The item data value of the chunk-buster.
+#    name: '&6Chunk Buster &7(Place to bust)'   The name of the item.
+#    glow: true                                 A glow effect for the chunk-buster item.
+#    lore:                                      A lore of the item.
+#      - '&7Place this chunk buster'
+#      - '&7to bust the chunk!'
+chunkbusters:
+  regular_buster:
+    radius: 1
+    type: SPONGE
+    data: 1
+    name: '&6Chunk Buster &7(Place to bust)'
+    lore:
+    - '&7Place this chunk buster'
+    - '&7to bust the chunk!'
+  large_buster:
+    #1 stands for 1x1 chunks, 3 for 3x3 and so on.
+    radius: 3
+    type: SPONGE
+    data: 1
+    name: '&cChunk Buster &7(Place to bust)'
+    lore:
+    - '&7Place this chunk buster'
+    - '&7to bust 9 chunks!'

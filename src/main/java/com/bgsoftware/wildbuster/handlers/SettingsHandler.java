@@ -2,6 +2,7 @@ package com.bgsoftware.wildbuster.handlers;
 
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.config.CommentedConfiguration;
+import com.bgsoftware.wildbuster.utils.ServerVersion;
 import com.bgsoftware.wildbuster.utils.items.ItemBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -14,6 +15,8 @@ import java.util.List;
 
 public final class SettingsHandler {
 
+    private static final String configName = ServerVersion.isAtLeast(ServerVersion.v1_18) ? "config118.yml" : "config.yml";
+
     public final long bustingInterval, timeBeforeRunning;
     public final int startingLevel, stoppingLevel, bustingLevelsAmount, defaultLimit, minimumCancelLevel;
     public final boolean onlyInsideClaim, skipAirLevels, reverseMode, cancelGUI, confirmPlacement;
@@ -23,14 +26,15 @@ public final class SettingsHandler {
         WildBusterPlugin.log("Loading configuration started...");
         long startTime = System.currentTimeMillis();
         int bustersAmount = 0;
+
         File file = new File(plugin.getDataFolder(), "config.yml");
 
         if(!file.exists())
-            plugin.saveResource("config.yml", false);
+            plugin.saveResource(configName, false);
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         oldDataConvertor(cfg);
-        cfg.syncWithConfig(file, plugin.getResource("config.yml"), "chunkbusters");
+        cfg.syncWithConfig(file, plugin.getResource(configName), "chunkbusters");
 
         bustingInterval = cfg.getLong("busting-interval", 10);
         startingLevel = Math.min(cfg.getInt("starting-level", 255), 255);
