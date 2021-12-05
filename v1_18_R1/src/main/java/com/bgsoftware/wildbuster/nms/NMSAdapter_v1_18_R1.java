@@ -13,6 +13,7 @@ import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutChat;
 import net.minecraft.network.protocol.game.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.level.ChunkProviderServer;
+import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.World;
 import net.minecraft.world.level.block.Blocks;
@@ -39,7 +40,6 @@ import org.bukkit.inventory.InventoryHolder;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -97,25 +97,14 @@ public final class NMSAdapter_v1_18_R1 implements NMSAdapter {
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, List<Location> blocksList, List<Player> playerList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         Map<Integer, Set<Short>> blocks = new HashMap<>();
+        WorldServer worldServer = getWorld(chunk);
 
-        for (Location location : blocksList) {
-            Set<Short> shortSet = blocks.computeIfAbsent(getSectionIndex(getWorld(chunk), location.getBlockY()), i -> createShortSet());
-            shortSet.add((short) ((location.getBlockX() & 15) << 8 | (location.getBlockZ() & 15) << 4 | (location.getBlockY() & 15)));
+        ChunkProviderServer chunkProviderServer = getChunkProvider(worldServer);
+
+        for(Location location : blocksList) {
+            BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            chunkProviderServer.a(blockPosition);
         }
-
-        ChunkSection[] chunkSections = getSections(chunk);
-
-        Set<PacketPlayOutMultiBlockChange> packetsToSend = new HashSet<>();
-
-        for (Map.Entry<Integer, Set<Short>> entry : blocks.entrySet()) {
-            PacketPlayOutMultiBlockChange packetPlayOutMultiBlockChange = createMultiBlockChangePacket(
-                    SectionPosition.a(getPos(chunk), entry.getKey()), entry.getValue(), chunkSections[entry.getKey()]);
-            if (packetPlayOutMultiBlockChange != null)
-                packetsToSend.add(packetPlayOutMultiBlockChange);
-        }
-
-        for (Player player : playerList)
-            packetsToSend.forEach(packet -> sendPacket(((CraftPlayer) player).getHandle().b, packet));
     }
 
     @SuppressWarnings("all")
