@@ -11,7 +11,6 @@ import net.minecraft.network.chat.ChatMessage;
 import net.minecraft.network.chat.ChatMessageType;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutChat;
-import net.minecraft.network.protocol.game.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.level.ChunkProviderServer;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.item.ItemStack;
@@ -38,7 +37,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,24 +48,9 @@ import static com.bgsoftware.wildbuster.nms.NMSMappings_v1_18_R1.*;
 @SuppressWarnings({"unused", "ConstantConditions"})
 public final class NMSAdapter_v1_18_R1 implements NMSAdapter {
 
-    private static Class<?> SHORT_ARRAY_SET_CLASS = null;
-    private static Constructor<?> MULTI_BLOCK_CHANGE_CONSTRUCTOR = null;
-
-    static {
-        try {
-            SHORT_ARRAY_SET_CLASS = Class.forName("it.unimi.dsi.fastutil.shorts.ShortArraySet");
-            Class<?> shortSetClass = Class.forName("it.unimi.dsi.fastutil.shorts.ShortSet");
-            for (Constructor<?> constructor : PacketPlayOutMultiBlockChange.class.getConstructors()) {
-                if (constructor.getParameterCount() == 4)
-                    MULTI_BLOCK_CHANGE_CONSTRUCTOR = constructor;
-            }
-        } catch (Exception ignored) {
-        }
-    }
-
     @Override
     public String getVersion() {
-        return "v1_17_R1";
+        return "v1_18_R1";
     }
 
     @Override
@@ -104,39 +87,6 @@ public final class NMSAdapter_v1_18_R1 implements NMSAdapter {
         for(Location location : blocksList) {
             BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
             chunkProviderServer.a(blockPosition);
-        }
-    }
-
-    @SuppressWarnings("all")
-    private static Set<Short> createShortSet() {
-//        if (SHORT_ARRAY_SET_CLASS == null)
-//            return new ShortArraySet();
-
-        try {
-            return (Set<Short>) SHORT_ARRAY_SET_CLASS.newInstance();
-        } catch (Throwable ex) {
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
-    private static PacketPlayOutMultiBlockChange createMultiBlockChangePacket(SectionPosition sectionPosition,
-                                                                              Set<Short> shortSet, ChunkSection chunkSection) {
-//        if (MULTI_BLOCK_CHANGE_CONSTRUCTOR == null) {
-//            return new PacketPlayOutMultiBlockChange(
-//                    sectionPosition,
-//                    (ShortSet) shortSet,
-//                    chunkSection,
-//                    true
-//            );
-//        }
-
-        try {
-            return (PacketPlayOutMultiBlockChange) MULTI_BLOCK_CHANGE_CONSTRUCTOR.newInstance(sectionPosition,
-                    shortSet, chunkSection, true);
-        } catch (Throwable ex) {
-            ex.printStackTrace();
-            return null;
         }
     }
 
