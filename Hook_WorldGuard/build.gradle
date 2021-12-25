@@ -3,7 +3,7 @@ group 'Hook_WorldGuard'
 dependencies {
     compileOnly 'com.sk89q:WorldEdit-7:latest'
     compileOnly 'com.sk89q:WorldGuard-7:latest'
-    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly "org.spigotmc:v1_16_R3:latest"
     compileOnly project(":API")
     compileOnly parent
 }
