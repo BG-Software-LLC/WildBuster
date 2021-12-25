@@ -2,11 +2,11 @@ package com.bgsoftware.wildbuster.handlers;
 
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
-import com.bgsoftware.wildbuster.hooks.BlockBreakProvider;
-import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_GriefPrevention;
-import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_Lands;
-import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_RedProtect;
-import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_WorldGuard;
+import com.bgsoftware.wildbuster.hooks.ClaimsProvider;
+import com.bgsoftware.wildbuster.hooks.ClaimsProvider_GriefPrevention;
+import com.bgsoftware.wildbuster.hooks.ClaimsProvider_Lands;
+import com.bgsoftware.wildbuster.hooks.ClaimsProvider_RedProtect;
+import com.bgsoftware.wildbuster.hooks.ClaimsProvider_WorldGuard;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider_Default;
 import com.bgsoftware.wildbuster.hooks.listener.IBusterBlockListener;
@@ -26,7 +26,7 @@ public final class ProvidersHandler {
 
     private final WildBusterPlugin plugin;
 
-    private final Set<BlockBreakProvider> blockBreakProviders = new HashSet<>();
+    private final Set<ClaimsProvider> claimsProviders = new HashSet<>();
     private final Set<IBusterBlockListener> busterBlockListeners = new HashSet<>();
     private FactionsProvider factionsProvider;
 
@@ -41,7 +41,7 @@ public final class ProvidersHandler {
 
             loadGeneralHooks();
             loadFactionProvider();
-            loadBlockBreakProviders();
+            loadClaimsProviders();
 
             WildBusterPlugin.log("Loading providers done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
         }, 1L);
@@ -53,7 +53,7 @@ public final class ProvidersHandler {
     }
 
     public boolean canBuild(OfflinePlayer player, Block block) {
-        return blockBreakProviders.stream().allMatch(p -> p.canBuild(player, block));
+        return claimsProviders.stream().allMatch(p -> p.canBuild(player, block));
     }
 
     public void registerBusterBlockListener(IBusterBlockListener busterBlockListener) {
@@ -87,23 +87,23 @@ public final class ProvidersHandler {
         this.factionsProvider = factionsProvider.get();
     }
 
-    private void loadBlockBreakProviders() {
-        blockBreakProviders.clear();
+    private void loadClaimsProviders() {
+        claimsProviders.clear();
 
         if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
-            blockBreakProviders.add(new BlockBreakProvider_WorldGuard());
+            claimsProviders.add(new ClaimsProvider_WorldGuard());
             WildBusterPlugin.log(" - Using WorldGuard as BlockBreakProvider.");
         }
         if (Bukkit.getPluginManager().isPluginEnabled("GriefPrevention")) {
-            blockBreakProviders.add(new BlockBreakProvider_GriefPrevention());
+            claimsProviders.add(new ClaimsProvider_GriefPrevention());
             WildBusterPlugin.log(" - Using GriefPrevention as BlockBreakProvider.");
         }
         if (Bukkit.getPluginManager().isPluginEnabled("Lands")) {
-            blockBreakProviders.add(new BlockBreakProvider_Lands());
+            claimsProviders.add(new ClaimsProvider_Lands());
             WildBusterPlugin.log(" - Using Lands as BlockBreakProvider.");
         }
         if (Bukkit.getPluginManager().isPluginEnabled("RedProtect")) {
-            blockBreakProviders.add(new BlockBreakProvider_RedProtect());
+            claimsProviders.add(new ClaimsProvider_RedProtect());
             WildBusterPlugin.log(" - Using RedProtect as BlockBreakProvider.");
         }
     }

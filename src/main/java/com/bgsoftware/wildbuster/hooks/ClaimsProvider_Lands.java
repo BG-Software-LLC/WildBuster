@@ -7,11 +7,11 @@ import me.angeschossen.lands.api.role.enums.RoleSetting;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 
-public final class BlockBreakProvider_Lands implements BlockBreakProvider {
+public final class ClaimsProvider_Lands implements ClaimsProvider {
 
     private final LandsIntegration landsIntegration;
 
-    public BlockBreakProvider_Lands(){
+    public ClaimsProvider_Lands(){
         landsIntegration = new LandsIntegration(WildBusterPlugin.getPlugin(), false);
         landsIntegration.initialize();
     }

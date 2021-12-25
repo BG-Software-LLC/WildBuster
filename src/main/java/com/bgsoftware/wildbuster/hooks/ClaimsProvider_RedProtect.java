@@ -5,7 +5,7 @@ import br.net.fabiozumbi12.RedProtect.Bukkit.Region;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 
-public final class BlockBreakProvider_RedProtect implements BlockBreakProvider {
+public final class ClaimsProvider_RedProtect implements ClaimsProvider {
 
     @Override
     public boolean canBuild(OfflinePlayer player, Block block) {

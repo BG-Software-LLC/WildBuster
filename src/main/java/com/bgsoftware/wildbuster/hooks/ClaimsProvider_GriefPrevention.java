@@ -7,7 +7,7 @@ import me.ryanhamshire.GriefPrevention.PlayerData;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 
-public final class BlockBreakProvider_GriefPrevention implements BlockBreakProvider {
+public final class ClaimsProvider_GriefPrevention implements ClaimsProvider {
 
     @Override
     public boolean canBuild(OfflinePlayer player, Block block) {

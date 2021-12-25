@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.Method;
 
-public final class BlockBreakProvider_WorldGuard implements BlockBreakProvider {
+public final class ClaimsProvider_WorldGuard implements ClaimsProvider {
 
     private static final WorldGuardPlugin worldGuard = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
     private static Method canBuildMethod = null;
