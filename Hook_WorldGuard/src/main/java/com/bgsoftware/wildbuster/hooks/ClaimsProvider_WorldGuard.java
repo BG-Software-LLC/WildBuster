@@ -1,5 +1,7 @@
 package com.bgsoftware.wildbuster.hooks;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
@@ -15,35 +17,27 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Method;
-
 public final class ClaimsProvider_WorldGuard implements ClaimsProvider {
 
     private static final WorldGuardPlugin worldGuard = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
-    private static Method canBuildMethod = null;
+    private static final ReflectMethod<Boolean> CAN_BUILD_METHOD = new ReflectMethod<>(WorldGuardPlugin.class,
+            "canBuild", Player.class, Block.class);
 
-    static {
-        try{
-            canBuildMethod = worldGuard.getClass().getMethod("canBuild", Player.class, Block.class);
-        }catch (Throwable ignored){}
+    public ClaimsProvider_WorldGuard() {
+        WildBusterPlugin.log(" - Using WorldGuard as ClaimsProvider.");
     }
 
     @Override
     public boolean canBuild(OfflinePlayer player, Block block) {
-        if(canBuildMethod != null){
-            try{
-                return (boolean) canBuildMethod.invoke(worldGuard, player, block);
-            }catch (Throwable ignored){}
-
-            return false;
-        }
+        if (CAN_BUILD_METHOD.isValid())
+            return CAN_BUILD_METHOD.invoke(worldGuard, player, block);
 
         WorldGuardPlatform worldGuardPlatform = WorldGuard.getInstance().getPlatform();
         RegionContainer regionContainer = worldGuardPlatform.getRegionContainer();
         com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(block.getWorld());
         RegionManager regionManager = regionContainer.get(world);
 
-        if(regionManager == null)
+        if (regionManager == null)
             return false;
 
         LocalPlayer localPlayer = worldGuard.wrapOfflinePlayer(player);
