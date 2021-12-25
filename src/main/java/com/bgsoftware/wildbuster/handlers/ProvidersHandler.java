@@ -70,8 +70,7 @@ public final class ProvidersHandler {
         Optional<FactionsProvider> factionsProvider = Optional.empty();
 
         if (Bukkit.getPluginManager().isPluginEnabled("FactionsX")) {
-            //factionsProvider = new FactionsProvider_FactionsX();
-            //WildBusterPlugin.log(" - Using FactionsX as FactionsProvider.");
+            factionsProvider = createInstance("FactionsProvider_FactionsX");
         } else if (Bukkit.getPluginManager().isPluginEnabled("Factions")) {
             if (!Bukkit.getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("drtshock")) {
                 factionsProvider = createInstance("FactionsProvider_MassiveCore");
