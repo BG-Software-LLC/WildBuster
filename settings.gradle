@@ -23,4 +23,5 @@ include 'Hook_FactionsX'
 include 'Hook_GriefPrevention'
 include 'Hook_RedProtect'
 include 'Hook_WorldGuard'
+include 'Hook_Lands'
 

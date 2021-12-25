@@ -3,7 +3,6 @@ package com.bgsoftware.wildbuster.handlers;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.hooks.ClaimsProvider;
-import com.bgsoftware.wildbuster.hooks.ClaimsProvider_Lands;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider_Default;
 import com.bgsoftware.wildbuster.hooks.listener.IBusterBlockListener;
@@ -96,8 +95,8 @@ public final class ProvidersHandler {
             claimsProvider.ifPresent(claimsProviders::add);
         }
         if (Bukkit.getPluginManager().isPluginEnabled("Lands")) {
-            claimsProviders.add(new ClaimsProvider_Lands());
-            WildBusterPlugin.log(" - Using Lands as BlockBreakProvider.");
+            Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_Lands");
+            claimsProvider.ifPresent(claimsProviders::add);
         }
         if (Bukkit.getPluginManager().isPluginEnabled("RedProtect")) {
             Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_RedProtect");

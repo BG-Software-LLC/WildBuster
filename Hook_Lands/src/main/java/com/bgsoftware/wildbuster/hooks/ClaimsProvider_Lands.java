@@ -11,9 +11,10 @@ public final class ClaimsProvider_Lands implements ClaimsProvider {
 
     private final LandsIntegration landsIntegration;
 
-    public ClaimsProvider_Lands(){
-        landsIntegration = new LandsIntegration(WildBusterPlugin.getPlugin(), false);
+    public ClaimsProvider_Lands(WildBusterPlugin plugin){
+        landsIntegration = new LandsIntegration(plugin, false);
         landsIntegration.initialize();
+        WildBusterPlugin.log(" - Using Lands as ClaimsProvider.");
     }
 
     @Override
