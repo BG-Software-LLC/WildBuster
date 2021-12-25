@@ -1,5 +1,6 @@
 package com.bgsoftware.wildbuster.hooks;
 
+import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.massivecraft.factions.Board;
 import com.massivecraft.factions.FLocation;
 import com.massivecraft.factions.FPlayer;
@@ -9,6 +10,10 @@ import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 
 public final class FactionsProvider_FactionsUUID implements FactionsProvider {
+
+    public FactionsProvider_FactionsUUID() {
+        WildBusterPlugin.log(" - Using FactionsUUID as FactionsProvider.");
+    }
 
     @Override
     public boolean isWilderness(Chunk chunk) {
@@ -28,4 +33,5 @@ public final class FactionsProvider_FactionsUUID implements FactionsProvider {
     public boolean hasBypassMode(Player player) {
         return FPlayers.getInstance().getByPlayer(player).isAdminBypassing();
     }
+
 }

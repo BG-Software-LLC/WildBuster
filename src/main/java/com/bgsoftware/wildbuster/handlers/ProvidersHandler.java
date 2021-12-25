@@ -76,8 +76,7 @@ public final class ProvidersHandler {
             if (!Bukkit.getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("drtshock")) {
                 factionsProvider = createInstance("FactionsProvider_MassiveCore");
             } else {
-                //factionsProvider = new FactionsProvider_FactionsUUID();
-                //WildBusterPlugin.log(" - Using FactionsUUID as FactionsProvider.");
+                factionsProvider = createInstance("FactionsProvider_FactionsUUID");
             }
         }
 

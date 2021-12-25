@@ -56,7 +56,6 @@ dependencies {
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
 
     // Plugin Hooks
-    compileOnly 'com.drtshock:FactionsUUID:latest'
     compileOnly 'net.prosavage:FactionsX:latest'
     compileOnly 'me.ryanhamshire:GriefPrevention:latest'
     compileOnly 'net.fabiozumbi12:RedProtect:latest'
