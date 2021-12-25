@@ -1,5 +1,6 @@
 package com.bgsoftware.wildbuster.hooks;
 
+import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.entity.BoardColl;
 import com.massivecraft.factions.entity.Faction;
@@ -9,6 +10,10 @@ import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 
 public final class FactionsProvider_MassiveCore implements FactionsProvider {
+
+    public FactionsProvider_MassiveCore() {
+        WildBusterPlugin.log(" - Using MassiveCore as FactionsProvider.");
+    }
 
     @Override
     public boolean isWilderness(Chunk chunk) {
@@ -26,4 +31,5 @@ public final class FactionsProvider_MassiveCore implements FactionsProvider {
     public boolean hasBypassMode(Player player) {
         return MPlayer.get(player).isOverriding();
     }
+
 }

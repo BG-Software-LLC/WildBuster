@@ -9,9 +9,6 @@ import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_RedProtect;
 import com.bgsoftware.wildbuster.hooks.BlockBreakProvider_WorldGuard;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider_Default;
-import com.bgsoftware.wildbuster.hooks.FactionsProvider_FactionsUUID;
-import com.bgsoftware.wildbuster.hooks.FactionsProvider_FactionsX;
-import com.bgsoftware.wildbuster.hooks.FactionsProvider_MassiveCore;
 import com.bgsoftware.wildbuster.hooks.listener.IBusterBlockListener;
 import com.bgsoftware.wildbuster.utils.threads.Executor;
 import org.bukkit.Bukkit;
@@ -70,21 +67,26 @@ public final class ProvidersHandler {
     }
 
     private void loadFactionProvider() {
+        Optional<FactionsProvider> factionsProvider = Optional.empty();
+
         if (Bukkit.getPluginManager().isPluginEnabled("FactionsX")) {
-            factionsProvider = new FactionsProvider_FactionsX();
-            WildBusterPlugin.log(" - Using FactionsX as FactionsProvider.");
+            //factionsProvider = new FactionsProvider_FactionsX();
+            //WildBusterPlugin.log(" - Using FactionsX as FactionsProvider.");
         } else if (Bukkit.getPluginManager().isPluginEnabled("Factions")) {
             if (!Bukkit.getPluginManager().getPlugin("Factions").getDescription().getAuthors().contains("drtshock")) {
-                factionsProvider = new FactionsProvider_MassiveCore();
-                WildBusterPlugin.log(" - Using MassiveCore as FactionsProvider.");
+                factionsProvider = createInstance("FactionsProvider_MassiveCore");
             } else {
-                factionsProvider = new FactionsProvider_FactionsUUID();
-                WildBusterPlugin.log(" - Using FactionsUUID as FactionsProvider.");
+                //factionsProvider = new FactionsProvider_FactionsUUID();
+                //WildBusterPlugin.log(" - Using FactionsUUID as FactionsProvider.");
             }
-        } else {
-            factionsProvider = new FactionsProvider_Default();
+        }
+
+        if (!factionsProvider.isPresent()) {
+            factionsProvider = Optional.of(new FactionsProvider_Default());
             WildBusterPlugin.log(" - Couldn't find any factions providers, using default one.");
         }
+
+        this.factionsProvider = factionsProvider.get();
     }
 
     private void loadBlockBreakProviders() {
