@@ -13,10 +13,10 @@ import java.util.regex.Pattern;
 
 public final class PlayerUtils {
 
-    private static WildBusterPlugin plugin = WildBusterPlugin.getPlugin();
+    private static final WildBusterPlugin plugin = WildBusterPlugin.getPlugin();
 
     public static boolean canBustChunk(Player player, Chunk chunk){
-        FactionsProvider factionsProvider = plugin.getFactionsProvider();
+        FactionsProvider factionsProvider = plugin.getProviders().getFactionsProvider();
         if(factionsProvider.hasBypassMode(player))
             return true;
         else if(plugin.getSettings().onlyInsideClaim){

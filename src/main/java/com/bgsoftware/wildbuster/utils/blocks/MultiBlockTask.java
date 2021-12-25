@@ -3,6 +3,7 @@ package com.bgsoftware.wildbuster.utils.blocks;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
+import com.bgsoftware.wildbuster.hooks.listener.IBusterBlockListener;
 import com.bgsoftware.wildbuster.objects.WBlockData;
 import com.bgsoftware.wildbuster.utils.threads.Executor;
 import com.google.common.collect.Maps;
@@ -76,8 +77,9 @@ public final class MultiBlockTask {
         List<Player> playerList = playerBuster.getNearbyPlayers();
         blocksCache.forEach((chunkPosition, blockDatas) -> {
             blockDatas.forEach(blockCache -> {
-                plugin.getCoreProtectHook().recordBlockChange(offlinePlayer, blockCache.location,
-                        blockCache.oldData, blockCache.newData.getType() != Material.AIR);
+                plugin.getProviders().notifyBusterBlockListeners(offlinePlayer, blockCache.location,
+                        blockCache.oldData, blockCache.newData.getType() == Material.AIR ?
+                                IBusterBlockListener.Action.BLOCK_BREAK : IBusterBlockListener.Action.BLOCK_PLACE);
 
                 if (blockCache.newData.hasContents()) {
                     ((InventoryHolder) blockCache.location.getBlock().getState())

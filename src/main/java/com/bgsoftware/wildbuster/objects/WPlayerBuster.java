@@ -240,7 +240,7 @@ public final class WPlayerBuster implements PlayerBuster {
                                     if (block.getType() == Material.AIR ||
                                             blockedMaterials.contains(block.getType().name()) ||
                                             !plugin.getNMSAdapter().isInsideBorder(block.getLocation()) ||
-                                            !plugin.canBuild(offlinePlayer, block))
+                                            !plugin.getProviders().canBuild(offlinePlayer, block))
                                         continue;
 
                                     InventoryHolder inventoryHolder = blockStateMap.get(block.getLocation());
