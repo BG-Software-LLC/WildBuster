@@ -4,7 +4,6 @@ import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.hooks.ClaimsProvider;
 import com.bgsoftware.wildbuster.hooks.ClaimsProvider_Lands;
-import com.bgsoftware.wildbuster.hooks.ClaimsProvider_RedProtect;
 import com.bgsoftware.wildbuster.hooks.ClaimsProvider_WorldGuard;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider_Default;
@@ -102,8 +101,8 @@ public final class ProvidersHandler {
             WildBusterPlugin.log(" - Using Lands as BlockBreakProvider.");
         }
         if (Bukkit.getPluginManager().isPluginEnabled("RedProtect")) {
-            claimsProviders.add(new ClaimsProvider_RedProtect());
-            WildBusterPlugin.log(" - Using RedProtect as BlockBreakProvider.");
+            Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_RedProtect");
+            claimsProvider.ifPresent(claimsProviders::add);
         }
     }
 

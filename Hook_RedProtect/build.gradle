@@ -1,0 +1,13 @@
+group 'Hook_RedProtect'
+
+dependencies {
+    compileOnly 'net.fabiozumbi12:RedProtect:latest'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly parent
+}
+
+if (project.hasProperty('hook.compile_redprotect') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_redprotect").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}
