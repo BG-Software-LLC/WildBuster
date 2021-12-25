@@ -1,5 +1,6 @@
 package com.bgsoftware.wildbuster.hooks;
 
+import com.bgsoftware.wildbuster.WildBusterPlugin;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.DataStore;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -8,6 +9,11 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 
 public final class ClaimsProvider_GriefPrevention implements ClaimsProvider {
+
+    public ClaimsProvider_GriefPrevention() {
+        WildBusterPlugin.log(" - Using GriefPrevention as ClaimsProvider.");
+
+    }
 
     @Override
     public boolean canBuild(OfflinePlayer player, Block block) {

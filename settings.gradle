@@ -20,4 +20,5 @@ include 'Hook_CoreProtect'
 include 'Hook_MassiveFactions'
 include 'Hook_FactionsUUID'
 include 'Hook_FactionsX'
+include 'Hook_GriefPrevention'
 

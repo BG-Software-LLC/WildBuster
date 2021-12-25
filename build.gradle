@@ -56,7 +56,6 @@ dependencies {
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
 
     // Plugin Hooks
-    compileOnly 'me.ryanhamshire:GriefPrevention:latest'
     compileOnly 'net.fabiozumbi12:RedProtect:latest'
     compileOnly 'com.bgsoftware:WildStackerAPI:latest'
     compileOnly 'com.sk89q:WorldEdit-7:latest'

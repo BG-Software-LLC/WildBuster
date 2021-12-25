@@ -3,7 +3,6 @@ package com.bgsoftware.wildbuster.handlers;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.hooks.ClaimsProvider;
-import com.bgsoftware.wildbuster.hooks.ClaimsProvider_GriefPrevention;
 import com.bgsoftware.wildbuster.hooks.ClaimsProvider_Lands;
 import com.bgsoftware.wildbuster.hooks.ClaimsProvider_RedProtect;
 import com.bgsoftware.wildbuster.hooks.ClaimsProvider_WorldGuard;
@@ -95,8 +94,8 @@ public final class ProvidersHandler {
             WildBusterPlugin.log(" - Using WorldGuard as BlockBreakProvider.");
         }
         if (Bukkit.getPluginManager().isPluginEnabled("GriefPrevention")) {
-            claimsProviders.add(new ClaimsProvider_GriefPrevention());
-            WildBusterPlugin.log(" - Using GriefPrevention as BlockBreakProvider.");
+            Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_GriefPrevention");
+            claimsProvider.ifPresent(claimsProviders::add);
         }
         if (Bukkit.getPluginManager().isPluginEnabled("Lands")) {
             claimsProviders.add(new ClaimsProvider_Lands());
