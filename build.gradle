@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'WildBuster'
-version = "2.5.1"
+version = "2.5.2"
 
 allprojects {
     apply plugin: 'java'
