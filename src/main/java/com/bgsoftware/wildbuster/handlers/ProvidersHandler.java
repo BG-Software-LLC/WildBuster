@@ -112,7 +112,7 @@ public final class ProvidersHandler {
 
     private void registerHook(String className) {
         try {
-            Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.hooks.support." + className);
+            Class<?> clazz = Class.forName("com.bgsoftware.wildbuster.hooks." + className);
             Method registerMethod = clazz.getMethod("register", WildBusterPlugin.class);
             registerMethod.invoke(null, plugin);
         } catch (Exception ignored) {
@@ -121,7 +121,7 @@ public final class ProvidersHandler {
 
     private <T> Optional<T> createInstance(String className) {
         try {
-            Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.hooks.provider." + className);
+            Class<?> clazz = Class.forName("com.bgsoftware.wildbuster.hooks." + className);
             try {
                 Method compatibleMethod = clazz.getDeclaredMethod("isCompatible");
                 if (!(boolean) compatibleMethod.invoke(null))
