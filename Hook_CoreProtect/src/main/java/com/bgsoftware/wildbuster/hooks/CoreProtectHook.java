@@ -14,6 +14,7 @@ public final class CoreProtectHook {
 
     private static WildBusterPlugin plugin;
     private static CoreProtect coreProtect;
+    private static boolean warningDisplayed = false;
 
     public static void register(WildBusterPlugin plugin) {
         CoreProtectHook.plugin = plugin;
@@ -37,7 +38,7 @@ public final class CoreProtectHook {
                     coreProtect.getAPI().logPlacement(offlinePlayer.getName(), location, blockData.getType(), blockData.getData());
                     break;
             }
-        } else if (coreProtect.getAPI().APIVersion() == 6) {
+        } else if (coreProtect.getAPI().APIVersion() <= 8) {
             switch (action) {
                 case BLOCK_BREAK:
                     coreProtect.getAPI().logRemoval(offlinePlayer.getName(), location, blockData.getType(),
@@ -48,6 +49,11 @@ public final class CoreProtectHook {
                             (org.bukkit.block.data.BlockData) plugin.getNMSAdapter().getBlockData(blockData.getCombinedId()));
                     break;
             }
+        }
+        else if(!warningDisplayed) {
+            warningDisplayed = true;
+            WildBusterPlugin.log("&cDetected an API version of CoreProtect that is not supported: " + coreProtect.getAPI().APIVersion());
+            WildBusterPlugin.log("&cOpen an issue on github regarding this!");
         }
     }
 

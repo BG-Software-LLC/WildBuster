@@ -77,9 +77,13 @@ public final class MultiBlockTask {
         List<Player> playerList = playerBuster.getNearbyPlayers();
         blocksCache.forEach((chunkPosition, blockDatas) -> {
             blockDatas.forEach(blockCache -> {
-                plugin.getProviders().notifyBusterBlockListeners(offlinePlayer, blockCache.location,
-                        blockCache.oldData, blockCache.newData.getType() == Material.AIR ?
-                                IBusterBlockListener.Action.BLOCK_BREAK : IBusterBlockListener.Action.BLOCK_PLACE);
+                if(blockCache.newData.getType() == Material.AIR) {
+                    plugin.getProviders().notifyBusterBlockListeners(offlinePlayer, blockCache.location,
+                            blockCache.oldData, IBusterBlockListener.Action.BLOCK_BREAK);
+                } else {
+                    plugin.getProviders().notifyBusterBlockListeners(offlinePlayer, blockCache.location,
+                            blockCache.newData, IBusterBlockListener.Action.BLOCK_PLACE);
+                }
 
                 if (blockCache.newData.hasContents()) {
                     ((InventoryHolder) blockCache.location.getBlock().getState())
