@@ -2,32 +2,35 @@ package com.bgsoftware.wildbuster.nms;
 
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
-import net.minecraft.server.v1_15_R1.Block;
-import net.minecraft.server.v1_15_R1.BlockPosition;
-import net.minecraft.server.v1_15_R1.ChatMessage;
-import net.minecraft.server.v1_15_R1.ChatMessageType;
-import net.minecraft.server.v1_15_R1.Chunk;
-import net.minecraft.server.v1_15_R1.ChunkProviderServer;
-import net.minecraft.server.v1_15_R1.ChunkSection;
-import net.minecraft.server.v1_15_R1.IBlockData;
-import net.minecraft.server.v1_15_R1.IChatBaseComponent;
-import net.minecraft.server.v1_15_R1.ItemStack;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import net.minecraft.server.v1_15_R1.NBTTagList;
-import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
-import net.minecraft.server.v1_15_R1.PacketPlayOutMultiBlockChange;
-import net.minecraft.server.v1_15_R1.TileEntityHopper;
-import net.minecraft.server.v1_15_R1.World;
+import net.minecraft.SystemUtils;
+import net.minecraft.core.BlockPosition;
+import net.minecraft.core.SectionPosition;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.chat.ChatMessage;
+import net.minecraft.network.chat.ChatMessageType;
+import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.network.protocol.game.PacketPlayOutChat;
+import net.minecraft.server.level.ChunkProviderServer;
+import net.minecraft.server.level.WorldServer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.World;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.TileEntity;
+import net.minecraft.world.level.block.entity.TileEntityHopper;
+import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.level.chunk.Chunk;
+import net.minecraft.world.level.chunk.ChunkSection;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.WorldBorder;
-import org.bukkit.craftbukkit.v1_15_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_15_R1.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_18_R2.CraftChunk;
+import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_18_R2.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
@@ -36,53 +39,55 @@ import org.bukkit.inventory.InventoryHolder;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
+import static com.bgsoftware.wildbuster.nms.NMSMappings_v1_18_R2.*;
+
 @SuppressWarnings({"unused", "ConstantConditions"})
-public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
+public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
 
     @Override
     public String getVersion() {
-        return "v1_15_R1";
+        return "v1_18_R2";
     }
 
     @Override
     public void setFastBlock(Location location, BlockData blockData) {
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        Chunk chunk = ((CraftWorld) location.getWorld()).getHandle().getChunkAtWorldCoords(blockPosition);
-        int indexY = blockPosition.getY() >> 4;
-        ChunkSection chunkSection = chunk.getSections()[indexY];
+        Chunk chunk = getChunkAtWorldCoords(((CraftWorld) location.getWorld()).getHandle(), blockPosition);
+        int indexY = getSectionIndex(chunk, getY(blockPosition));
 
-        if(chunkSection == null)
-            chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
+        ChunkSection[] chunkSections = getSections(chunk);
 
-        chunkSection.setType(blockPosition.getX() & 15, blockPosition.getY() & 15, blockPosition.getZ() & 15, Block.getByCombinedId(blockData.getCombinedId()), false);
+        ChunkSection chunkSection = chunkSections[indexY];
 
-        ChunkProviderServer chunkProviderServer = (ChunkProviderServer) chunk.world.getChunkProvider();
-        chunkProviderServer.getLightEngine().a(blockPosition);
-        chunkProviderServer.flagDirty(blockPosition);
+        if (chunkSection == null) {
+            int yOffset = SectionPosition.a(getY(blockPosition));
+            chunkSection = chunkSections[indexY] = new ChunkSection(yOffset, chunk.biomeRegistry);
+        }
+
+        setType(chunkSection, getX(blockPosition) & 15, getY(blockPosition) & 15, getZ(blockPosition) & 15,
+                getByCombinedId(blockData.getCombinedId()), false);
+
+        ChunkProviderServer chunkProviderServer = getChunkProvider(getWorld(chunk));
+        getLightEngine(getWorld(chunk)).a(blockPosition);
+        flagDirty(chunkProviderServer, blockPosition);
     }
 
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, List<Location> blocksList, List<Player> playerList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        int blocksAmount = blocksList.size();
-        short[] values = new short[blocksAmount];
+        Map<Integer, Set<Short>> blocks = new HashMap<>();
+        WorldServer worldServer = getWorld(chunk);
 
-        Location firstLocation = null;
+        ChunkProviderServer chunkProviderServer = getChunkProvider(worldServer);
 
-        int counter = 0;
         for(Location location : blocksList) {
-            if(firstLocation == null)
-                firstLocation = location;
-
-            values[counter++] = (short) ((location.getBlockX() & 15) << 12 | (location.getBlockZ() & 15) << 8 | location.getBlockY());
+            BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            chunkProviderServer.a(blockPosition);
         }
-
-        PacketPlayOutMultiBlockChange multiBlockChange = new PacketPlayOutMultiBlockChange(blocksAmount, values, chunk);
-
-        for(Player player : playerList)
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(multiBlockChange);
     }
 
     @Override
@@ -93,18 +98,21 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
     @Override
     public void clearTileEntities(org.bukkit.Chunk bukkitChunk, List<Location> tileEntities) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        new HashMap<>(chunk.tileEntities).forEach(((blockPosition, tileEntity) -> {
-            Location location = new Location(bukkitChunk.getWorld(), blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
-            if(tileEntities.contains(location))
-                chunk.tileEntities.remove(blockPosition);
+
+        Map<BlockPosition, TileEntity> chunkTileEntities = getTileEntities(chunk);
+
+        new HashMap<>(chunkTileEntities).forEach(((blockPosition, tileEntity) -> {
+            Location location = new Location(bukkitChunk.getWorld(), getX(blockPosition), getY(blockPosition), getZ(blockPosition));
+            if (tileEntities.contains(location))
+                chunkTileEntities.remove(blockPosition);
         }));
     }
 
     @Override
     public void sendActionBar(Player pl, String message) {
         IChatBaseComponent chatBaseComponent = IChatBaseComponent.ChatSerializer.a("{\"text\":\"" + message + "\"}");
-        PacketPlayOutChat packet = new PacketPlayOutChat(chatBaseComponent, ChatMessageType.GAME_INFO);
-        ((CraftPlayer) pl).getHandle().playerConnection.sendPacket(packet);
+        PacketPlayOutChat packet = new PacketPlayOutChat(chatBaseComponent, ChatMessageType.c, SystemUtils.c);
+        sendPacket(((CraftPlayer) pl).getHandle().b, packet);
     }
 
     @Override
@@ -115,7 +123,7 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
     @Override
     public int getMaterialData(org.bukkit.block.Block block) {
         World world = ((CraftWorld) block.getWorld()).getHandle();
-        IBlockData blockData = world.getType(new BlockPosition(block.getX(), block.getY(), block.getZ()));
+        IBlockData blockData = getType(world, new BlockPosition(block.getX(), block.getY(), block.getZ()));
         return CraftMagicNumbers.toLegacyData(blockData);
     }
 
@@ -123,37 +131,36 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
     public int getCombinedId(org.bukkit.block.Block block) {
         World world = ((CraftWorld) block.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
-        return Block.getCombinedId(world.getType(blockPosition));
+        return NMSMappings_v1_18_R2.getCombinedId(getType(world, blockPosition));
     }
 
     @Override
     public Object getBlockData(int combined) {
-        return CraftBlockData.fromData(Block.getByCombinedId(combined));
+        return CraftBlockData.fromData(getByCombinedId(combined));
     }
 
     @Override
     public org.bukkit.inventory.ItemStack getPlayerSkull(org.bukkit.inventory.ItemStack itemStack, String texture) {
         ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
 
-        NBTTagCompound nbtTagCompound = nmsItem.hasTag() ? nmsItem.getTag() : new NBTTagCompound();
+        NBTTagCompound nbtTagCompound = getOrCreateTag(nmsItem);
 
-        NBTTagCompound skullOwner = nbtTagCompound.hasKey("SkullOwner") ? nbtTagCompound.getCompound("SkullOwner") : new NBTTagCompound();
+        NBTTagCompound skullOwner = hasKey(nbtTagCompound, "SkullOwner") ?
+                getCompound(nbtTagCompound, "SkullOwner") : new NBTTagCompound();
 
         NBTTagCompound properties = new NBTTagCompound();
 
         NBTTagList textures = new NBTTagList();
         NBTTagCompound signature = new NBTTagCompound();
-        signature.setString("Value", texture);
+        setString(signature, "Value", texture);
         textures.add(signature);
 
-        properties.set("textures", textures);
+        set(properties,"textures", textures);
 
-        skullOwner.set("Properties", properties);
-        skullOwner.setString("Id", UUID.randomUUID().toString());
+        set(skullOwner, "Properties", properties);
+        setString(skullOwner, "Id", UUID.randomUUID().toString());
 
-        nbtTagCompound.set("SkullOwner", skullOwner);
-
-        nmsItem.setTag(nbtTagCompound);
+        set(nbtTagCompound, "SkullOwner", skullOwner);
 
         return CraftItemStack.asBukkitCopy(nmsItem);
     }
@@ -163,7 +170,7 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
         WorldBorder worldBorder = location.getWorld().getWorldBorder();
         Location center = worldBorder.getCenter();
         int radius = (int) worldBorder.getSize() / 2;
-        return location.getBlockX() <=(center.getBlockX() + radius) && location.getBlockX() >= (center.getBlockX() - radius) &&
+        return location.getBlockX() <= (center.getBlockX() + radius) && location.getBlockX() >= (center.getBlockX() - radius) &&
                 location.getBlockZ() <= (center.getBlockZ() + radius) && location.getBlockZ() >= (center.getBlockZ() - radius);
     }
 
@@ -215,18 +222,10 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
 
     @Override
     public boolean isTallGrass(Material type) {
-        switch (type){
-            case SUNFLOWER:
-            case LILAC:
-            case TALL_GRASS:
-            case LARGE_FERN:
-            case ROSE_BUSH:
-            case PEONY:
-            case TALL_SEAGRASS:
-                return true;
-            default:
-                return false;
-        }
+        return switch (type) {
+            case SUNFLOWER, LILAC, TALL_GRASS, LARGE_FERN, ROSE_BUSH, PEONY, TALL_SEAGRASS -> true;
+            default -> false;
+        };
     }
 
     @Override
@@ -236,19 +235,25 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
 
     @Override
     public void handleChunkUnload(org.bukkit.World world, List<org.bukkit.Chunk> chunks, WildBusterPlugin plugin, boolean unload) {
-        if(unload)
+        if (unload)
             chunks.forEach(chunk -> world.removePluginChunkTicket(chunk.getX(), chunk.getZ(), plugin));
         else
             chunks.forEach(chunk -> world.addPluginChunkTicket(chunk.getX(), chunk.getZ(), plugin));
+    }
+
+    @Override
+    public int getWorldMinHeight(org.bukkit.World world) {
+        return world.getMinHeight();
     }
 
     private static class CustomTileEntityHopper extends TileEntityHopper {
 
         private final InventoryHolder holder;
 
-        CustomTileEntityHopper(InventoryHolder holder, String title){
+        CustomTileEntityHopper(InventoryHolder holder, String title) {
+            super(BlockPosition.b, NMSMappings_v1_18_R2.getBlockData(Blocks.a));
             this.holder = holder;
-            this.setCustomName(new ChatMessage(title));
+            this.a(new ChatMessage(title));
         }
 
         @Override
