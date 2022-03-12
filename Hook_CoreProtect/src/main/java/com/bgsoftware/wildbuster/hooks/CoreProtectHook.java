@@ -38,7 +38,7 @@ public final class CoreProtectHook {
                     coreProtect.getAPI().logPlacement(offlinePlayer.getName(), location, blockData.getType(), blockData.getData());
                     break;
             }
-        } else if (coreProtect.getAPI().APIVersion() <= 8) {
+        } else if (coreProtect.getAPI().APIVersion() <= 9) {
             switch (action) {
                 case BLOCK_BREAK:
                     coreProtect.getAPI().logRemoval(offlinePlayer.getName(), location, blockData.getType(),
