@@ -56,7 +56,7 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
     @Override
     public void setFastBlock(Location location, BlockData blockData) {
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        Chunk chunk = getChunkAtWorldCoords(((CraftWorld) location.getWorld()).getHandle(), blockPosition);
+        Chunk chunk = getChunkAt(((CraftWorld) location.getWorld()).getHandle(), blockPosition);
         int indexY = getSectionIndex(chunk, getY(blockPosition));
 
         ChunkSection[] chunkSections = getSections(chunk);
@@ -68,21 +68,21 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
             chunkSection = chunkSections[indexY] = new ChunkSection(yOffset, chunk.biomeRegistry);
         }
 
-        setType(chunkSection, getX(blockPosition) & 15, getY(blockPosition) & 15, getZ(blockPosition) & 15,
+        setBlockState(chunkSection, getX(blockPosition) & 15, getY(blockPosition) & 15, getZ(blockPosition) & 15,
                 getByCombinedId(blockData.getCombinedId()), false);
 
-        ChunkProviderServer chunkProviderServer = getChunkProvider(getWorld(chunk));
-        getLightEngine(getWorld(chunk)).a(blockPosition);
-        flagDirty(chunkProviderServer, blockPosition);
+        ChunkProviderServer chunkProviderServer = getChunkSource(getLevel(chunk));
+        getLightEngine(getLevel(chunk)).a(blockPosition);
+        blockChanged(chunkProviderServer, blockPosition);
     }
 
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, List<Location> blocksList, List<Player> playerList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         Map<Integer, Set<Short>> blocks = new HashMap<>();
-        WorldServer worldServer = getWorld(chunk);
+        WorldServer worldServer = getLevel(chunk);
 
-        ChunkProviderServer chunkProviderServer = getChunkProvider(worldServer);
+        ChunkProviderServer chunkProviderServer = getChunkSource(worldServer);
 
         for(Location location : blocksList) {
             BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
@@ -99,7 +99,7 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
     public void clearTileEntities(org.bukkit.Chunk bukkitChunk, List<Location> tileEntities) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
 
-        Map<BlockPosition, TileEntity> chunkTileEntities = getTileEntities(chunk);
+        Map<BlockPosition, TileEntity> chunkTileEntities = getBlockEntities(chunk);
 
         new HashMap<>(chunkTileEntities).forEach(((blockPosition, tileEntity) -> {
             Location location = new Location(bukkitChunk.getWorld(), getX(blockPosition), getY(blockPosition), getZ(blockPosition));
@@ -112,7 +112,7 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
     public void sendActionBar(Player pl, String message) {
         IChatBaseComponent chatBaseComponent = IChatBaseComponent.ChatSerializer.a("{\"text\":\"" + message + "\"}");
         PacketPlayOutChat packet = new PacketPlayOutChat(chatBaseComponent, ChatMessageType.c, SystemUtils.c);
-        sendPacket(((CraftPlayer) pl).getHandle().b, packet);
+        send(((CraftPlayer) pl).getHandle().b, packet);
     }
 
     @Override
@@ -123,7 +123,7 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
     @Override
     public int getMaterialData(org.bukkit.block.Block block) {
         World world = ((CraftWorld) block.getWorld()).getHandle();
-        IBlockData blockData = getType(world, new BlockPosition(block.getX(), block.getY(), block.getZ()));
+        IBlockData blockData = getBlockState(world, new BlockPosition(block.getX(), block.getY(), block.getZ()));
         return CraftMagicNumbers.toLegacyData(blockData);
     }
 
@@ -131,7 +131,7 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
     public int getCombinedId(org.bukkit.block.Block block) {
         World world = ((CraftWorld) block.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
-        return NMSMappings_v1_18_R2.getCombinedId(getType(world, blockPosition));
+        return NMSMappings_v1_18_R2.getId(getBlockState(world, blockPosition));
     }
 
     @Override
@@ -145,22 +145,22 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
 
         NBTTagCompound nbtTagCompound = getOrCreateTag(nmsItem);
 
-        NBTTagCompound skullOwner = hasKey(nbtTagCompound, "SkullOwner") ?
+        NBTTagCompound skullOwner = contains(nbtTagCompound, "SkullOwner") ?
                 getCompound(nbtTagCompound, "SkullOwner") : new NBTTagCompound();
 
         NBTTagCompound properties = new NBTTagCompound();
 
         NBTTagList textures = new NBTTagList();
         NBTTagCompound signature = new NBTTagCompound();
-        setString(signature, "Value", texture);
+        putString(signature, "Value", texture);
         textures.add(signature);
 
-        set(properties,"textures", textures);
+        put(properties,"textures", textures);
 
-        set(skullOwner, "Properties", properties);
-        setString(skullOwner, "Id", UUID.randomUUID().toString());
+        put(skullOwner, "Properties", properties);
+        putString(skullOwner, "Id", UUID.randomUUID().toString());
 
-        set(nbtTagCompound, "SkullOwner", skullOwner);
+        put(nbtTagCompound, "SkullOwner", skullOwner);
 
         return CraftItemStack.asBukkitCopy(nmsItem);
     }
