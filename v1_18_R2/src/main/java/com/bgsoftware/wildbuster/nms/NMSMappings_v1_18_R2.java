@@ -9,7 +9,6 @@ import net.minecraft.server.level.ChunkProviderServer;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.World;
 import net.minecraft.world.level.block.Block;
@@ -28,10 +27,6 @@ public final class NMSMappings_v1_18_R2 {
 
     }
 
-    public static Chunk getChunkAtWorldCoords(World world, BlockPosition blockPosition) {
-        return world.l(blockPosition);
-    }
-
     public static int getX(BaseBlockPosition baseBlockPosition) {
         return baseBlockPosition.u();
     }
@@ -48,12 +43,12 @@ public final class NMSMappings_v1_18_R2 {
         return levelHeightAccessor.e(y);
     }
 
-    public static ChunkSection[] getSections(IChunkAccess chunkAccess) {
-        return chunkAccess.d();
-    }
-
     public static void setType(ChunkSection chunkSection, int x, int y, int z, IBlockData state, boolean lock) {
         chunkSection.a(x, y, z, state, lock);
+    }
+
+    public static IBlockData getBlockData(Block block) {
+        return block.n();
     }
 
     public static IBlockData getByCombinedId(int combinedId) {
@@ -76,16 +71,20 @@ public final class NMSMappings_v1_18_R2 {
         chunkProviderServer.a(blockPosition);
     }
 
-    public static ChunkCoordIntPair getPos(IChunkAccess chunk) {
-        return chunk.f();
-    }
-
     public static void sendPacket(PlayerConnection playerConnection, Packet<?> packet) {
         playerConnection.a(packet);
     }
 
+    public static ChunkSection[] getSections(IChunkAccess chunkAccess) {
+        return chunkAccess.d();
+    }
+
     public static Map<BlockPosition, TileEntity> getTileEntities(IChunkAccess chunkAccess) {
         return chunkAccess.i;
+    }
+
+    public static Chunk getChunkAtWorldCoords(World world, BlockPosition blockPosition) {
+        return world.l(blockPosition);
     }
 
     public static IBlockData getType(World world, BlockPosition blockPosition) {
@@ -97,7 +96,7 @@ public final class NMSMappings_v1_18_R2 {
     }
 
     public static NBTTagCompound getOrCreateTag(ItemStack itemStack) {
-        return itemStack.t();
+        return itemStack.u();
     }
 
     public static boolean hasKey(NBTTagCompound nbtTagCompound, String key) {
@@ -114,10 +113,6 @@ public final class NMSMappings_v1_18_R2 {
 
     public static void set(NBTTagCompound nbtTagCompound, String key, NBTBase nbtBase) {
         nbtTagCompound.a(key, nbtBase);
-    }
-
-    public static IBlockData getBlockData(Block block) {
-        return block.n();
     }
 
 }
