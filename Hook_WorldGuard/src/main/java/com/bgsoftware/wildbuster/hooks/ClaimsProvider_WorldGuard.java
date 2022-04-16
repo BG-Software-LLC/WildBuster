@@ -29,8 +29,10 @@ public final class ClaimsProvider_WorldGuard implements ClaimsProvider {
 
     @Override
     public boolean canBuild(OfflinePlayer player, Block block) {
-        if (CAN_BUILD_METHOD.isValid())
-            return CAN_BUILD_METHOD.invoke(worldGuard, player, block);
+        if (CAN_BUILD_METHOD.isValid()) {
+            Player onlinePlayer = player.getPlayer();
+            return onlinePlayer != null && CAN_BUILD_METHOD.invoke(worldGuard, onlinePlayer, block);
+        }
 
         WorldGuardPlatform worldGuardPlatform = WorldGuard.getInstance().getPlatform();
         RegionContainer regionContainer = worldGuardPlatform.getRegionContainer();
