@@ -11,6 +11,7 @@ import com.bgsoftware.wildbuster.objects.WBlockData;
 import com.bgsoftware.wildbuster.objects.WChunkBuster;
 import com.bgsoftware.wildbuster.objects.WPlayerBuster;
 import com.bgsoftware.wildbuster.utils.blocks.ChunkPosition;
+import com.bgsoftware.wildbuster.utils.items.ItemUtils;
 import com.bgsoftware.wildbuster.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -40,42 +41,42 @@ public final class BustersHandler implements BustersManager {
     private final Map<UUID, PlayerBuster> notifyBusters = new HashMap<>();
     private final WildBusterPlugin plugin;
 
-    public BustersHandler(WildBusterPlugin plugin){
+    public BustersHandler(WildBusterPlugin plugin) {
         this.plugin = plugin;
     }
 
     @Override
-    public ChunkBuster getChunkBuster(String name){
+    public ChunkBuster getChunkBuster(String name) {
         return chunkBusters.get(name.toLowerCase());
     }
 
     @Override
-    public ChunkBuster getChunkBuster(ItemStack item){
+    public ChunkBuster getChunkBuster(ItemStack item) {
         return chunkBusters.values().stream().filter(chunkBuster -> chunkBuster.getBusterItem().isSimilar(item)).findFirst().orElse(null);
     }
 
     @Override
-    public List<ChunkBuster> getChunkBusters(){
+    public List<ChunkBuster> getChunkBusters() {
         return new ArrayList<>(chunkBusters.values());
     }
 
     @Override
-    public PlayerBuster getPlayerBuster(Chunk chunk){
+    public PlayerBuster getPlayerBuster(Chunk chunk) {
         return chunksToPlayerBusters.get(ChunkPosition.of(chunk));
     }
 
     @Override
-    public boolean isChunkBusted(Chunk chunk){
+    public boolean isChunkBusted(Chunk chunk) {
         return getPlayerBuster(chunk) != null;
     }
 
     @Override
-    public List<PlayerBuster> getPlayerBusters(){
+    public List<PlayerBuster> getPlayerBusters() {
         return new ArrayList<>(playerBusters);
     }
 
     @Override
-    public List<PlayerBuster> getPlayerBusters(OfflinePlayer player){
+    public List<PlayerBuster> getPlayerBusters(OfflinePlayer player) {
         return playerBusters.stream()
                 .filter(buster -> buster.getUniqueID().equals(player.getUniqueId()))
                 .collect(Collectors.toList());
@@ -112,7 +113,7 @@ public final class BustersHandler implements BustersManager {
     }
 
     @Override
-    public void removePlayerBuster(PlayerBuster playerBuster){
+    public void removePlayerBuster(PlayerBuster playerBuster) {
         Executor.sync(() -> {
             playerBusters.remove(playerBuster);
             playerBuster.getChunks().forEach(chunk -> chunksToPlayerBusters.remove(ChunkPosition.of(chunk)));
@@ -122,12 +123,12 @@ public final class BustersHandler implements BustersManager {
     }
 
     @Override
-    public void setNotifyBuster(PlayerBuster buster){
+    public void setNotifyBuster(PlayerBuster buster) {
         notifyBusters.put(buster.getUniqueID(), buster);
     }
 
     @Override
-    public PlayerBuster getNotifyBuster(UUID uuid){
+    public PlayerBuster getNotifyBuster(UUID uuid) {
         return notifyBusters.get(uuid);
     }
 
@@ -141,12 +142,12 @@ public final class BustersHandler implements BustersManager {
         ChunkBusterPlaceEvent event = new ChunkBusterPlaceEvent(location, player, chunkBuster);
         Bukkit.getPluginManager().callEvent(event);
 
-        if(event.isCancelled())
+        if (event.isCancelled())
             return;
 
         //Remove the item from the inventory of the player
-        if(player.getGameMode() != GameMode.CREATIVE)
-            player.getInventory().removeItem(chunkBuster.getBusterItem());
+        if (player.getGameMode() != GameMode.CREATIVE)
+            ItemUtils.removeItem(player.getInventory(), chunkBuster.getBusterItem());
 
         //Register the player-buster in the system
         createPlayerBuster(player, location, chunkBuster);
