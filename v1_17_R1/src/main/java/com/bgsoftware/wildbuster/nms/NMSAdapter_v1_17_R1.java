@@ -80,7 +80,12 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
         if (chunkSection == null)
             chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
 
-        chunkSection.setType(blockPosition.getX() & 15, blockPosition.getY() & 15, blockPosition.getZ() & 15, Block.getByCombinedId(blockData.getCombinedId()), false);
+        IBlockData oldBlockData = chunkSection.setType(blockPosition.getX() & 15, blockPosition.getY() & 15, blockPosition.getZ() & 15,
+                Block.getByCombinedId(blockData.getCombinedId()), false);
+
+        if(oldBlockData.isTileEntity()) {
+            chunk.getWorld().removeTileEntity(blockPosition);
+        }
 
         ChunkProviderServer chunkProviderServer = (ChunkProviderServer) chunk.getWorld().getChunkProvider();
         chunkProviderServer.getLightEngine().a(blockPosition);

@@ -41,13 +41,21 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
         int indexY = location.getBlockY() >> 4;
         ChunkSection chunkSection = chunk.getSections()[indexY];
 
-        if(chunkSection == null)
+        if (chunkSection == null)
             chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, !chunk.world.worldProvider.g);
 
-        int blockX = location.getBlockX() & 15, blockY = location.getBlockY() & 15, blockZ = location.getBlockZ() & 15;
+        int blockX = location.getBlockX() & 15;
+        int blockY = location.getBlockY() & 15;
+        int blockZ = location.getBlockZ() & 15;
 
+
+        Block oldBlock = chunkSection.getTypeId(blockX, blockY, blockZ);
         chunkSection.setTypeId(blockX, blockY, blockZ, Block.getById(blockData.getCombinedId()));
         chunkSection.setData(blockX, blockY, blockZ, blockData.getData());
+
+        if (oldBlock.isTileEntity()) {
+            chunk.world.p(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        }
     }
 
     @Override
@@ -59,8 +67,8 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
         Location firstLocation = null;
 
         int counter = 0;
-        for(Location location : blocksList) {
-            if(firstLocation == null)
+        for (Location location : blocksList) {
+            if (firstLocation == null)
                 firstLocation = location;
 
             values[counter++] = (short) ((location.getBlockX() & 15) << 12 | (location.getBlockZ() & 15) << 8 | location.getBlockY());
@@ -68,7 +76,7 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
 
         PacketPlayOutMultiBlockChange multiBlockChange = new PacketPlayOutMultiBlockChange(blocksAmount, values, chunk);
 
-        for(Player player : playerList)
+        for (Player player : playerList)
             ((CraftPlayer) player).getHandle().playerConnection.sendPacket(multiBlockChange);
     }
 
@@ -83,7 +91,7 @@ public final class NMSAdapter_v1_7_R4 implements NMSAdapter {
         //noinspection unchecked
         new HashMap<>((Map<ChunkPosition, TileEntity>) chunk.tileEntities).forEach(((chunkPosition, tileEntity) -> {
             Location location = new Location(bukkitChunk.getWorld(), chunkPosition.x, chunkPosition.y, chunkPosition.z);
-            if(tileEntities.contains(location))
+            if (tileEntities.contains(location))
                 chunk.tileEntities.remove(chunkPosition);
         }));
     }

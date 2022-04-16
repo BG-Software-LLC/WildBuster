@@ -68,8 +68,12 @@ public final class NMSAdapter_v1_18_R1 implements NMSAdapter {
             chunkSection = chunkSections[indexY] = new ChunkSection(yOffset, chunk.biomeRegistry);
         }
 
-        setType(chunkSection, getX(blockPosition) & 15, getY(blockPosition) & 15, getZ(blockPosition) & 15,
+        IBlockData oldBlockData = setType(chunkSection, getX(blockPosition) & 15, getY(blockPosition) & 15, getZ(blockPosition) & 15,
                 getByCombinedId(blockData.getCombinedId()), false);
+
+        if(isTileEntity(oldBlockData)) {
+            removeTileEntity(getWorld(chunk), blockPosition);
+        }
 
         ChunkProviderServer chunkProviderServer = getChunkProvider(getWorld(chunk));
         getLightEngine(getWorld(chunk)).a(blockPosition);
@@ -84,7 +88,7 @@ public final class NMSAdapter_v1_18_R1 implements NMSAdapter {
 
         ChunkProviderServer chunkProviderServer = getChunkProvider(worldServer);
 
-        for(Location location : blocksList) {
+        for (Location location : blocksList) {
             BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
             chunkProviderServer.a(blockPosition);
         }
@@ -155,7 +159,7 @@ public final class NMSAdapter_v1_18_R1 implements NMSAdapter {
         setString(signature, "Value", texture);
         textures.add(signature);
 
-        set(properties,"textures", textures);
+        set(properties, "textures", textures);
 
         set(skullOwner, "Properties", properties);
         setString(skullOwner, "Id", UUID.randomUUID().toString());

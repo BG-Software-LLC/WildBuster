@@ -43,8 +43,8 @@ public final class NMSMappings_v1_18_R2 {
         return levelHeightAccessor.e(y);
     }
 
-    public static void setBlockState(ChunkSection chunkSection, int x, int y, int z, IBlockData state, boolean lock) {
-        chunkSection.a(x, y, z, state, lock);
+    public static IBlockData setBlockState(ChunkSection chunkSection, int x, int y, int z, IBlockData state, boolean lock) {
+        return chunkSection.a(x, y, z, state, lock);
     }
 
     public static IBlockData getBlockData(Block block) {
@@ -113,6 +113,14 @@ public final class NMSMappings_v1_18_R2 {
 
     public static void put(NBTTagCompound nbtTagCompound, String key, NBTBase nbtBase) {
         nbtTagCompound.a(key, nbtBase);
+    }
+
+    public static boolean isTileEntity(IBlockData blockData) {
+        return blockData.n();
+    }
+
+    public static void removeTileEntity(WorldServer world, BlockPosition blockPosition) {
+        world.m(blockPosition);
     }
 
 }

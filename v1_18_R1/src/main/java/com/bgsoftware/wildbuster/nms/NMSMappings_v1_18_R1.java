@@ -9,7 +9,6 @@ import net.minecraft.server.level.ChunkProviderServer;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.World;
 import net.minecraft.world.level.block.Block;
@@ -52,8 +51,8 @@ public final class NMSMappings_v1_18_R1 {
         return chunkAccess.d();
     }
 
-    public static void setType(ChunkSection chunkSection, int x, int y, int z, IBlockData state, boolean lock) {
-        chunkSection.a(x, y, z, state, lock);
+    public static IBlockData setType(ChunkSection chunkSection, int x, int y, int z, IBlockData state, boolean lock) {
+        return chunkSection.a(x, y, z, state, lock);
     }
 
     public static IBlockData getByCombinedId(int combinedId) {
@@ -74,10 +73,6 @@ public final class NMSMappings_v1_18_R1 {
 
     public static void flagDirty(ChunkProviderServer chunkProviderServer, BlockPosition blockPosition) {
         chunkProviderServer.a(blockPosition);
-    }
-
-    public static ChunkCoordIntPair getPos(IChunkAccess chunk) {
-        return chunk.f();
     }
 
     public static void sendPacket(PlayerConnection playerConnection, Packet<?> packet) {
@@ -118,6 +113,14 @@ public final class NMSMappings_v1_18_R1 {
 
     public static IBlockData getBlockData(Block block) {
         return block.n();
+    }
+
+    public static boolean isTileEntity(IBlockData blockData) {
+        return blockData.m();
+    }
+
+    public static void removeTileEntity(WorldServer world, BlockPosition blockPosition) {
+        world.m(blockPosition);
     }
 
 }

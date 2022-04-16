@@ -68,8 +68,12 @@ public final class NMSAdapter_v1_18_R2 implements NMSAdapter {
             chunkSection = chunkSections[indexY] = new ChunkSection(yOffset, chunk.biomeRegistry);
         }
 
-        setBlockState(chunkSection, getX(blockPosition) & 15, getY(blockPosition) & 15, getZ(blockPosition) & 15,
+        IBlockData oldBlockData = setBlockState(chunkSection, getX(blockPosition) & 15, getY(blockPosition) & 15, getZ(blockPosition) & 15,
                 getByCombinedId(blockData.getCombinedId()), false);
+
+        if(isTileEntity(oldBlockData)) {
+            removeTileEntity(getLevel(chunk), blockPosition);
+        }
 
         ChunkProviderServer chunkProviderServer = getChunkSource(getLevel(chunk));
         getLightEngine(getLevel(chunk)).a(blockPosition);

@@ -47,7 +47,17 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
         if(chunkSection == null)
             chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, chunk.world.worldProvider.m());
 
-        chunkSection.setType(location.getBlockX() & 15, location.getBlockY() & 15, location.getBlockZ() & 15, Block.getByCombinedId(blockData.getCombinedId()));
+        int blockX = location.getBlockX() & 15;
+        int blockY = location.getBlockY() & 15;
+        int blockZ = location.getBlockZ() & 15;
+
+        IBlockData oldBlockData = chunkSection.getType(blockX, blockY, blockZ);
+        chunkSection.setType(blockX, blockY, blockZ, Block.getByCombinedId(blockData.getCombinedId()));
+
+        if(oldBlockData.getBlock().isTileEntity()) {
+            chunk.world.s(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+        }
+
     }
 
     @Override
