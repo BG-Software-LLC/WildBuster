@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
+import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -101,6 +102,26 @@ public final class ProvidersHandler {
         if (Bukkit.getPluginManager().isPluginEnabled("RedProtect")) {
             Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_RedProtect");
             claimsProvider.ifPresent(claimsProviders::add);
+        }
+        if (Bukkit.getPluginManager().isPluginEnabled("PlotSquared")) {
+            Plugin plugin = Bukkit.getPluginManager().getPlugin("PlotSquared");
+            if (plugin.getDescription().getVersion().startsWith("6.")) {
+                try {
+                    Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_PlotSquared6");
+                    claimsProvider.ifPresent(claimsProviders::add);
+                } catch (Exception ex) {
+                    WildBusterPlugin.log("&cYour version of PlotSquared is not supported. Please contact Ome_R for support.");
+                }
+            } else if (plugin.getDescription().getVersion().startsWith("5.")) {
+                Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_PlotSquared5");
+                claimsProvider.ifPresent(claimsProviders::add);
+            } else if (plugin.getDescription().getMain().contains("com.github")) {
+                Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_PlotSquared4");
+                claimsProvider.ifPresent(claimsProviders::add);
+            } else {
+                Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_PlotSquaredLegacy");
+                claimsProvider.ifPresent(claimsProviders::add);
+            }
         }
     }
 
