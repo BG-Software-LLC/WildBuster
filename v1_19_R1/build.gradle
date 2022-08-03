@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.19-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT' // API is the same as in 1.18
     compileOnly 'org.spigotmc:v1_19_R1:b3513'
 
     compileOnly 'com.mojang:brigadier:1.0.18'
