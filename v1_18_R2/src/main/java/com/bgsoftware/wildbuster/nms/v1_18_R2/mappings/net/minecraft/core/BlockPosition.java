@@ -1,7 +1,7 @@
-package com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.net.minecraft.core;
+package com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.net.minecraft.core;
 
 import com.bgsoftware.wildbuster.nms.mapping.Remap;
-import com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.MappedObject;
+import com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.MappedObject;
 
 public class BlockPosition extends MappedObject<net.minecraft.core.BlockPosition> {
 

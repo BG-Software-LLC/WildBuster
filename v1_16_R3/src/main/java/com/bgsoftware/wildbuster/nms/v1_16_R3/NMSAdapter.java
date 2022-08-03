@@ -1,4 +1,4 @@
-package com.bgsoftware.wildbuster.nms;
+package com.bgsoftware.wildbuster.nms.v1_16_R3;
 
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
@@ -47,7 +47,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
-public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
+public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapter {
 
     private static Class<?> SHORT_ARRAY_SET_CLASS = null;
     private static Constructor<?> MULTI_BLOCK_CHANGE_CONSTRUCTOR = null;

@@ -1,26 +1,27 @@
-package com.bgsoftware.wildbuster.nms;
+package com.bgsoftware.wildbuster.nms.v1_12_R1;
 
 import com.bgsoftware.wildbuster.api.objects.BlockData;
-import net.minecraft.server.v1_8_R3.Block;
-import net.minecraft.server.v1_8_R3.BlockPosition;
-import net.minecraft.server.v1_8_R3.Chunk;
-import net.minecraft.server.v1_8_R3.ChunkSection;
-import net.minecraft.server.v1_8_R3.IBlockData;
-import net.minecraft.server.v1_8_R3.IChatBaseComponent;
-import net.minecraft.server.v1_8_R3.ItemStack;
-import net.minecraft.server.v1_8_R3.NBTTagCompound;
-import net.minecraft.server.v1_8_R3.NBTTagList;
-import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
-import net.minecraft.server.v1_8_R3.PacketPlayOutMultiBlockChange;
-import net.minecraft.server.v1_8_R3.World;
+import net.minecraft.server.v1_12_R1.Block;
+import net.minecraft.server.v1_12_R1.BlockPosition;
+import net.minecraft.server.v1_12_R1.ChatMessageType;
+import net.minecraft.server.v1_12_R1.Chunk;
+import net.minecraft.server.v1_12_R1.ChunkSection;
+import net.minecraft.server.v1_12_R1.IBlockData;
+import net.minecraft.server.v1_12_R1.IChatBaseComponent;
+import net.minecraft.server.v1_12_R1.ItemStack;
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
+import net.minecraft.server.v1_12_R1.NBTTagList;
+import net.minecraft.server.v1_12_R1.PacketPlayOutChat;
+import net.minecraft.server.v1_12_R1.PacketPlayOutMultiBlockChange;
+import net.minecraft.server.v1_12_R1.World;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WorldBorder;
-import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
@@ -30,11 +31,11 @@ import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
-public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
+public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapter {
 
     @Override
     public String getVersion() {
-        return "v1_8_R3";
+        return "v1_12_R1";
     }
 
     @Override
@@ -44,7 +45,7 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         ChunkSection chunkSection = chunk.getSections()[indexY];
 
         if(chunkSection == null)
-            chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, !chunk.world.worldProvider.o());
+            chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, chunk.world.worldProvider.m());
 
         int blockX = location.getBlockX() & 15;
         int blockY = location.getBlockY() & 15;
@@ -54,8 +55,9 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         chunkSection.setType(blockX, blockY, blockZ, Block.getByCombinedId(blockData.getCombinedId()));
 
         if(oldBlockData.getBlock().isTileEntity()) {
-            chunk.world.t(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+            chunk.world.s(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
         }
+
     }
 
     @Override
@@ -98,7 +100,7 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     @Override
     public void sendActionBar(Player pl, String message) {
         IChatBaseComponent chatBaseComponent = IChatBaseComponent.ChatSerializer.a("{\"text\":\"" + message + "\"}");
-        PacketPlayOutChat packet = new PacketPlayOutChat(chatBaseComponent, (byte) 2);
+        PacketPlayOutChat packet = new PacketPlayOutChat(chatBaseComponent, ChatMessageType.GAME_INFO);
         ((CraftPlayer) pl).getHandle().playerConnection.sendPacket(packet);
     }
 
@@ -125,6 +127,7 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public org.bukkit.inventory.ItemStack getPlayerSkull(org.bukkit.inventory.ItemStack itemStack, String texture) {
         ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
 
@@ -191,6 +194,16 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
             @Override
             public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
                 return true;
+            }
+
+            @Override
+            public boolean isTreasure() {
+                return false;
+            }
+
+            @Override
+            public boolean isCursed() {
+                return false;
             }
         };
     }

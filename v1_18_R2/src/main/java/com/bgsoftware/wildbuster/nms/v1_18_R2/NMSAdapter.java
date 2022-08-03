@@ -1,16 +1,17 @@
-package com.bgsoftware.wildbuster.nms;
+package com.bgsoftware.wildbuster.nms.v1_18_R2;
 
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
-import com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.net.minecraft.core.BlockPosition;
-import com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.net.minecraft.nbt.NBTTagCompound;
-import com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.net.minecraft.server.level.ChunkProviderServer;
-import com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.net.minecraft.server.level.WorldServer;
-import com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.net.minecraft.world.item.ItemStack;
-import com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.net.minecraft.world.level.block.Block;
-import com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.net.minecraft.world.level.block.state.IBlockData;
-import com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.net.minecraft.world.level.chunk.Chunk;
-import com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.net.minecraft.world.level.chunk.ChunkSection;
+import com.bgsoftware.wildbuster.nms.mapping.Remap;
+import com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.net.minecraft.core.BlockPosition;
+import com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.net.minecraft.nbt.NBTTagCompound;
+import com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.net.minecraft.server.level.ChunkProviderServer;
+import com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.net.minecraft.world.item.ItemStack;
+import com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.net.minecraft.world.level.World;
+import com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.net.minecraft.world.level.block.Block;
+import com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.net.minecraft.world.level.block.state.IBlockData;
+import com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.net.minecraft.world.level.chunk.Chunk;
+import com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.net.minecraft.world.level.chunk.ChunkSection;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.core.SectionPosition;
@@ -21,11 +22,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.WorldBorder;
-import org.bukkit.craftbukkit.v1_19_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R1.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_18_R2.CraftChunk;
+import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_18_R2.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
@@ -40,17 +41,17 @@ import java.util.Set;
 import java.util.UUID;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
-public final class NMSAdapter_v1_19_R1 implements NMSAdapter {
+public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapter {
 
     @Override
     public String getVersion() {
-        return "v1_19_R1";
+        return "v1_18_R2";
     }
 
     @Override
     public void setFastBlock(Location location, BlockData blockData) {
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        WorldServer worldServer = new WorldServer(((CraftWorld) location.getWorld()).getHandle());
+        World worldServer = new World(((CraftWorld) location.getWorld()).getHandle());
         Chunk chunk = worldServer.getChunkAt(blockPosition);
         int indexY = chunk.getSectionIndex(blockPosition.getY());
 
@@ -80,7 +81,7 @@ public final class NMSAdapter_v1_19_R1 implements NMSAdapter {
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, List<Location> blocksList, List<Player> playerList) {
         Chunk chunk = new Chunk(((CraftChunk) bukkitChunk).getHandle());
-        WorldServer worldServer = chunk.getLevel();
+        World worldServer = chunk.getLevel();
         Map<Integer, Set<Short>> blocks = new HashMap<>();
 
         ChunkProviderServer chunkProviderServer = worldServer.getChunkSource();
@@ -122,7 +123,7 @@ public final class NMSAdapter_v1_19_R1 implements NMSAdapter {
 
     @Override
     public int getMaterialData(org.bukkit.block.Block block) {
-        WorldServer worldServer = new WorldServer(((CraftWorld) block.getWorld()).getHandle());
+        World worldServer = new World(((CraftWorld) block.getWorld()).getHandle());
         BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
         net.minecraft.world.level.block.state.IBlockData blockData = worldServer.getBlockState(blockPosition);
         return CraftMagicNumbers.toLegacyData(blockData);
@@ -130,7 +131,7 @@ public final class NMSAdapter_v1_19_R1 implements NMSAdapter {
 
     @Override
     public int getCombinedId(org.bukkit.block.Block block) {
-        WorldServer worldServer = new WorldServer(((CraftWorld) block.getWorld()).getHandle());
+        World worldServer = new World(((CraftWorld) block.getWorld()).getHandle());
         BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
         return Block.getId(worldServer.getBlockState(blockPosition));
     }
@@ -251,10 +252,18 @@ public final class NMSAdapter_v1_19_R1 implements NMSAdapter {
 
         private final InventoryHolder holder;
 
+        @Remap(classPath = "net.minecraft.world.level.block.entity.BaseContainerBlockEntity",
+                name = "setCustomName",
+                type = Remap.Type.METHOD,
+                remappedName = "a")
+        @Remap(classPath = "net.minecraft.network.chat.Component",
+                name = "nullToEmpty",
+                type = Remap.Type.METHOD,
+                remappedName = "a")
         CustomTileEntityHopper(InventoryHolder holder, String title) {
             super(BlockPosition.ZERO.getHandle(), Block.AIR.getBlockData());
             this.holder = holder;
-            this.a(IChatBaseComponent.b(title));
+            this.a(IChatBaseComponent.a(title));
         }
 
         @Override

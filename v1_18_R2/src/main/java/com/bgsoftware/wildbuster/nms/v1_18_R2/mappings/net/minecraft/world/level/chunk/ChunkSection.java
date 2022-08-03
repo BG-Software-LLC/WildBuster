@@ -1,8 +1,8 @@
-package com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.net.minecraft.world.level.chunk;
+package com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.net.minecraft.world.level.chunk;
 
 import com.bgsoftware.wildbuster.nms.mapping.Remap;
-import com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.MappedObject;
-import com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.net.minecraft.world.level.block.state.IBlockData;
+import com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.MappedObject;
+import com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.net.minecraft.world.level.block.state.IBlockData;
 
 public class ChunkSection extends MappedObject<net.minecraft.world.level.chunk.ChunkSection> {
 

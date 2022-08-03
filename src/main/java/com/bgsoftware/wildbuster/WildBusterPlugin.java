@@ -32,9 +32,21 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
 
     private Enchantment glowEnchant;
 
+    private boolean shouldEnable = true;
+
+    @Override
+    public void onLoad() {
+        plugin = this;
+        shouldEnable = loadNMSAdapter();
+    }
+
     @Override
     public void onEnable() {
-        plugin = this;
+        if (!shouldEnable) {
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
         new Metrics(this);
 
         log("******** ENABLE START ********");
@@ -47,7 +59,6 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         getCommand("buster").setExecutor(commandsHandler);
         getCommand("buster").setTabCompleter(commandsHandler);
 
-        loadNMSAdapter();
         registerGlowEnchantment();
 
         bustersManager = new BustersHandler(this);
@@ -70,17 +81,22 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
 
     @Override
     public void onDisable() {
+        if (!shouldEnable)
+            return;
+
         dataHandler.saveBusters();
     }
 
-    private void loadNMSAdapter() {
+    private boolean loadNMSAdapter() {
         String version = getServer().getClass().getPackage().getName().split("\\.")[3];
         try {
-            nmsAdapter = (NMSAdapter) Class.forName("com.bgsoftware.wildbuster.nms.NMSAdapter_" + version).newInstance();
+            nmsAdapter = (NMSAdapter) Class.forName(String.format("com.bgsoftware.wildbuster.nms.%s.NMSAdapter", version)).newInstance();
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             log("Couldn't load up with an adapter " + version + ". Please contact @Ome_R");
-            getServer().getPluginManager().disablePlugin(this);
+            return false;
         }
+
+        return true;
     }
 
     private void loadAPI() {

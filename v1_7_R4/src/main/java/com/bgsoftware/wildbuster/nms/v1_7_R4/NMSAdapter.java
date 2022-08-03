@@ -1,41 +1,38 @@
-package com.bgsoftware.wildbuster.nms;
+package com.bgsoftware.wildbuster.nms.v1_7_R4;
 
 import com.bgsoftware.wildbuster.api.objects.BlockData;
-import net.minecraft.server.v1_12_R1.Block;
-import net.minecraft.server.v1_12_R1.BlockPosition;
-import net.minecraft.server.v1_12_R1.ChatMessageType;
-import net.minecraft.server.v1_12_R1.Chunk;
-import net.minecraft.server.v1_12_R1.ChunkSection;
-import net.minecraft.server.v1_12_R1.IBlockData;
-import net.minecraft.server.v1_12_R1.IChatBaseComponent;
-import net.minecraft.server.v1_12_R1.ItemStack;
-import net.minecraft.server.v1_12_R1.NBTTagCompound;
-import net.minecraft.server.v1_12_R1.NBTTagList;
-import net.minecraft.server.v1_12_R1.PacketPlayOutChat;
-import net.minecraft.server.v1_12_R1.PacketPlayOutMultiBlockChange;
-import net.minecraft.server.v1_12_R1.World;
+import net.minecraft.server.v1_7_R4.Block;
+import net.minecraft.server.v1_7_R4.Chunk;
+import net.minecraft.server.v1_7_R4.ChunkPosition;
+import net.minecraft.server.v1_7_R4.ChunkSection;
+import net.minecraft.server.v1_7_R4.ItemStack;
+import net.minecraft.server.v1_7_R4.NBTTagCompound;
+import net.minecraft.server.v1_7_R4.NBTTagList;
+import net.minecraft.server.v1_7_R4.PacketPlayOutMultiBlockChange;
+import net.minecraft.server.v1_7_R4.TileEntity;
+import net.minecraft.server.v1_7_R4.World;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.WorldBorder;
-import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_7_R4.CraftChunk;
+import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
+import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_7_R4.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
-public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
+public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapter {
 
     @Override
     public String getVersion() {
-        return "v1_12_R1";
+        return "v1_7_R4";
     }
 
     @Override
@@ -44,20 +41,21 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
         int indexY = location.getBlockY() >> 4;
         ChunkSection chunkSection = chunk.getSections()[indexY];
 
-        if(chunkSection == null)
-            chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, chunk.world.worldProvider.m());
+        if (chunkSection == null)
+            chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, !chunk.world.worldProvider.g);
 
         int blockX = location.getBlockX() & 15;
         int blockY = location.getBlockY() & 15;
         int blockZ = location.getBlockZ() & 15;
 
-        IBlockData oldBlockData = chunkSection.getType(blockX, blockY, blockZ);
-        chunkSection.setType(blockX, blockY, blockZ, Block.getByCombinedId(blockData.getCombinedId()));
 
-        if(oldBlockData.getBlock().isTileEntity()) {
-            chunk.world.s(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+        Block oldBlock = chunkSection.getTypeId(blockX, blockY, blockZ);
+        chunkSection.setTypeId(blockX, blockY, blockZ, Block.getById(blockData.getCombinedId()));
+        chunkSection.setData(blockX, blockY, blockZ, blockData.getData());
+
+        if (oldBlock.isTileEntity()) {
+            chunk.world.p(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         }
-
     }
 
     @Override
@@ -69,8 +67,8 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
         Location firstLocation = null;
 
         int counter = 0;
-        for(Location location : blocksList) {
-            if(firstLocation == null)
+        for (Location location : blocksList) {
+            if (firstLocation == null)
                 firstLocation = location;
 
             values[counter++] = (short) ((location.getBlockX() & 15) << 12 | (location.getBlockZ() & 15) << 8 | location.getBlockY());
@@ -78,7 +76,7 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
 
         PacketPlayOutMultiBlockChange multiBlockChange = new PacketPlayOutMultiBlockChange(blocksAmount, values, chunk);
 
-        for(Player player : playerList)
+        for (Player player : playerList)
             ((CraftPlayer) player).getHandle().playerConnection.sendPacket(multiBlockChange);
     }
 
@@ -90,18 +88,17 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
     @Override
     public void clearTileEntities(org.bukkit.Chunk bukkitChunk, List<Location> tileEntities) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        new HashMap<>(chunk.tileEntities).forEach(((blockPosition, tileEntity) -> {
-            Location location = new Location(bukkitChunk.getWorld(), blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
-            if(tileEntities.contains(location))
-                chunk.tileEntities.remove(blockPosition);
+        //noinspection unchecked
+        new HashMap<>((Map<ChunkPosition, TileEntity>) chunk.tileEntities).forEach(((chunkPosition, tileEntity) -> {
+            Location location = new Location(bukkitChunk.getWorld(), chunkPosition.x, chunkPosition.y, chunkPosition.z);
+            if (tileEntities.contains(location))
+                chunk.tileEntities.remove(chunkPosition);
         }));
     }
 
     @Override
     public void sendActionBar(Player pl, String message) {
-        IChatBaseComponent chatBaseComponent = IChatBaseComponent.ChatSerializer.a("{\"text\":\"" + message + "\"}");
-        PacketPlayOutChat packet = new PacketPlayOutChat(chatBaseComponent, ChatMessageType.GAME_INFO);
-        ((CraftPlayer) pl).getHandle().playerConnection.sendPacket(packet);
+        //No action bar in 1.7
     }
 
     @Override
@@ -112,8 +109,7 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
     @Override
     public int getMaterialData(org.bukkit.block.Block block) {
         World world = ((CraftWorld) block.getWorld()).getHandle();
-        IBlockData blockData = world.getType(new BlockPosition(block.getX(), block.getY(), block.getZ()));
-        return blockData.getBlock().toLegacyData(blockData);
+        return world.getData(block.getX(), block.getY(), block.getZ());
     }
 
     @Override
@@ -127,7 +123,6 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
     }
 
     @Override
-    @SuppressWarnings("ConstantConditions")
     public org.bukkit.inventory.ItemStack getPlayerSkull(org.bukkit.inventory.ItemStack itemStack, String texture) {
         ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
 
@@ -156,11 +151,7 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
 
     @Override
     public boolean isInsideBorder(Location location) {
-        WorldBorder worldBorder = location.getWorld().getWorldBorder();
-        Location center = worldBorder.getCenter();
-        int radius = (int) worldBorder.getSize() / 2;
-        return location.getBlockX() <=(center.getBlockX() + radius) && location.getBlockX() >= (center.getBlockX() - radius) &&
-                location.getBlockZ() <= (center.getBlockZ() + radius) && location.getBlockZ() >= (center.getBlockZ() - radius);
+        return true;
     }
 
     @Override
@@ -194,16 +185,6 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
             @Override
             public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
                 return true;
-            }
-
-            @Override
-            public boolean isTreasure() {
-                return false;
-            }
-
-            @Override
-            public boolean isCursed() {
-                return false;
             }
         };
     }

@@ -1,8 +1,8 @@
-package com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.net.minecraft.world.item;
+package com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.net.minecraft.world.item;
 
 import com.bgsoftware.wildbuster.nms.mapping.Remap;
-import com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.MappedObject;
-import com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.net.minecraft.nbt.NBTTagCompound;
+import com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.MappedObject;
+import com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.net.minecraft.nbt.NBTTagCompound;
 
 public class ItemStack extends MappedObject<net.minecraft.world.item.ItemStack> {
 
@@ -13,9 +13,9 @@ public class ItemStack extends MappedObject<net.minecraft.world.item.ItemStack> 
     @Remap(classPath = "net.minecraft.world.item.ItemStack",
             name = "getOrCreateTag",
             type = Remap.Type.METHOD,
-            remappedName = "v")
+            remappedName = "u")
     public NBTTagCompound getOrCreateTag() {
-        return new NBTTagCompound(handle.v());
+        return new NBTTagCompound(handle.u());
     }
 
 }
