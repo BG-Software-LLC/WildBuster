@@ -91,6 +91,12 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         String version = getServer().getClass().getPackage().getName().split("\\.")[3];
         try {
             nmsAdapter = (NMSAdapter) Class.forName(String.format("com.bgsoftware.wildbuster.nms.%s.NMSAdapter", version)).newInstance();
+
+            if(!nmsAdapter.isMappingsSupported()) {
+                log("Error while loading adapter - your version mappings are not supported. Please contact @Ome_R");
+                return false;
+            }
+
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             log("Couldn't load up with an adapter " + version + ". Please contact @Ome_R");
             return false;

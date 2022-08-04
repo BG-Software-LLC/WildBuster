@@ -65,6 +65,13 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         }
     }
 
+    private static final String BUILT_AGAINST_MAPPING = "acd6e6c27e5a0a9440afba70a96c27c9";
+
+    @Override
+    public boolean isMappingsSupported() {
+        return ((CraftMagicNumbers) CraftMagicNumbers.INSTANCE).getMappingsVersion().equals(BUILT_AGAINST_MAPPING);
+    }
+
     @Override
     public String getVersion() {
         return "v1_17_R1";

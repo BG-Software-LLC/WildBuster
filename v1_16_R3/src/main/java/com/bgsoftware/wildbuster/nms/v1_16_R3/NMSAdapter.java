@@ -64,6 +64,11 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
     }
 
     @Override
+    public boolean isMappingsSupported() {
+        return true;
+    }
+
+    @Override
     public String getVersion() {
         return "v1_16_R3";
     }

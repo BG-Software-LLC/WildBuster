@@ -33,6 +33,11 @@ import java.util.UUID;
 public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapter {
 
     @Override
+    public boolean isMappingsSupported() {
+        return true;
+    }
+
+    @Override
     public String getVersion() {
         return "v1_8_R3";
     }
@@ -43,7 +48,7 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         int indexY = location.getBlockY() >> 4;
         ChunkSection chunkSection = chunk.getSections()[indexY];
 
-        if(chunkSection == null)
+        if (chunkSection == null)
             chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, !chunk.world.worldProvider.o());
 
         int blockX = location.getBlockX() & 15;
@@ -53,7 +58,7 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         IBlockData oldBlockData = chunkSection.getType(blockX, blockY, blockZ);
         chunkSection.setType(blockX, blockY, blockZ, Block.getByCombinedId(blockData.getCombinedId()));
 
-        if(oldBlockData.getBlock().isTileEntity()) {
+        if (oldBlockData.getBlock().isTileEntity()) {
             chunk.world.t(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
         }
     }
@@ -67,8 +72,8 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         Location firstLocation = null;
 
         int counter = 0;
-        for(Location location : blocksList) {
-            if(firstLocation == null)
+        for (Location location : blocksList) {
+            if (firstLocation == null)
                 firstLocation = location;
 
             values[counter++] = (short) ((location.getBlockX() & 15) << 12 | (location.getBlockZ() & 15) << 8 | location.getBlockY());
@@ -76,7 +81,7 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
 
         PacketPlayOutMultiBlockChange multiBlockChange = new PacketPlayOutMultiBlockChange(blocksAmount, values, chunk);
 
-        for(Player player : playerList)
+        for (Player player : playerList)
             ((CraftPlayer) player).getHandle().playerConnection.sendPacket(multiBlockChange);
     }
 
@@ -90,7 +95,7 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         new HashMap<>(chunk.tileEntities).forEach(((blockPosition, tileEntity) -> {
             Location location = new Location(bukkitChunk.getWorld(), blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
-            if(tileEntities.contains(location))
+            if (tileEntities.contains(location))
                 chunk.tileEntities.remove(blockPosition);
         }));
     }
@@ -156,7 +161,7 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         WorldBorder worldBorder = location.getWorld().getWorldBorder();
         Location center = worldBorder.getCenter();
         int radius = (int) worldBorder.getSize() / 2;
-        return location.getBlockX() <=(center.getBlockX() + radius) && location.getBlockX() >= (center.getBlockX() - radius) &&
+        return location.getBlockX() <= (center.getBlockX() + radius) && location.getBlockX() >= (center.getBlockX() - radius) &&
                 location.getBlockZ() <= (center.getBlockZ() + radius) && location.getBlockZ() >= (center.getBlockZ() - radius);
     }
 

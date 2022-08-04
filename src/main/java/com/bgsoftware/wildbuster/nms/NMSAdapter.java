@@ -17,6 +17,8 @@ import java.util.List;
 
 public interface NMSAdapter {
 
+    boolean isMappingsSupported();
+
     String getVersion();
 
     void setFastBlock(Location location, BlockData blockData);

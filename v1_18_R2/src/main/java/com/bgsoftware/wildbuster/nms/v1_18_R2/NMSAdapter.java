@@ -43,6 +43,13 @@ import java.util.UUID;
 @SuppressWarnings({"unused", "ConstantConditions"})
 public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapter {
 
+    private static final String BUILT_AGAINST_MAPPING = "eaeedbff51b16ead3170906872fda334";
+
+    @Override
+    public boolean isMappingsSupported() {
+        return ((CraftMagicNumbers) CraftMagicNumbers.INSTANCE).getMappingsVersion().equals(BUILT_AGAINST_MAPPING);
+    }
+
     @Override
     public String getVersion() {
         return "v1_18_R2";
