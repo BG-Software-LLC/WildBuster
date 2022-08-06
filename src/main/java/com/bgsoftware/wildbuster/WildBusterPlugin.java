@@ -1,5 +1,6 @@
 package com.bgsoftware.wildbuster;
 
+import com.bgsoftware.common.mappings.MappingsChecker;
 import com.bgsoftware.wildbuster.api.WildBuster;
 import com.bgsoftware.wildbuster.api.WildBusterAPI;
 import com.bgsoftware.wildbuster.api.handlers.BustersManager;
@@ -13,9 +14,11 @@ import com.bgsoftware.wildbuster.listeners.MenusListener;
 import com.bgsoftware.wildbuster.listeners.PlayersListener;
 import com.bgsoftware.wildbuster.metrics.Metrics;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
+import com.bgsoftware.wildbuster.nms.mapping.TestRemaps;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 
@@ -92,14 +95,27 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         try {
             nmsAdapter = (NMSAdapter) Class.forName(String.format("com.bgsoftware.wildbuster.nms.%s.NMSAdapter", version)).newInstance();
 
-            if(!nmsAdapter.isMappingsSupported()) {
+            String mappingVersionHash = nmsAdapter.getMappingsHash();
+
+            if (mappingVersionHash != null && !MappingsChecker.checkMappings(mappingVersionHash, version)) {
                 log("Error while loading adapter - your version mappings are not supported. Please contact @Ome_R");
+                log("Your current mappings version: " + mappingVersionHash);
                 return false;
             }
 
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             log("Couldn't load up with an adapter " + version + ". Please contact @Ome_R");
             return false;
+        }
+
+        File mappingsFile = new File("mappings");
+        if (mappingsFile.exists()) {
+            try {
+                TestRemaps.testRemapsForClassesInPackage(mappingsFile,
+                        plugin.getClassLoader(), "com.bgsoftware.wildbuster.nms." + version);
+            } catch (Exception error) {
+                error.printStackTrace();
+            }
         }
 
         return true;

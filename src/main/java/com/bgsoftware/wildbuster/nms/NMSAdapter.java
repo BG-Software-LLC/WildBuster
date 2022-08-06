@@ -13,11 +13,13 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public interface NMSAdapter {
 
-    boolean isMappingsSupported();
+    @Nullable
+    String getMappingsHash();
 
     String getVersion();
 
@@ -45,15 +47,15 @@ public interface NMSAdapter {
 
     Enchantment getGlowEnchant();
 
-    default boolean isTallGrass(Material type){
+    default boolean isTallGrass(Material type) {
         return type == Material.LONG_GRASS;
     }
 
-    default Object getCustomHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title){
+    default Object getCustomHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title) {
         return defaultHolder;
     }
 
-    default void handleChunkUnload(org.bukkit.World world, List<org.bukkit.Chunk> chunks, WildBusterPlugin plugin, boolean unload){
+    default void handleChunkUnload(org.bukkit.World world, List<org.bukkit.Chunk> chunks, WildBusterPlugin plugin, boolean unload) {
 
     }
 

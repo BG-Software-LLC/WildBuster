@@ -65,11 +65,9 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         }
     }
 
-    private static final String BUILT_AGAINST_MAPPING = "acd6e6c27e5a0a9440afba70a96c27c9";
-
     @Override
-    public boolean isMappingsSupported() {
-        return ((CraftMagicNumbers) CraftMagicNumbers.INSTANCE).getMappingsVersion().equals(BUILT_AGAINST_MAPPING);
+    public String getMappingsHash() {
+        return ((CraftMagicNumbers) CraftMagicNumbers.INSTANCE).getMappingsVersion();
     }
 
     @Override
@@ -90,7 +88,7 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         IBlockData oldBlockData = chunkSection.setType(blockPosition.getX() & 15, blockPosition.getY() & 15, blockPosition.getZ() & 15,
                 Block.getByCombinedId(blockData.getCombinedId()), false);
 
-        if(oldBlockData.isTileEntity()) {
+        if (oldBlockData.isTileEntity()) {
             chunk.getWorld().removeTileEntity(blockPosition);
         }
 

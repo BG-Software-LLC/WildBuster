@@ -56,16 +56,17 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         try {
             SHORT_ARRAY_SET_CLASS = Class.forName("it.unimi.dsi.fastutil.shorts.ShortArraySet");
             Class<?> shortSetClass = Class.forName("it.unimi.dsi.fastutil.shorts.ShortSet");
-            for(Constructor<?> constructor : PacketPlayOutMultiBlockChange.class.getConstructors()){
-                if(constructor.getParameterCount() > 0)
+            for (Constructor<?> constructor : PacketPlayOutMultiBlockChange.class.getConstructors()) {
+                if (constructor.getParameterCount() > 0)
                     MULTI_BLOCK_CHANGE_CONSTRUCTOR = constructor;
             }
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
-    public boolean isMappingsSupported() {
-        return true;
+    public String getMappingsHash() {
+        return null;
     }
 
     @Override
@@ -80,13 +81,13 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         int indexY = blockPosition.getY() >> 4;
         ChunkSection chunkSection = chunk.getSections()[indexY];
 
-        if(chunkSection == null)
+        if (chunkSection == null)
             chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
 
         IBlockData oldBlockData = chunkSection.setType(blockPosition.getX() & 15, blockPosition.getY() & 15, blockPosition.getZ() & 15,
                 Block.getByCombinedId(blockData.getCombinedId()), false);
 
-        if(oldBlockData.getBlock().isTileEntity()) {
+        if (oldBlockData.getBlock().isTileEntity()) {
             chunk.world.removeTileEntity(blockPosition);
         }
 
@@ -100,39 +101,39 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         Map<Integer, Set<Short>> blocks = new HashMap<>();
 
-        for(Location location : blocksList){
+        for (Location location : blocksList) {
             Set<Short> shortSet = blocks.computeIfAbsent(location.getBlockY() >> 4, i -> createShortSet());
-            shortSet.add((short)((location.getBlockX() & 15) << 8 | (location.getBlockZ() & 15) << 4 | (location.getBlockY() & 15)));
+            shortSet.add((short) ((location.getBlockX() & 15) << 8 | (location.getBlockZ() & 15) << 4 | (location.getBlockY() & 15)));
         }
 
         Set<PacketPlayOutMultiBlockChange> packetsToSend = new HashSet<>();
 
-        for(Map.Entry<Integer,  Set<Short>> entry : blocks.entrySet()){
+        for (Map.Entry<Integer, Set<Short>> entry : blocks.entrySet()) {
             PacketPlayOutMultiBlockChange packetPlayOutMultiBlockChange = createMultiBlockChangePacket(
                     SectionPosition.a(chunk.getPos(), entry.getKey()), entry.getValue(), chunk.getSections()[entry.getKey()]);
-            if(packetPlayOutMultiBlockChange != null)
+            if (packetPlayOutMultiBlockChange != null)
                 packetsToSend.add(packetPlayOutMultiBlockChange);
         }
 
-        for(Player player : playerList)
+        for (Player player : playerList)
             packetsToSend.forEach(((CraftPlayer) player).getHandle().playerConnection::sendPacket);
     }
 
     @SuppressWarnings("all")
-    private static Set<Short> createShortSet(){
-        if(SHORT_ARRAY_SET_CLASS == null)
+    private static Set<Short> createShortSet() {
+        if (SHORT_ARRAY_SET_CLASS == null)
             return new ShortArraySet();
 
-        try{
+        try {
             return (Set<Short>) SHORT_ARRAY_SET_CLASS.newInstance();
-        }catch (Throwable ex){
+        } catch (Throwable ex) {
             ex.printStackTrace();
             return null;
         }
     }
 
-    private static PacketPlayOutMultiBlockChange createMultiBlockChangePacket(SectionPosition sectionPosition, Set<Short> shortSet, ChunkSection chunkSection){
-        if(MULTI_BLOCK_CHANGE_CONSTRUCTOR == null){
+    private static PacketPlayOutMultiBlockChange createMultiBlockChangePacket(SectionPosition sectionPosition, Set<Short> shortSet, ChunkSection chunkSection) {
+        if (MULTI_BLOCK_CHANGE_CONSTRUCTOR == null) {
             return new PacketPlayOutMultiBlockChange(
                     sectionPosition,
                     (ShortSet) shortSet,
@@ -141,9 +142,9 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
             );
         }
 
-        try{
+        try {
             return (PacketPlayOutMultiBlockChange) MULTI_BLOCK_CHANGE_CONSTRUCTOR.newInstance(sectionPosition, shortSet, chunkSection, true);
-        }catch (Throwable ex){
+        } catch (Throwable ex) {
             ex.printStackTrace();
             return null;
         }
@@ -159,7 +160,7 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         new HashMap<>(chunk.tileEntities).forEach(((blockPosition, tileEntity) -> {
             Location location = new Location(bukkitChunk.getWorld(), blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
-            if(tileEntities.contains(location))
+            if (tileEntities.contains(location))
                 chunk.tileEntities.remove(blockPosition);
         }));
     }
@@ -227,7 +228,7 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         WorldBorder worldBorder = location.getWorld().getWorldBorder();
         Location center = worldBorder.getCenter();
         int radius = (int) worldBorder.getSize() / 2;
-        return location.getBlockX() <=(center.getBlockX() + radius) && location.getBlockX() >= (center.getBlockX() - radius) &&
+        return location.getBlockX() <= (center.getBlockX() + radius) && location.getBlockX() >= (center.getBlockX() - radius) &&
                 location.getBlockZ() <= (center.getBlockZ() + radius) && location.getBlockZ() >= (center.getBlockZ() - radius);
     }
 
@@ -279,7 +280,7 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
 
     @Override
     public boolean isTallGrass(Material type) {
-        switch (type){
+        switch (type) {
             case SUNFLOWER:
             case LILAC:
             case TALL_GRASS:
@@ -300,7 +301,7 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
 
     @Override
     public void handleChunkUnload(org.bukkit.World world, List<org.bukkit.Chunk> chunks, WildBusterPlugin plugin, boolean unload) {
-        if(unload)
+        if (unload)
             chunks.forEach(chunk -> world.removePluginChunkTicket(chunk.getX(), chunk.getZ(), plugin));
         else
             chunks.forEach(chunk -> world.addPluginChunkTicket(chunk.getX(), chunk.getZ(), plugin));
@@ -310,7 +311,7 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
 
         private final InventoryHolder holder;
 
-        CustomTileEntityHopper(InventoryHolder holder, String title){
+        CustomTileEntityHopper(InventoryHolder holder, String title) {
             this.holder = holder;
             this.setCustomName(new ChatMessage(title));
         }
