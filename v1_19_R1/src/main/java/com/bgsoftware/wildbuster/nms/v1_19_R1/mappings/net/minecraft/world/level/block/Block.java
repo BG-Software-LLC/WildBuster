@@ -1,6 +1,6 @@
 package com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.net.minecraft.world.level.block;
 
-import com.bgsoftware.wildbuster.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.wildbuster.nms.v1_19_R1.mappings.MappedObject;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.IBlockData;

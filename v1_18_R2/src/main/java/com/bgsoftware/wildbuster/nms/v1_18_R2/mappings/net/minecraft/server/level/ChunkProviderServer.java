@@ -1,6 +1,6 @@
 package com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.net.minecraft.server.level;
 
-import com.bgsoftware.wildbuster.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.MappedObject;
 import com.bgsoftware.wildbuster.nms.v1_18_R2.mappings.net.minecraft.core.BlockPosition;
 

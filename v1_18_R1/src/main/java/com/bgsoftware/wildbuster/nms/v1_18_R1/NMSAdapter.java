@@ -1,8 +1,8 @@
 package com.bgsoftware.wildbuster.nms.v1_18_R1;
 
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
-import com.bgsoftware.wildbuster.nms.mapping.Remap;
 import com.bgsoftware.wildbuster.nms.v1_18_R1.mappings.net.minecraft.core.BlockPosition;
 import com.bgsoftware.wildbuster.nms.v1_18_R1.mappings.net.minecraft.nbt.NBTTagCompound;
 import com.bgsoftware.wildbuster.nms.v1_18_R1.mappings.net.minecraft.server.level.ChunkProviderServer;

@@ -1,6 +1,7 @@
 package com.bgsoftware.wildbuster;
 
 import com.bgsoftware.common.mappings.MappingsChecker;
+import com.bgsoftware.common.remaps.TestRemaps;
 import com.bgsoftware.wildbuster.api.WildBuster;
 import com.bgsoftware.wildbuster.api.WildBusterAPI;
 import com.bgsoftware.wildbuster.api.handlers.BustersManager;
@@ -14,7 +15,6 @@ import com.bgsoftware.wildbuster.listeners.MenusListener;
 import com.bgsoftware.wildbuster.listeners.PlayersListener;
 import com.bgsoftware.wildbuster.metrics.Metrics;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
-import com.bgsoftware.wildbuster.nms.mapping.TestRemaps;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.plugin.java.JavaPlugin;
 
