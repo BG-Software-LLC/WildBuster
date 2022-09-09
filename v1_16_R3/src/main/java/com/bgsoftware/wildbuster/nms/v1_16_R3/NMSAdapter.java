@@ -2,9 +2,10 @@ package com.bgsoftware.wildbuster.nms.v1_16_R3;
 
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
+import com.bgsoftware.wildbuster.nms.algorithms.PaperGlowEnchantment;
+import com.bgsoftware.wildbuster.nms.algorithms.SpigotGlowEnchantment;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
-import net.minecraft.server.v1_16_R3.ChatMessage;
 import net.minecraft.server.v1_16_R3.ChatMessageType;
 import net.minecraft.server.v1_16_R3.Chunk;
 import net.minecraft.server.v1_16_R3.ChunkProviderServer;
@@ -18,11 +19,9 @@ import net.minecraft.server.v1_16_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_16_R3.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.v1_16_R3.SectionPosition;
 import net.minecraft.server.v1_16_R3.SystemUtils;
-import net.minecraft.server.v1_16_R3.TileEntityHopper;
 import net.minecraft.server.v1_16_R3.World;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.WorldBorder;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.shorts.ShortArraySet;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.shorts.ShortSet;
@@ -33,7 +32,6 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
@@ -229,48 +227,11 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
 
     @Override
     public Enchantment getGlowEnchant() {
-        //noinspection NullableProblems
-        return new Enchantment(NamespacedKey.minecraft("wb_glowing_enchant")) {
-            @Override
-            public String getName() {
-                return "WildBusterGlow";
-            }
-
-            @Override
-            public int getMaxLevel() {
-                return 1;
-            }
-
-            @Override
-            public int getStartLevel() {
-                return 0;
-            }
-
-            @Override
-            public EnchantmentTarget getItemTarget() {
-                return null;
-            }
-
-            @Override
-            public boolean conflictsWith(Enchantment enchantment) {
-                return false;
-            }
-
-            @Override
-            public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
-                return true;
-            }
-
-            @Override
-            public boolean isTreasure() {
-                return false;
-            }
-
-            @Override
-            public boolean isCursed() {
-                return false;
-            }
-        };
+        try {
+            return new PaperGlowEnchantment("wildbuster_glowing_enchant");
+        } catch (Throwable error) {
+            return new SpigotGlowEnchantment("wildbuster_glowing_enchant");
+        }
     }
 
     @Override
@@ -300,21 +261,6 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
             chunks.forEach(chunk -> world.removePluginChunkTicket(chunk.getX(), chunk.getZ(), plugin));
         else
             chunks.forEach(chunk -> world.addPluginChunkTicket(chunk.getX(), chunk.getZ(), plugin));
-    }
-
-    private static class CustomTileEntityHopper extends TileEntityHopper {
-
-        private final InventoryHolder holder;
-
-        CustomTileEntityHopper(InventoryHolder holder, String title) {
-            this.holder = holder;
-            this.setCustomName(new ChatMessage(title));
-        }
-
-        @Override
-        public InventoryHolder getOwner() {
-            return holder;
-        }
     }
 
 }
