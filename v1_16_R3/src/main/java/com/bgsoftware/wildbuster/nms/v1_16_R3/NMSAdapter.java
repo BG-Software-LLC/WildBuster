@@ -65,11 +65,6 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
     }
 
     @Override
-    public String getMappingsHash() {
-        return null;
-    }
-
-    @Override
     public String getVersion() {
         return "v1_16_R3";
     }

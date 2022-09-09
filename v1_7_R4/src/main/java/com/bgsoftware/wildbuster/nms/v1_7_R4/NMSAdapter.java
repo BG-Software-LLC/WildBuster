@@ -31,11 +31,6 @@ import java.util.UUID;
 public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapter {
 
     @Override
-    public String getMappingsHash() {
-        return null;
-    }
-
-    @Override
     public String getVersion() {
         return "v1_7_R4";
     }

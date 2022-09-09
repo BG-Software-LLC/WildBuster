@@ -1,7 +1,6 @@
 package com.bgsoftware.wildbuster;
 
-import com.bgsoftware.common.mappings.MappingsChecker;
-import com.bgsoftware.common.remaps.TestRemaps;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildbuster.api.WildBuster;
 import com.bgsoftware.wildbuster.api.WildBusterAPI;
 import com.bgsoftware.wildbuster.api.handlers.BustersManager;
@@ -15,11 +14,16 @@ import com.bgsoftware.wildbuster.listeners.MenusListener;
 import com.bgsoftware.wildbuster.listeners.PlayersListener;
 import com.bgsoftware.wildbuster.metrics.Metrics;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
+import com.bgsoftware.wildbuster.utils.Pair;
+import com.bgsoftware.wildbuster.utils.ServerVersion;
+import org.bukkit.Bukkit;
+import org.bukkit.UnsafeValues;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 
 public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
@@ -91,35 +95,45 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
     }
 
     private boolean loadNMSAdapter() {
-        String version = getServer().getClass().getPackage().getName().split("\\.")[3];
-        try {
-            nmsAdapter = (NMSAdapter) Class.forName(String.format("com.bgsoftware.wildbuster.nms.%s.NMSAdapter", version)).newInstance();
+        String version = null;
 
-            String mappingVersionHash = nmsAdapter.getMappingsHash();
+        if (ServerVersion.isLessThan(ServerVersion.v1_18)) {
+            version = getServer().getClass().getPackage().getName().split("\\.")[3];
+        } else {
+            ReflectMethod<Integer> getDataVersion = new ReflectMethod<>(UnsafeValues.class, "getDataVersion");
+            int dataVersion = getDataVersion.invoke(Bukkit.getUnsafe());
 
-            if (mappingVersionHash != null && !MappingsChecker.checkMappings(mappingVersionHash, version, error -> {
-                log("&cFailed to retrieve allowed mappings for your server, skipping...");
-                return true;
-            })) {
-                log("Error while loading adapter - your version mappings are not supported. Please contact @Ome_R");
-                log("Your current mappings version: " + mappingVersionHash);
-                return false;
+            List<Pair<Integer, String>> versions = Arrays.asList(
+                    new Pair<>(2865, "v1181"),
+                    new Pair<>(2975, "v1182"),
+                    new Pair<>(3105, "v119"),
+                    new Pair<>(3117, "v1191"),
+                    new Pair<>(3120, "v1192")
+            );
+
+            for (Pair<Integer, String> versionData : versions) {
+                if (dataVersion <= versionData.first) {
+                    version = versionData.second;
+                    break;
+                }
             }
 
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-            log("Couldn't load up with an adapter " + version + ". Please contact @Ome_R");
-            return false;
+            if (version == null) {
+                log("Data version: " + dataVersion);
+            }
         }
 
-        File mappingsFile = new File("mappings");
-        if (mappingsFile.exists()) {
+        if (version != null) {
             try {
-                TestRemaps.testRemapsForClassesInPackage(mappingsFile,
-                        plugin.getClassLoader(), "com.bgsoftware.wildbuster.nms." + version);
+                nmsAdapter = (NMSAdapter) Class.forName(String.format("com.bgsoftware.wildbuster.nms.%s.NMSAdapter", version)).newInstance();
+                return true;
             } catch (Exception error) {
                 error.printStackTrace();
             }
         }
+
+        log("The plugin doesn't support your minecraft version.");
+        log("Please try a different version.");
 
         return true;
     }

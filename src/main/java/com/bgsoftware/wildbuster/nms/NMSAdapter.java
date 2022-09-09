@@ -13,13 +13,9 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public interface NMSAdapter {
-
-    @Nullable
-    String getMappingsHash();
 
     String getVersion();
 

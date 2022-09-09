@@ -66,11 +66,6 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
     }
 
     @Override
-    public String getMappingsHash() {
-        return ((CraftMagicNumbers) CraftMagicNumbers.INSTANCE).getMappingsVersion();
-    }
-
-    @Override
     public String getVersion() {
         return "v1_17_R1";
     }
