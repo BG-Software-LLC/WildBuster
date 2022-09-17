@@ -137,7 +137,7 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         log("The plugin doesn't support your minecraft version.");
         log("Please try a different version.");
 
-        return true;
+        return false;
     }
 
     private void loadAPI() {
