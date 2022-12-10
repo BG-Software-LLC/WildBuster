@@ -1,7 +1,7 @@
 group 'Hook_RedProtect'
 
 dependencies {
-    compileOnly 'net.fabiozumbi12:RedProtect:latest'
+    compileOnly 'br.net.fabiozumbi12:RedProtect:7.7.2'
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
     compileOnly parent
