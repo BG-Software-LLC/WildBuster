@@ -229,7 +229,7 @@ public final class WPlayerBuster implements PlayerBuster {
 
                 MultiBlockTask multiBlockTask = new MultiBlockTask(plugin, offlinePlayer, this, true);
 
-                for (int y = plugin.getNMSAdapter().getWorldMinHeight(world); y < levelsAmount; y++) {
+                for (int y = 0; y < levelsAmount; y++) {
                     //Making sure the buster hasn't reached the stop level
                     if (currentLevel - y >= stopLevel) {
                         for(Chunk chunk : chunks) {
