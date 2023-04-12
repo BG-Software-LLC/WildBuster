@@ -72,7 +72,8 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
 
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, List<Location> blocksList, List<Player> playerList) {
-        LevelChunk levelChunk = ((CraftChunk) bukkitChunk).getHandle();
+        ServerLevel serverLevel = ((CraftChunk) bukkitChunk).getCraftWorld().getHandle();
+        LevelChunk levelChunk = serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
         ServerChunkCache chunkCache = levelChunk.level.getChunkSource();
         blocksList.forEach(location -> {
             BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
@@ -87,7 +88,8 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
 
     @Override
     public void clearTileEntities(org.bukkit.Chunk bukkitChunk, List<Location> tileEntities) {
-        LevelChunk levelChunk = ((CraftChunk) bukkitChunk).getHandle();
+        ServerLevel serverLevel = ((CraftChunk) bukkitChunk).getCraftWorld().getHandle();
+        LevelChunk levelChunk = serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
         Iterator<BlockPos> blockEntitiesIterator = levelChunk.getBlockEntities().keySet().iterator();
         while (blockEntitiesIterator.hasNext()) {
             BlockPos blockPos = blockEntitiesIterator.next();
