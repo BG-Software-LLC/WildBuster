@@ -107,7 +107,7 @@ clean {
 
 build {
     dependsOn shadowJar
-//    dependsOn copyAPI
+    dependsOn copyAPI
     dependsOn clean
 }
 
