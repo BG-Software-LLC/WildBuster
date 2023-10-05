@@ -1,14 +1,22 @@
 name: WildBuster
 version: ${project.version}
-api-version: 1.13
 main: com.bgsoftware.wildbuster.WildBusterPlugin
+
 description: Highly configurable and optimized chunk-busters plugin.
 website: https://bg-software.com/
-authors: [ Ome_R ]
-softdepend: [ Factions, WorldGuard, PlotSquared ]
+api-version: 1.13
+author: Ome_R
+
+# Custom section used by DependenciesManager, which replaces softdepend.
+class-depends:
+  - Factions
+  - WorldGuard
+  - PlotSquared
+
 commands:
   buster:
     description: WildBuster command list.
+
 permissions:
   wildbuster.*:
     description: Gives access to all the command.

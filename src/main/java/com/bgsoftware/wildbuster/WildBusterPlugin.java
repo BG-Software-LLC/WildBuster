@@ -1,5 +1,6 @@
 package com.bgsoftware.wildbuster;
 
+import com.bgsoftware.common.dependencies.DependenciesManager;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.wildbuster.api.WildBuster;
 import com.bgsoftware.wildbuster.api.WildBusterAPI;
@@ -44,6 +45,9 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
     @Override
     public void onLoad() {
         plugin = this;
+
+        DependenciesManager.inject(this);
+
         shouldEnable = loadNMSAdapter();
     }
 
