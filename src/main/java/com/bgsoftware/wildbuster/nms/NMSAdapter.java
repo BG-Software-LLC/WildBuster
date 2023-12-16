@@ -13,6 +13,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 public interface NMSAdapter {
@@ -42,6 +43,25 @@ public interface NMSAdapter {
     boolean isInsideBorder(Location location);
 
     Enchantment getGlowEnchant();
+
+    default Enchantment createGlowEnchantment() {
+        Enchantment glowEnchant = getGlowEnchant();
+
+        try {
+            Field field = Enchantment.class.getDeclaredField("acceptingNew");
+            field.setAccessible(true);
+            field.set(null, true);
+            field.setAccessible(false);
+        } catch (Exception ignored) {
+        }
+
+        try {
+            Enchantment.registerEnchantment(glowEnchant);
+        } catch (Exception ignored) {
+        }
+
+        return glowEnchant;
+    }
 
     default boolean isTallGrass(Material type) {
         return type == Material.LONG_GRASS;

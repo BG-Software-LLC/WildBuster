@@ -70,7 +70,7 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         getCommand("buster").setExecutor(commandsHandler);
         getCommand("buster").setTabCompleter(commandsHandler);
 
-        registerGlowEnchantment();
+        this.glowEnchant = nmsAdapter.createGlowEnchantment();
 
         bustersManager = new BustersHandler(this);
         providersHandler = new ProvidersHandler(this);
@@ -115,7 +115,8 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
                     new Pair<>(3336, null),
                     new Pair<>(3337, "v1_19"),
                     new Pair<>(3465, "v1_20_1"),
-                    new Pair<>(3578, "v1_20_2")
+                    new Pair<>(3578, "v1_20_2"),
+                    new Pair<>(3700, "v1_20_3")
             );
 
             for (Pair<Integer, String> versionData : versions) {
@@ -154,23 +155,6 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
             log("Failed to set-up API - disabling plugin...");
             setEnabled(false);
             ex.printStackTrace();
-        }
-    }
-
-    private void registerGlowEnchantment() {
-        glowEnchant = nmsAdapter.getGlowEnchant();
-
-        try {
-            Field field = Enchantment.class.getDeclaredField("acceptingNew");
-            field.setAccessible(true);
-            field.set(null, true);
-            field.setAccessible(false);
-        } catch (Exception ignored) {
-        }
-
-        try {
-            Enchantment.registerEnchantment(glowEnchant);
-        } catch (Exception ignored) {
         }
     }
 
