@@ -17,6 +17,7 @@ import java.util.List;
 public final class SettingsHandler {
 
     private static final String configName = ServerVersion.isAtLeast(ServerVersion.v1_18) ? "config118.yml" : "config.yml";
+    private static final int MAX_BUST_LEVEL = ServerVersion.isAtLeast(ServerVersion.v1_18) ? 320 : 255;
 
     public final long bustingInterval, timeBeforeRunning;
     public final int startingLevel, stoppingLevel, bustingLevelsAmount, defaultLimit, minimumCancelLevel;
@@ -48,7 +49,7 @@ public final class SettingsHandler {
         }
 
         bustingInterval = cfg.getLong("busting-interval", 10);
-        startingLevel = Math.min(cfg.getInt("starting-level", 255), 255);
+        startingLevel = Math.min(cfg.getInt("starting-level", MAX_BUST_LEVEL), MAX_BUST_LEVEL);
         stoppingLevel = cfg.getInt("stopping-level", 1);
         bustingLevelsAmount = cfg.getInt("busting-levels-amount", 1);
         defaultLimit = cfg.getInt("default-limit", 2);
