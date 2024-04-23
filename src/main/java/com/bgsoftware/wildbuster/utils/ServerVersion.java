@@ -24,10 +24,8 @@ public enum ServerVersion {
 
     static {
         bukkitVersion = Bukkit.getBukkitVersion().split("-")[0];
-        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-        String[] sections = version.split("_");
-        ;
-        currentVersion = ServerVersion.valueOf(sections[0] + "_" + sections[1]);
+        String[] sections = bukkitVersion.split("\\.");
+        currentVersion = ServerVersion.valueOf("v" + sections[0] + "_" + sections[1]);
         legacy = isLessThan(ServerVersion.v1_13);
     }
 
