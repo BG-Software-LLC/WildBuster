@@ -2,6 +2,7 @@ package com.bgsoftware.wildbuster.handlers;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
+import com.bgsoftware.wildbuster.utils.Resources;
 import com.bgsoftware.wildbuster.utils.ServerVersion;
 import com.bgsoftware.wildbuster.utils.items.ItemBuilder;
 import org.bukkit.ChatColor;
@@ -16,7 +17,6 @@ import java.util.List;
 
 public final class SettingsHandler {
 
-    private static final String configName = ServerVersion.isAtLeast(ServerVersion.v1_18) ? "config118.yml" : "config.yml";
     private static final int MAX_BUST_LEVEL = ServerVersion.isAtLeast(ServerVersion.v1_18) ? 320 : 255;
 
     public final long bustingInterval, timeBeforeRunning;
@@ -32,18 +32,19 @@ public final class SettingsHandler {
         File file = new File(plugin.getDataFolder(), "config.yml");
 
         if (!file.exists()) {
-            plugin.saveResource(configName, false);
-            if (!configName.equals("config.yml")) {
-                File newFile = new File(plugin.getDataFolder(), configName);
-                newFile.renameTo(file);
-            }
+            Resources.saveResource("config.yml");
+//            plugin.saveResource(configName, false);
+//            if (!configName.equals("config.yml")) {
+//                File newFile = new File(plugin.getDataFolder(), configName);
+//                newFile.renameTo(file);
+//            }
         }
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         oldDataConvertor(cfg);
 
         try {
-            cfg.syncWithConfig(file, plugin.getResource(configName), "chunkbusters");
+            cfg.syncWithConfig(file, Resources.getResource("config.yml"), "chunkbusters");
         } catch (IOException error) {
             error.printStackTrace();
         }
