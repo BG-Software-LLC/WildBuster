@@ -5,12 +5,16 @@ import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.nms.algorithms.v1_20_R3.PaperGlowEnchantment;
 import com.bgsoftware.wildbuster.nms.algorithms.v1_20_R3.SpigotGlowEnchantment;
+import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -35,6 +39,7 @@ import org.bukkit.inventory.InventoryHolder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapter {
 
@@ -126,24 +131,12 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
     public org.bukkit.inventory.ItemStack getPlayerSkull(org.bukkit.inventory.ItemStack bukkitItem, String texture) {
         ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitItem);
 
-//        DataComponentMap dataComponents = itemStack.getComponents();
-//
-//        ResolvableProfile skullOwner = dataComponents.has(DataComponents.PROFILE) ?
-//                dataComponents.get(DataComponents.PROFILE) : new CompoundTag();
-//
-//        CompoundTag properties = new CompoundTag();
-//        ListTag textures = new ListTag();
-//        CompoundTag signature = new CompoundTag();
-//
-//        signature.putString("Value", texture);
-//        textures.add(signature);
-//
-//        properties.put("textures", textures);
-//
-//        skullOwner.put("Properties", properties);
-//        skullOwner.putString("Id", UUID.randomUUID().toString());
-//
-//        compoundTag.put("SkullOwner", skullOwner);
+        PropertyMap propertyMap = new PropertyMap();
+        propertyMap.put("textures", new Property("textures", texture));
+
+        ResolvableProfile resolvableProfile = new ResolvableProfile(Optional.empty(), Optional.empty(), propertyMap);
+
+        itemStack.set(DataComponents.PROFILE, resolvableProfile);
 
         return CraftItemStack.asBukkitCopy(itemStack);
     }
