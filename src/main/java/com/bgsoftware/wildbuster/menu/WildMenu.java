@@ -14,7 +14,7 @@ public abstract class WildMenu implements InventoryHolder {
 
     private static final ReflectField<Object> CRAFT_INVENTORY_HANDLE = new ReflectField<>(
             new ClassInfo("inventory.CraftInventory", ClassInfo.PackageType.CRAFTBUKKIT),
-            Object.class, "inventory");
+            Object.class, "inventory").removeFinal();
 
     protected static final WildBusterPlugin plugin = WildBusterPlugin.getPlugin();
 
