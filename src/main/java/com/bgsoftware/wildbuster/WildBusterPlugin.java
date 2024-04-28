@@ -54,6 +54,8 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
             return;
         }
 
+        this.nmsAdapter.loadLegacy();
+
         new Metrics(this);
 
         log("******** ENABLE START ********");

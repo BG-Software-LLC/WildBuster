@@ -29,6 +29,7 @@ import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R3.legacy.CraftLegacy;
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -48,6 +49,12 @@ public final class NMSAdapterImpl implements NMSAdapter {
     @Override
     public String getVersion() {
         return "v1_20_R3";
+    }
+
+    @Override
+    public void loadLegacy() {
+        // Load legacy by accessing the CraftLegacy class.
+        CraftLegacy.fromLegacy(Material.ACACIA_BOAT);
     }
 
     @Override
