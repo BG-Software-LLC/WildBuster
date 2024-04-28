@@ -2,6 +2,7 @@ package com.bgsoftware.wildbuster.nms.v1_17;
 
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
+import com.bgsoftware.wildbuster.nms.NMSAdapter;
 import com.bgsoftware.wildbuster.nms.algorithms.PaperGlowEnchantment;
 import com.bgsoftware.wildbuster.nms.algorithms.SpigotGlowEnchantment;
 import net.md_5.bungee.api.ChatMessageType;
@@ -35,7 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapter {
+public final class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public String getVersion() {

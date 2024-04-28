@@ -1,36 +1,31 @@
-package com.bgsoftware.wildbuster.nms.v1_20_4;
+package com.bgsoftware.wildbuster.nms.v1_20_1;
 
-import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
-import com.bgsoftware.wildbuster.nms.algorithms.v1_20_R3.PaperGlowEnchantment;
-import com.bgsoftware.wildbuster.nms.algorithms.v1_20_R3.SpigotGlowEnchantment;
-import com.mojang.authlib.properties.Property;
-import com.mojang.authlib.properties.PropertyMap;
+import com.bgsoftware.wildbuster.nms.NMSAdapter;
+import com.bgsoftware.wildbuster.nms.algorithms.PaperGlowEnchantment;
+import com.bgsoftware.wildbuster.nms.algorithms.SpigotGlowEnchantment;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
 import org.bukkit.WorldBorder;
-import org.bukkit.craftbukkit.CraftChunk;
-import org.bukkit.craftbukkit.CraftRegistry;
-import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.block.CraftBlock;
-import org.bukkit.craftbukkit.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_20_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_20_R1.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -38,17 +33,13 @@ import org.bukkit.inventory.InventoryHolder;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.UUID;
 
-public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapter {
-
-    private static final ReflectField<Map<NamespacedKey, Enchantment>> REGISTRY_CACHE =
-            new ReflectField<>(CraftRegistry.class, Map.class, "cache");
+public final class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public String getVersion() {
-        return "v1_20_R4";
+        return "v1_20_R1";
     }
 
     @Override
@@ -131,12 +122,24 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
     public org.bukkit.inventory.ItemStack getPlayerSkull(org.bukkit.inventory.ItemStack bukkitItem, String texture) {
         ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitItem);
 
-        PropertyMap propertyMap = new PropertyMap();
-        propertyMap.put("textures", new Property("textures", texture));
+        CompoundTag compoundTag = itemStack.getOrCreateTag();
 
-        ResolvableProfile resolvableProfile = new ResolvableProfile(Optional.empty(), Optional.empty(), propertyMap);
+        CompoundTag skullOwner = compoundTag.contains("SkullOwner") ?
+                compoundTag.getCompound("SkullOwner") : new CompoundTag();
 
-        itemStack.set(DataComponents.PROFILE, resolvableProfile);
+        CompoundTag properties = new CompoundTag();
+        ListTag textures = new ListTag();
+        CompoundTag signature = new CompoundTag();
+
+        signature.putString("Value", texture);
+        textures.add(signature);
+
+        properties.put("textures", textures);
+
+        skullOwner.put("Properties", properties);
+        skullOwner.putString("Id", UUID.randomUUID().toString());
+
+        compoundTag.put("SkullOwner", skullOwner);
 
         return CraftItemStack.asBukkitCopy(itemStack);
     }
@@ -157,17 +160,6 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         } catch (Throwable error) {
             return new SpigotGlowEnchantment("wildbuster_glowing_enchant");
         }
-    }
-
-    @Override
-    public Enchantment createGlowEnchantment() {
-        Enchantment enchantment = getGlowEnchant();
-
-        Map<NamespacedKey, Enchantment> registryCache = REGISTRY_CACHE.get(Registry.ENCHANTMENT);
-
-        registryCache.put(enchantment.getKey(), enchantment);
-
-        return enchantment;
     }
 
     @Override
