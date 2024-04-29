@@ -1,6 +1,7 @@
 package com.bgsoftware.wildbuster.nms.v1_8_R3;
 
 import com.bgsoftware.wildbuster.api.objects.BlockData;
+import com.bgsoftware.wildbuster.nms.NMSAdapter;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Chunk;
@@ -30,7 +31,7 @@ import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
-public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapter {
+public final class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public String getVersion() {

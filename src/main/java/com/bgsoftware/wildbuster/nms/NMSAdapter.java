@@ -20,6 +20,10 @@ public interface NMSAdapter {
 
     String getVersion();
 
+    default void loadLegacy() {
+
+    }
+
     void setFastBlock(Location location, BlockData blockData);
 
     void refreshChunk(Chunk chunk, List<Location> blocksList, List<Player> playerList);

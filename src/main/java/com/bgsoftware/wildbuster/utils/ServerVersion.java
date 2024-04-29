@@ -2,6 +2,8 @@ package com.bgsoftware.wildbuster.utils;
 
 import org.bukkit.Bukkit;
 
+import java.util.Arrays;
+
 public enum ServerVersion {
 
     v1_8(18),
@@ -24,10 +26,8 @@ public enum ServerVersion {
 
     static {
         bukkitVersion = Bukkit.getBukkitVersion().split("-")[0];
-        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-        String[] sections = version.split("_");
-        ;
-        currentVersion = ServerVersion.valueOf(sections[0] + "_" + sections[1]);
+        String[] sections = bukkitVersion.split("\\.");
+        currentVersion = ServerVersion.valueOf("v" + sections[0] + "_" + sections[1]);
         legacy = isLessThan(ServerVersion.v1_13);
     }
 
@@ -56,6 +56,18 @@ public enum ServerVersion {
 
     public static String getBukkitVersion() {
         return bukkitVersion;
+    }
+
+    public static ServerVersion[] getByOrder() {
+        ServerVersion[] versions = Arrays.copyOfRange(values(), 0, currentVersion.ordinal() + 1);
+
+        for (int i = 0; i < versions.length / 2; i++) {
+            ServerVersion temp = versions[i];
+            versions[i] = versions[versions.length - i - 1];
+            versions[versions.length - i - 1] = temp;
+        }
+
+        return versions;
     }
 
 }

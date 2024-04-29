@@ -1,13 +1,14 @@
-package com.bgsoftware.wildbuster.nms.v1_17;
+package com.bgsoftware.wildbuster.nms.v1_20_3;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
-import com.bgsoftware.wildbuster.nms.algorithms.PaperGlowEnchantment;
-import com.bgsoftware.wildbuster.nms.algorithms.SpigotGlowEnchantment;
+import com.bgsoftware.wildbuster.nms.NMSAdapter;
+import com.bgsoftware.wildbuster.nms.algorithms.v1_20_R3.PaperGlowEnchantment;
+import com.bgsoftware.wildbuster.nms.algorithms.v1_20_R3.SpigotGlowEnchantment;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.SectionPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerChunkCache;
@@ -19,13 +20,17 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.WorldBorder;
-import org.bukkit.craftbukkit.v1_17_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_17_R1.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_20_R3.CraftChunk;
+import org.bukkit.craftbukkit.v1_20_R3.CraftRegistry;
+import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R3.legacy.CraftLegacy;
+import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -33,13 +38,23 @@ import org.bukkit.inventory.InventoryHolder;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapter {
+public final class NMSAdapterImpl implements NMSAdapter {
+
+    private static final ReflectField<Map<NamespacedKey, Enchantment>> REGISTRY_CACHE =
+            new ReflectField<>(CraftRegistry.class, Map.class, "cache");
 
     @Override
     public String getVersion() {
-        return "v1_17_R1";
+        return "v1_20_R3";
+    }
+
+    @Override
+    public void loadLegacy() {
+        // Load legacy by accessing the CraftLegacy class.
+        CraftLegacy.fromLegacy(Material.ACACIA_BOAT);
     }
 
     @Override
@@ -47,16 +62,8 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         ServerLevel serverLevel = ((CraftWorld) location.getWorld()).getHandle();
         LevelChunk levelChunk = serverLevel.getChunkAt(blockPos);
-        int indexY = levelChunk.getSectionIndex(blockPos.getY());
 
-        LevelChunkSection[] chunkSections = levelChunk.getSections();
-
-        LevelChunkSection chunkSection = chunkSections[indexY];
-
-        if (chunkSection == null) {
-            int yOffset = SectionPos.blockToSectionCoord(blockPos.getY());
-            chunkSection = chunkSections[indexY] = new LevelChunkSection(yOffset);
-        }
+        LevelChunkSection chunkSection = levelChunk.getSection(levelChunk.getSectionIndex(blockPos.getY()));
 
         BlockState oldBlockState = chunkSection.setBlockState(blockPos.getX() & 15,
                 blockPos.getY() & 15, blockPos.getZ() & 15,
@@ -72,7 +79,8 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
 
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, List<Location> blocksList, List<Player> playerList) {
-        LevelChunk levelChunk = ((CraftChunk) bukkitChunk).getHandle();
+        ServerLevel serverLevel = ((CraftChunk) bukkitChunk).getCraftWorld().getHandle();
+        LevelChunk levelChunk = serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
         ServerChunkCache chunkCache = levelChunk.level.getChunkSource();
         blocksList.forEach(location -> {
             BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
@@ -87,7 +95,8 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
 
     @Override
     public void clearTileEntities(org.bukkit.Chunk bukkitChunk, List<Location> tileEntities) {
-        LevelChunk levelChunk = ((CraftChunk) bukkitChunk).getHandle();
+        ServerLevel serverLevel = ((CraftChunk) bukkitChunk).getCraftWorld().getHandle();
+        LevelChunk levelChunk = serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
         Iterator<BlockPos> blockEntitiesIterator = levelChunk.getBlockEntities().keySet().iterator();
         while (blockEntitiesIterator.hasNext()) {
             BlockPos blockPos = blockEntitiesIterator.next();
@@ -166,6 +175,17 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         } catch (Throwable error) {
             return new SpigotGlowEnchantment("wildbuster_glowing_enchant");
         }
+    }
+
+    @Override
+    public Enchantment createGlowEnchantment() {
+        Enchantment enchantment = getGlowEnchant();
+
+        Map<NamespacedKey, Enchantment> registryCache = REGISTRY_CACHE.get(Registry.ENCHANTMENT);
+
+        registryCache.put(enchantment.getKey(), enchantment);
+
+        return enchantment;
     }
 
     @Override
