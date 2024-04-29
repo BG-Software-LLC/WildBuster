@@ -4,6 +4,7 @@ import com.bgsoftware.common.dependencies.DependenciesManager;
 import com.bgsoftware.common.nmsloader.INMSLoader;
 import com.bgsoftware.common.nmsloader.NMSHandlersFactory;
 import com.bgsoftware.common.nmsloader.NMSLoadException;
+import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.wildbuster.api.WildBuster;
 import com.bgsoftware.wildbuster.api.WildBusterAPI;
 import com.bgsoftware.wildbuster.api.handlers.BustersManager;
@@ -24,6 +25,8 @@ import java.lang.reflect.Field;
 import java.util.logging.Level;
 
 public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
+
+    private final Updater updater = new Updater(this, "wildbuster");
 
     private static WildBusterPlugin plugin;
 
@@ -78,10 +81,10 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         Locale.reload();
         loadAPI();
 
-        if (Updater.isOutdated()) {
+        if (updater.isOutdated()) {
             log("");
-            log("A new version is available (v" + Updater.getLatestVersion() + ")!");
-            log("Version's description: \"" + Updater.getVersionDescription() + "\"");
+            log("A new version is available (v" + updater.getLatestVersion() + ")!");
+            log("Version's description: \"" + updater.getVersionDescription() + "\"");
             log("");
         }
 
@@ -150,6 +153,10 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
 
     public Enchantment getGlowEnchant() {
         return glowEnchant;
+    }
+
+    public Updater getUpdater() {
+        return updater;
     }
 
     public static void log(String message) {
