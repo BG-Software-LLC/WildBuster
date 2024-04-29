@@ -33,11 +33,6 @@ public final class SettingsHandler {
 
         if (!file.exists()) {
             Resources.saveResource("config.yml");
-//            plugin.saveResource(configName, false);
-//            if (!configName.equals("config.yml")) {
-//                File newFile = new File(plugin.getDataFolder(), configName);
-//                newFile.renameTo(file);
-//            }
         }
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
