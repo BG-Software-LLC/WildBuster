@@ -15,8 +15,8 @@ import com.bgsoftware.wildbuster.handlers.SettingsHandler;
 import com.bgsoftware.wildbuster.listeners.BlocksListener;
 import com.bgsoftware.wildbuster.listeners.MenusListener;
 import com.bgsoftware.wildbuster.listeners.PlayersListener;
-import com.bgsoftware.wildbuster.metrics.Metrics;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -56,7 +56,7 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
 
         this.nmsAdapter.loadLegacy();
 
-        new Metrics(this);
+        new Metrics(this, 4106);
 
         log("******** ENABLE START ********");
 
