@@ -66,8 +66,7 @@ confirm-placement: false
 chunkbusters:
   regular_buster:
     radius: 1
-    type: SPONGE
-    data: 1
+    type: WET_SPONGE
     name: '&6Chunk Buster &7(Place to bust)'
     lore:
     - '&7Place this chunk buster'
@@ -75,8 +74,7 @@ chunkbusters:
   large_buster:
     #1 stands for 1x1 chunks, 3 for 3x3 and so on.
     radius: 3
-    type: SPONGE
-    data: 1
+    type: WET_SPONGE
     name: '&cChunk Buster &7(Place to bust)'
     lore:
     - '&7Place this chunk buster'

@@ -1,6 +1,5 @@
 package com.bgsoftware.wildbuster.listeners;
 
-import com.bgsoftware.wildbuster.Updater;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.utils.threads.Executor;
 import org.bukkit.ChatColor;
@@ -15,7 +14,7 @@ public final class PlayersListener implements Listener {
     Just notifies me if the server is using WildBuster
      */
 
-    private WildBusterPlugin plugin;
+    private final WildBusterPlugin plugin;
 
     public PlayersListener(WildBusterPlugin plugin){
         this.plugin = plugin;
@@ -29,10 +28,10 @@ public final class PlayersListener implements Listener {
                         ChatColor.GRAY + "This server is using WildBuster v" + plugin.getDescription().getVersion()), 5L);
         }
 
-        if(e.getPlayer().isOp() && Updater.isOutdated()){
+        if(e.getPlayer().isOp() && plugin.getUpdater().isOutdated()){
             Executor.sync(() ->
                 e.getPlayer().sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "WildBuster" +
-                        ChatColor.GRAY + " A new version is available (v" + Updater.getLatestVersion() + ")!"), 20L);
+                        ChatColor.GRAY + " A new version is available (v" + plugin.getUpdater().getLatestVersion() + ")!"), 20L);
         }
 
     }

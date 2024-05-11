@@ -1,7 +1,8 @@
-package com.bgsoftware.wildbuster.nms.v1_17;
+package com.bgsoftware.wildbuster.nms.v1_18;
 
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
+import com.bgsoftware.wildbuster.nms.NMSAdapter;
 import com.bgsoftware.wildbuster.nms.algorithms.PaperGlowEnchantment;
 import com.bgsoftware.wildbuster.nms.algorithms.SpigotGlowEnchantment;
 import net.md_5.bungee.api.ChatMessageType;
@@ -20,12 +21,13 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WorldBorder;
-import org.bukkit.craftbukkit.v1_17_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_17_R1.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_18_R2.CraftChunk;
+import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_18_R2.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_18_R2.legacy.CraftLegacy;
+import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -35,11 +37,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapter {
+public final class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public String getVersion() {
-        return "v1_17_R1";
+        return "v1_18_R2";
+    }
+
+    @Override
+    public void loadLegacy() {
+        // Load legacy by accessing the CraftLegacy class.
+        CraftLegacy.fromLegacy(Material.ACACIA_BOAT);
     }
 
     @Override
@@ -55,7 +63,7 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
 
         if (chunkSection == null) {
             int yOffset = SectionPos.blockToSectionCoord(blockPos.getY());
-            chunkSection = chunkSections[indexY] = new LevelChunkSection(yOffset);
+            chunkSection = chunkSections[indexY] = new LevelChunkSection(yOffset, levelChunk.biomeRegistry);
         }
 
         BlockState oldBlockState = chunkSection.setBlockState(blockPos.getX() & 15,

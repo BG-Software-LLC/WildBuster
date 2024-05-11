@@ -2,6 +2,7 @@ package com.bgsoftware.wildbuster.nms.v1_16_R3;
 
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
+import com.bgsoftware.wildbuster.nms.NMSAdapter;
 import com.bgsoftware.wildbuster.nms.algorithms.PaperGlowEnchantment;
 import com.bgsoftware.wildbuster.nms.algorithms.SpigotGlowEnchantment;
 import net.minecraft.server.v1_16_R3.Block;
@@ -45,7 +46,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
-public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapter {
+public final class NMSAdapterImpl implements NMSAdapter {
 
     private static Class<?> SHORT_ARRAY_SET_CLASS = null;
     private static Constructor<?> MULTI_BLOCK_CHANGE_CONSTRUCTOR = null;

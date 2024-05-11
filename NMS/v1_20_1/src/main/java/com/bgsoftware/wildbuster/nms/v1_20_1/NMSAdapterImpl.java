@@ -2,6 +2,7 @@ package com.bgsoftware.wildbuster.nms.v1_20_1;
 
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
+import com.bgsoftware.wildbuster.nms.NMSAdapter;
 import com.bgsoftware.wildbuster.nms.algorithms.PaperGlowEnchantment;
 import com.bgsoftware.wildbuster.nms.algorithms.SpigotGlowEnchantment;
 import net.md_5.bungee.api.ChatMessageType;
@@ -24,6 +25,7 @@ import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_20_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R1.legacy.CraftLegacy;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -34,11 +36,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapter {
+public final class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public String getVersion() {
         return "v1_20_R1";
+    }
+
+    @Override
+    public void loadLegacy() {
+        // Load legacy by accessing the CraftLegacy class.
+        CraftLegacy.fromLegacy(Material.ACACIA_BOAT);
     }
 
     @Override

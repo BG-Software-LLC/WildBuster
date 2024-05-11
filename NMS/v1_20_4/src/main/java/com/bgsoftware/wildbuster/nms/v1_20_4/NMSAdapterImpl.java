@@ -1,31 +1,38 @@
-package com.bgsoftware.wildbuster.nms.v1_19;
+package com.bgsoftware.wildbuster.nms.v1_20_4;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
-import com.bgsoftware.wildbuster.nms.algorithms.PaperGlowEnchantment;
-import com.bgsoftware.wildbuster.nms.algorithms.SpigotGlowEnchantment;
+import com.bgsoftware.wildbuster.nms.NMSAdapter;
+import com.bgsoftware.wildbuster.nms.algorithms.v1_20_R3.PaperGlowEnchantment;
+import com.bgsoftware.wildbuster.nms.algorithms.v1_20_R3.SpigotGlowEnchantment;
+import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.SectionPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.WorldBorder;
-import org.bukkit.craftbukkit.v1_19_R3.CraftChunk;
-import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.CraftChunk;
+import org.bukkit.craftbukkit.CraftRegistry;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.block.CraftBlock;
+import org.bukkit.craftbukkit.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.legacy.CraftLegacy;
+import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -33,13 +40,23 @@ import org.bukkit.inventory.InventoryHolder;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
+import java.util.Optional;
 
-public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapter {
+public final class NMSAdapterImpl implements NMSAdapter {
+
+    private static final ReflectField<Map<NamespacedKey, Enchantment>> REGISTRY_CACHE =
+            new ReflectField<>(CraftRegistry.class, Map.class, "cache");
 
     @Override
     public String getVersion() {
-        return "v1_19_R3";
+        return "v1_20_R4";
+    }
+
+    @Override
+    public void loadLegacy() {
+        // Load legacy by accessing the CraftLegacy class.
+        CraftLegacy.fromLegacy(Material.ACACIA_BOAT);
     }
 
     @Override
@@ -47,16 +64,8 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         ServerLevel serverLevel = ((CraftWorld) location.getWorld()).getHandle();
         LevelChunk levelChunk = serverLevel.getChunkAt(blockPos);
-        int indexY = levelChunk.getSectionIndex(blockPos.getY());
 
-        LevelChunkSection[] chunkSections = levelChunk.getSections();
-
-        LevelChunkSection chunkSection = chunkSections[indexY];
-
-        if (chunkSection == null) {
-            int yOffset = SectionPos.blockToSectionCoord(blockPos.getY());
-            chunkSection = chunkSections[indexY] = new LevelChunkSection(yOffset, levelChunk.biomeRegistry);
-        }
+        LevelChunkSection chunkSection = levelChunk.getSection(levelChunk.getSectionIndex(blockPos.getY()));
 
         BlockState oldBlockState = chunkSection.setBlockState(blockPos.getX() & 15,
                 blockPos.getY() & 15, blockPos.getZ() & 15,
@@ -130,24 +139,12 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
     public org.bukkit.inventory.ItemStack getPlayerSkull(org.bukkit.inventory.ItemStack bukkitItem, String texture) {
         ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitItem);
 
-        CompoundTag compoundTag = itemStack.getOrCreateTag();
+        PropertyMap propertyMap = new PropertyMap();
+        propertyMap.put("textures", new Property("textures", texture));
 
-        CompoundTag skullOwner = compoundTag.contains("SkullOwner") ?
-                compoundTag.getCompound("SkullOwner") : new CompoundTag();
+        ResolvableProfile resolvableProfile = new ResolvableProfile(Optional.empty(), Optional.empty(), propertyMap);
 
-        CompoundTag properties = new CompoundTag();
-        ListTag textures = new ListTag();
-        CompoundTag signature = new CompoundTag();
-
-        signature.putString("Value", texture);
-        textures.add(signature);
-
-        properties.put("textures", textures);
-
-        skullOwner.put("Properties", properties);
-        skullOwner.putString("Id", UUID.randomUUID().toString());
-
-        compoundTag.put("SkullOwner", skullOwner);
+        itemStack.set(DataComponents.PROFILE, resolvableProfile);
 
         return CraftItemStack.asBukkitCopy(itemStack);
     }
@@ -168,6 +165,17 @@ public final class NMSAdapter implements com.bgsoftware.wildbuster.nms.NMSAdapte
         } catch (Throwable error) {
             return new SpigotGlowEnchantment("wildbuster_glowing_enchant");
         }
+    }
+
+    @Override
+    public Enchantment createGlowEnchantment() {
+        Enchantment enchantment = getGlowEnchant();
+
+        Map<NamespacedKey, Enchantment> registryCache = REGISTRY_CACHE.get(Registry.ENCHANTMENT);
+
+        registryCache.put(enchantment.getKey(), enchantment);
+
+        return enchantment;
     }
 
     @Override
