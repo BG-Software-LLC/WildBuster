@@ -28,10 +28,10 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,13 +44,13 @@ public final class WPlayerBuster implements PlayerBuster {
     private final static WildBusterPlugin plugin = WildBusterPlugin.getPlugin();
 
     private final Map<Location, InventoryHolder> blockStateMap = new HashMap<>();
+    private final Set<Location> tileEntities = new HashSet<>();
 
     private final String busterName;
     private final UUID uuid;
     private final World world;
     private final Chunk originalChunk;
     private final List<Chunk> chunks;
-    private final Set<Location> tileEntities;
 
     private List<BlockData> removedBlocks;
 
@@ -58,14 +58,14 @@ public final class WPlayerBuster implements PlayerBuster {
     private int currentLevel;
     private boolean cancelStatus;
 
-    public WPlayerBuster(Player player, Location placedLocation, ChunkBuster buster){
+    public WPlayerBuster(Player player, Location placedLocation, ChunkBuster buster) {
         this(buster.getName(), player.getUniqueId(), placedLocation.getWorld(), false, true,
                 plugin.getSettings().startingLevel == -1 ? placedLocation.getBlockY() : plugin.getSettings().startingLevel,
                 getChunks(player, placedLocation.getChunk(), buster.getRadius()), new ArrayList<>(), placedLocation.getChunk());
     }
 
     public WPlayerBuster(String busterName, UUID uuid, World world, boolean cancelStatus, boolean notifyStatus, int currentLevel,
-                         List<Chunk> chunksList, List<BlockData> removedBlocks, Chunk originalChunk){
+                         List<Chunk> chunksList, List<BlockData> removedBlocks, Chunk originalChunk) {
         this.busterName = busterName;
         this.uuid = uuid;
         this.world = world;
@@ -73,34 +73,30 @@ public final class WPlayerBuster implements PlayerBuster {
         this.currentLevel = currentLevel;
         this.chunks = Collections.unmodifiableList(chunksList);
         this.originalChunk = originalChunk == null ? getOriginalChunk() : originalChunk;
-        this.tileEntities = loadTileEntities();
-        this.removedBlocks = new ArrayList<>(removedBlocks);
+        this.removedBlocks = new LinkedList<>(removedBlocks);
 
-        chunksList.forEach(chunk ->
-            Arrays.stream(chunk.getTileEntities()).filter(blockState -> blockState instanceof InventoryHolder)
-                    .forEach(blockState -> blockStateMap.put(blockState.getLocation(), (InventoryHolder) blockState)));
+        loadTileEntities();
 
-        if(notifyStatus)
+        if (notifyStatus)
             setNotify();
 
-        if(cancelStatus){
+        if (cancelStatus) {
             runCancelTask();
-        }
-
-        else{
+        } else {
             Executor.sync(this::runRegularTask, plugin.getSettings().timeBeforeRunning);
         }
     }
 
     private static List<Chunk> getChunks(Player player, Chunk origin, int radius) {
-        List<Chunk> chunks = new ArrayList<>();
+        List<Chunk> chunks = new LinkedList<>();
 
         origin = origin.getWorld().getChunkAt(origin.getX() - (radius / 2), origin.getZ() - (radius / 2));
 
         for (int x = 0; x < radius; x++) {
             for (int z = 0; z < radius; z++) {
                 Chunk ch = origin.getWorld().getChunkAt(origin.getX() + x, origin.getZ() + z);
-                if (PlayerUtils.canBustChunk(player, ch) && plugin.getBustersManager().getPlayerBuster(ch) == null)
+                if (PlayerUtils.canBustChunk(player, ch, false) &&
+                        plugin.getBustersManager().getPlayerBuster(ch) == null)
                     chunks.add(ch);
             }
         }
@@ -108,12 +104,12 @@ public final class WPlayerBuster implements PlayerBuster {
         return chunks;
     }
 
-    private Chunk getOriginalChunk(){
+    private Chunk getOriginalChunk() {
         int radius = (int) Math.sqrt(chunks.size());
         Chunk minimumChunk = chunks.stream().min((o1, o2) -> {
-            if(o1.getX() < o2.getX() && o1.getZ() < o2.getZ())
+            if (o1.getX() < o2.getX() && o1.getZ() < o2.getZ())
                 return -1;
-            else if(o1.getX() == o2.getX() && o1.getZ() == o2.getZ())
+            else if (o1.getX() == o2.getX() && o1.getZ() == o2.getZ())
                 return 0;
             else
                 return 1;
@@ -122,13 +118,15 @@ public final class WPlayerBuster implements PlayerBuster {
         return minimumChunk.getWorld().getChunkAt(minimumChunk.getX() + radius, minimumChunk.getZ() + radius);
     }
 
-    private Set<Location> loadTileEntities(){
-        Set<Location> tileEntities = new HashSet<>();
-
-        chunks.forEach(chunk ->
-            tileEntities.addAll(Arrays.stream(chunk.getTileEntities()).map(BlockState::getLocation).collect(Collectors.toList())));
-
-        return tileEntities;
+    private void loadTileEntities() {
+        for (Chunk chunk : this.chunks) {
+            for (BlockState blockState : chunk.getTileEntities()) {
+                Location location = blockState.getLocation();
+                this.tileEntities.add(location);
+                if (blockState instanceof InventoryHolder)
+                    blockStateMap.put(location, (InventoryHolder) blockState);
+            }
+        }
     }
 
     @Override
@@ -137,7 +135,7 @@ public final class WPlayerBuster implements PlayerBuster {
     }
 
     @Override
-    public ChunkBuster getChunkBuster(){
+    public ChunkBuster getChunkBuster() {
         return plugin.getBustersManager().getChunkBuster(busterName);
     }
 
@@ -173,7 +171,7 @@ public final class WPlayerBuster implements PlayerBuster {
 
     @Override
     public List<BlockData> getRemovedBlocks() {
-        return new ArrayList<>(removedBlocks);
+        return Collections.unmodifiableList(removedBlocks);
     }
 
     @Override
@@ -194,16 +192,16 @@ public final class WPlayerBuster implements PlayerBuster {
 
     @Override
     public void runRegularTask() {
-        if(cancelStatus)
+        if (cancelStatus)
             return;
 
         timer = new Timer();
 
-        List<ChunkSnapshot> chunkSnapshots = new ArrayList<>();
+        List<ChunkSnapshot> chunkSnapshots = new LinkedList<>();
         chunks.forEach(chunk -> chunkSnapshots.add(chunk.getChunkSnapshot(true, false, false)));
 
         Executor.async(() -> {
-            if(plugin.getSettings().skipAirLevels) {
+            if (plugin.getSettings().skipAirLevels) {
                 int startingLevel = plugin.getNMSAdapter().getWorldMinHeight(world);
 
                 for (ChunkSnapshot chunkSnapshot : chunkSnapshots) {
@@ -218,7 +216,7 @@ public final class WPlayerBuster implements PlayerBuster {
             }
 
             TimerUtils.runTimer(timer, () -> {
-                if(cancelStatus)
+                if (cancelStatus)
                     return;
 
                 //Counter for skipped levels
@@ -232,7 +230,7 @@ public final class WPlayerBuster implements PlayerBuster {
                 for (int y = 0; y < levelsAmount; y++) {
                     //Making sure the buster hasn't reached the stop level
                     if (currentLevel - y >= stopLevel) {
-                        for(Chunk chunk : chunks) {
+                        for (Chunk chunk : chunks) {
                             for (int x = 0; x < 16; x++) {
                                 for (int z = 0; z < 16; z++) {
                                     Block block = chunk.getBlock(x, (currentLevel - y), z);
@@ -266,12 +264,12 @@ public final class WPlayerBuster implements PlayerBuster {
 
                 currentLevel -= levelsAmount;
 
-                if(currentLevel < stopLevel){
+                if (currentLevel < stopLevel) {
                     ChunkBusterFinishEvent event = new ChunkBusterFinishEvent(this, ChunkBusterFinishEvent.FinishReason.BUSTER_FINISH);
                     Bukkit.getPluginManager().callEvent(event);
                     deleteBuster(false);
 
-                    if(offlinePlayer.isOnline())
+                    if (offlinePlayer.isOnline())
                         Locale.BUSTER_FINISHED.send(offlinePlayer.getPlayer());
                 }
             }, plugin.getSettings().bustingInterval);
@@ -280,25 +278,25 @@ public final class WPlayerBuster implements PlayerBuster {
     }
 
     @Override
-    public void performCancel(CommandSender sender){
+    public void performCancel(CommandSender sender) {
         OfflinePlayer target = Bukkit.getOfflinePlayer(uuid);
 
-        if(!sender.hasPermission("wildbuster.cancel.other") && !uuid.equals(((Player) sender).getUniqueId())){
+        if (!sender.hasPermission("wildbuster.cancel.other") && !uuid.equals(((Player) sender).getUniqueId())) {
             Locale.NO_PERMISSION.send(sender);
             return;
         }
 
-        if(cancelStatus){
+        if (cancelStatus) {
             Locale.BUSTER_ALREADY_CANCELLED.send(sender);
             return;
         }
 
-        if(currentLevel < plugin.getSettings().minimumCancelLevel){
+        if (currentLevel < plugin.getSettings().minimumCancelLevel) {
             Locale.BELOW_MINIMUM_CANCEL.send(sender);
             return;
         }
 
-        if(sender instanceof Player) {
+        if (sender instanceof Player) {
             ChunkBusterCancelEvent event = new ChunkBusterCancelEvent((Player) sender, this);
             Bukkit.getPluginManager().callEvent(event);
 
@@ -310,13 +308,13 @@ public final class WPlayerBuster implements PlayerBuster {
 
         Locale.CANCELLED_BUSTER.send(sender, target.getName());
 
-        if(sender instanceof Player && target.isOnline() && !target.getUniqueId().equals(((Player) sender).getUniqueId()))
+        if (sender instanceof Player && target.isOnline() && !target.getUniqueId().equals(((Player) sender).getUniqueId()))
             Locale.CANCELLED_BUSTER_OTHER.send(target.getPlayer(), sender.getName());
     }
 
     @Override
     public void runCancelTask() {
-        if(timer != null)
+        if (timer != null)
             timer.cancel();
 
         cancelStatus = true;
@@ -331,8 +329,8 @@ public final class WPlayerBuster implements PlayerBuster {
         TimerUtils.runTimer(timer, () -> {
             MultiBlockTask multiBlockTask = new MultiBlockTask(plugin, offlinePlayer, this, false);
 
-            for(int index = 0; index < chunks.size() * 16 * 16 * levelsAmount; index++){
-                if(removedBlocks.isEmpty()) {
+            for (int index = 0; index < chunks.size() * 16 * 16 * levelsAmount; index++) {
+                if (removedBlocks.isEmpty()) {
                     ChunkBusterFinishEvent event = new ChunkBusterFinishEvent(this, ChunkBusterFinishEvent.FinishReason.CANCEL_FINISH);
                     Bukkit.getPluginManager().callEvent(event);
                     deleteBuster(true);
@@ -349,7 +347,7 @@ public final class WPlayerBuster implements PlayerBuster {
             int currentLevelToNotify = currentLevel;
 
             multiBlockTask.submitUpdate(() -> {
-                if(isNotify() && offlinePlayer.isOnline())
+                if (isNotify() && offlinePlayer.isOnline())
                     PlayerUtils.sendActionBar(offlinePlayer.getPlayer(), Locale.ACTIONBAR_CANCEL_MESSAGE, currentLevelToNotify);
             });
         }, plugin.getSettings().bustingInterval);
@@ -359,12 +357,11 @@ public final class WPlayerBuster implements PlayerBuster {
     public void deleteBuster(boolean giveBusterItem) {
         Player pl = Bukkit.getPlayer(uuid);
 
-        if(giveBusterItem) {
+        if (giveBusterItem) {
             ItemStack dropItem = getChunkBuster().getBusterItem();
-            if(pl != null) {
+            if (pl != null) {
                 ItemUtils.addItem(dropItem, pl.getInventory(), pl.getLocation());
-            }
-            else if(removedBlocks.size() > 0){
+            } else if (!removedBlocks.isEmpty()) {
                 Location dropLocation = removedBlocks.get(0).getLocation();
                 dropLocation.getWorld().dropItemNaturally(dropLocation, dropItem);
             }

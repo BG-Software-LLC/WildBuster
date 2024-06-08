@@ -8,7 +8,7 @@ import com.plotsquared.core.plot.PlotArea;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 
-public final class ClaimsProvider_PlotSquared6 implements ClaimsProvider {
+public final class ClaimsProvider_PlotSquared6 implements ClaimsProviderPerBlock {
 
     private final PlotSquared instance = PlotSquared.get();
 

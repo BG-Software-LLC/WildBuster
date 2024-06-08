@@ -5,7 +5,7 @@ import com.intellectualcrafters.plot.object.Plot;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 
-public final class ClaimsProvider_PlotSquaredLegacy implements ClaimsProvider {
+public final class ClaimsProvider_PlotSquaredLegacy implements ClaimsProviderPerBlock {
 
     private final PlotAPI API = new PlotAPI();
 

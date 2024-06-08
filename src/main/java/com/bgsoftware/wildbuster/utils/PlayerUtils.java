@@ -15,34 +15,36 @@ public final class PlayerUtils {
 
     private static final WildBusterPlugin plugin = WildBusterPlugin.getPlugin();
 
-    public static boolean canBustChunk(Player player, Chunk chunk){
+    public static boolean canBustChunk(Player player, Chunk chunk, boolean checkInsideClaim) {
+        if (!checkInsideClaim && !plugin.getProviders().canBuild(player, chunk))
+            return false;
+
         FactionsProvider factionsProvider = plugin.getProviders().getFactionsProvider();
-        if(factionsProvider.hasBypassMode(player))
+        if (factionsProvider.hasBypassMode(player))
             return true;
-        else if(plugin.getSettings().onlyInsideClaim){
+        else if (plugin.getSettings().onlyInsideClaim) {
             return factionsProvider.isPlayersClaim(player, chunk);
-        }
-        else{
+        } else {
             return factionsProvider.isPlayersClaim(player, chunk) || factionsProvider.isWilderness(chunk);
         }
     }
 
-    public static void sendActionBar(Player player, Locale locale, Object... objects){
+    public static void sendActionBar(Player player, Locale locale, Object... objects) {
         String msg = locale.getMessage(objects);
-        if(msg != null && player != null)
+        if (msg != null && player != null)
             plugin.getNMSAdapter().sendActionBar(player, msg);
     }
 
-    public static int getBustersLimit(Player player){
+    public static int getBustersLimit(Player player) {
         int limit = plugin.getSettings().defaultLimit;
 
         Pattern pattern = Pattern.compile("wildbuster.limit.(\\d$)");
         Matcher matcher;
 
-        for(PermissionAttachmentInfo permissionAttachmentInfo : player.getEffectivePermissions()){
-            if((matcher = pattern.matcher(permissionAttachmentInfo.getPermission())).matches()){
+        for (PermissionAttachmentInfo permissionAttachmentInfo : player.getEffectivePermissions()) {
+            if ((matcher = pattern.matcher(permissionAttachmentInfo.getPermission())).matches()) {
                 int permissionLimit = Integer.parseInt(matcher.group(1));
-                if(permissionLimit > limit)
+                if (permissionLimit > limit)
                     limit = permissionLimit;
             }
         }
@@ -50,7 +52,7 @@ public final class PlayerUtils {
         return Math.max(limit, 0);
     }
 
-    public static boolean isCloseEnough(Location location, Chunk chunk){
+    public static boolean isCloseEnough(Location location, Chunk chunk) {
         int chunkX = location.getBlockX() >> 4, chunkZ = location.getBlockZ() >> 4;
         return Math.abs(chunkX - chunk.getX()) <= 32 && Math.abs(chunkZ - chunk.getZ()) <= 32;
     }

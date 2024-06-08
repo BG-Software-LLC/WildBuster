@@ -58,7 +58,7 @@ public final class BlocksListener implements Listener {
         }
 
         //Checks if the player can bust the chunk.
-        if(!PlayerUtils.canBustChunk(e.getPlayer(), chunk)){
+        if(!PlayerUtils.canBustChunk(e.getPlayer(), chunk, true)){
             Locale.MUST_PLACE_IN_CLAIM.send(e.getPlayer());
             return;
         }

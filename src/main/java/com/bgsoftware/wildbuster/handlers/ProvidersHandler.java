@@ -3,11 +3,14 @@ package com.bgsoftware.wildbuster.handlers;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.hooks.ClaimsProvider;
+import com.bgsoftware.wildbuster.hooks.ClaimsProviderPerBlock;
+import com.bgsoftware.wildbuster.hooks.ClaimsProviderPerChunk;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider_Default;
 import com.bgsoftware.wildbuster.hooks.listener.IBusterBlockListener;
 import com.bgsoftware.wildbuster.utils.threads.Executor;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
@@ -49,8 +52,24 @@ public final class ProvidersHandler {
         return factionsProvider;
     }
 
-    public boolean canBuild(OfflinePlayer player, Block block) {
-        return claimsProviders.stream().allMatch(p -> p.canBuild(player, block));
+    public boolean canBuild(OfflinePlayer offlinePlayer, Block block) {
+        for (ClaimsProvider claimsProvider : this.claimsProviders) {
+            if (claimsProvider.getType() == ClaimsProvider.Type.BLOCK_CLAIM &&
+                    !((ClaimsProviderPerBlock) claimsProvider).canBuild(offlinePlayer, block))
+                return false;
+        }
+
+        return true;
+    }
+
+    public boolean canBuild(OfflinePlayer offlinePlayer, Chunk chunk) {
+        for (ClaimsProvider claimsProvider : this.claimsProviders) {
+            if (claimsProvider.getType() == ClaimsProvider.Type.CHUNK_CLAIM &&
+                    !((ClaimsProviderPerChunk) claimsProvider).canBuild(offlinePlayer, chunk))
+                return false;
+        }
+
+        return true;
     }
 
     public void registerBusterBlockListener(IBusterBlockListener busterBlockListener) {

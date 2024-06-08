@@ -8,11 +8,10 @@ import me.ryanhamshire.GriefPrevention.PlayerData;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 
-public final class ClaimsProvider_GriefPrevention implements ClaimsProvider {
+public final class ClaimsProvider_GriefPrevention implements ClaimsProviderPerBlock {
 
     public ClaimsProvider_GriefPrevention() {
         WildBusterPlugin.log(" - Using GriefPrevention as ClaimsProvider.");
-
     }
 
     @Override

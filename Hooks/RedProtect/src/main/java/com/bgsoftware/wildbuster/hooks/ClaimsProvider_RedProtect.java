@@ -6,11 +6,10 @@ import com.bgsoftware.wildbuster.WildBusterPlugin;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 
-public final class ClaimsProvider_RedProtect implements ClaimsProvider {
+public final class ClaimsProvider_RedProtect implements ClaimsProviderPerBlock {
 
     public ClaimsProvider_RedProtect() {
         WildBusterPlugin.log(" - Using RedProtect as ClaimsProvider.");
-
     }
 
     @Override

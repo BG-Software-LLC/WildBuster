@@ -17,7 +17,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-public final class ClaimsProvider_WorldGuard implements ClaimsProvider {
+public final class ClaimsProvider_WorldGuard implements ClaimsProviderPerBlock {
 
     private static final WorldGuardPlugin worldGuard = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
     private static final ReflectMethod<Boolean> CAN_BUILD_METHOD = new ReflectMethod<>(WorldGuardPlugin.class,
