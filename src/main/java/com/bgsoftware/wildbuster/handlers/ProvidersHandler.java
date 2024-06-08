@@ -96,7 +96,9 @@ public final class ProvidersHandler {
             claimsProvider.ifPresent(claimsProviders::add);
         }
         if (Bukkit.getPluginManager().isPluginEnabled("Lands")) {
-            Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_Lands");
+            Optional<ClaimsProvider> claimsProvider = createInstance("ClaimsProvider_Lands4");
+            if (!claimsProvider.isPresent())
+                claimsProvider = createInstance("ClaimsProvider_Lands7");
             claimsProvider.ifPresent(claimsProviders::add);
         }
         if (Bukkit.getPluginManager().isPluginEnabled("RedProtect")) {

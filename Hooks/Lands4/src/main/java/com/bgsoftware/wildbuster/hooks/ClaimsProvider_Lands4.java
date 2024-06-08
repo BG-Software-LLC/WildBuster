@@ -7,11 +7,20 @@ import me.angeschossen.lands.api.role.enums.RoleSetting;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 
-public final class ClaimsProvider_Lands implements ClaimsProvider {
+public final class ClaimsProvider_Lands4 implements ClaimsProvider {
 
     private final LandsIntegration landsIntegration;
 
-    public ClaimsProvider_Lands(WildBusterPlugin plugin){
+    public static boolean isCompatible() {
+        try {
+            Class.forName("me.angeschossen.lands.api.role.enums.RoleSetting");
+            return true;
+        } catch (ClassNotFoundException error) {
+            return false;
+        }
+    }
+
+    public ClaimsProvider_Lands4(WildBusterPlugin plugin){
         landsIntegration = new LandsIntegration(plugin, false);
         landsIntegration.initialize();
         WildBusterPlugin.log(" - Using Lands as ClaimsProvider.");
