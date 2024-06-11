@@ -1,9 +1,9 @@
 package com.bgsoftware.wildbuster.menu;
 
 import com.bgsoftware.wildbuster.api.objects.ChunkBuster;
+import com.bgsoftware.wildbuster.scheduler.Scheduler;
 import com.bgsoftware.wildbuster.utils.items.ItemBuilder;
 import com.bgsoftware.wildbuster.utils.items.ItemUtils;
-import com.bgsoftware.wildbuster.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -59,14 +59,14 @@ public final class BustersConfirmMenu extends WildMenu {
 
     public static void open(Player player, Location location, ChunkBuster chunkBuster){
         if(Bukkit.isPrimaryThread()){
-            Executor.async(() -> open(player, location, chunkBuster));
+            Scheduler.runTaskAsync(() -> open(player, location, chunkBuster));
             return;
         }
 
         BustersConfirmMenu bustersCancelMenu = new BustersConfirmMenu(chunkBuster, location);
         Inventory inventory = bustersCancelMenu.buildInventory();
 
-        Executor.sync(() -> player.openInventory(inventory));
+        Scheduler.runTask(player, () -> player.openInventory(inventory));
     }
 
 }

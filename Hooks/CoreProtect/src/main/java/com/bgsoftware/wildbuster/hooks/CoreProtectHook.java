@@ -3,7 +3,7 @@ package com.bgsoftware.wildbuster.hooks;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.hooks.listener.IBusterBlockListener;
-import com.bgsoftware.wildbuster.utils.threads.Executor;
+import com.bgsoftware.wildbuster.scheduler.Scheduler;
 import net.coreprotect.CoreProtect;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -25,7 +25,7 @@ public final class CoreProtectHook {
     private static void recordBlockChange(OfflinePlayer offlinePlayer, Location location, BlockData blockData,
                                           IBusterBlockListener.Action action) {
         if (!Bukkit.isPrimaryThread()) {
-            Executor.sync(() -> recordBlockChange(offlinePlayer, location, blockData, action));
+            Scheduler.runTask(() -> recordBlockChange(offlinePlayer, location, blockData, action));
             return;
         }
 

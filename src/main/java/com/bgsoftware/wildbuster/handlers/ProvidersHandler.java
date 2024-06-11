@@ -8,12 +8,11 @@ import com.bgsoftware.wildbuster.hooks.ClaimsProviderPerChunk;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider;
 import com.bgsoftware.wildbuster.hooks.FactionsProvider_Default;
 import com.bgsoftware.wildbuster.hooks.listener.IBusterBlockListener;
-import com.bgsoftware.wildbuster.utils.threads.Executor;
+import com.bgsoftware.wildbuster.scheduler.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Block;
 import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Constructor;
@@ -33,7 +32,7 @@ public final class ProvidersHandler {
     public ProvidersHandler(WildBusterPlugin plugin) {
         this.plugin = plugin;
 
-        Executor.sync(() -> {
+        Scheduler.runTask(() -> {
             WildBusterPlugin.log("Loading providers started...");
             long startTime = System.currentTimeMillis();
 
@@ -52,10 +51,10 @@ public final class ProvidersHandler {
         return factionsProvider;
     }
 
-    public boolean canBuild(OfflinePlayer offlinePlayer, Block block) {
+    public boolean canBuild(OfflinePlayer offlinePlayer, Location blockLocation) {
         for (ClaimsProvider claimsProvider : this.claimsProviders) {
             if (claimsProvider.getType() == ClaimsProvider.Type.BLOCK_CLAIM &&
-                    !((ClaimsProviderPerBlock) claimsProvider).canBuild(offlinePlayer, block))
+                    !((ClaimsProviderPerBlock) claimsProvider).canBuild(offlinePlayer, blockLocation))
                 return false;
         }
 

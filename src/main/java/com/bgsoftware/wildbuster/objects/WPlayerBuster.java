@@ -7,20 +7,19 @@ import com.bgsoftware.wildbuster.api.events.ChunkBusterFinishEvent;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.api.objects.ChunkBuster;
 import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
+import com.bgsoftware.wildbuster.nms.ChunkSnapshotReader;
+import com.bgsoftware.wildbuster.scheduler.Scheduler;
 import com.bgsoftware.wildbuster.utils.PlayerUtils;
 import com.bgsoftware.wildbuster.utils.TimerUtils;
 import com.bgsoftware.wildbuster.utils.blocks.MultiBlockTask;
 import com.bgsoftware.wildbuster.utils.items.ItemUtils;
-import com.bgsoftware.wildbuster.utils.threads.Executor;
 import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -37,6 +36,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public final class WPlayerBuster implements PlayerBuster {
@@ -83,7 +84,7 @@ public final class WPlayerBuster implements PlayerBuster {
         if (cancelStatus) {
             runCancelTask();
         } else {
-            Executor.sync(this::runRegularTask, plugin.getSettings().timeBeforeRunning);
+            Scheduler.runTask(this::runRegularTask, plugin.getSettings().timeBeforeRunning);
         }
     }
 
@@ -197,17 +198,32 @@ public final class WPlayerBuster implements PlayerBuster {
 
         timer = new Timer();
 
-        List<ChunkSnapshot> chunkSnapshots = new LinkedList<>();
-        chunks.forEach(chunk -> chunkSnapshots.add(chunk.getChunkSnapshot(true, false, false)));
+        CompletableFuture<Boolean> completeLock = new CompletableFuture<>();
+        int expectedChunkSnapshots = chunks.size();
 
-        Executor.async(() -> {
+        List<ChunkSnapshotReader> chunkSnapshots = new LinkedList<>();
+        if (Scheduler.isRegionScheduler()) {
+            AtomicInteger finishedChunkSnapshots = new AtomicInteger(0);
+            chunks.forEach(chunk -> Scheduler.runTask(chunk, () -> {
+                chunkSnapshots.add(plugin.getNMSAdapter().createChunkSnapshotReader(
+                        chunk.getChunkSnapshot(true, false, false)));
+                if (finishedChunkSnapshots.incrementAndGet() == expectedChunkSnapshots)
+                    completeLock.complete(true);
+            }));
+        } else {
+            chunks.forEach(chunk -> chunkSnapshots.add(plugin.getNMSAdapter().createChunkSnapshotReader(
+                    chunk.getChunkSnapshot(true, false, false))));
+            completeLock.complete(true);
+        }
+
+        completeLock.whenCompleteAsync((v, e) -> {
             if (plugin.getSettings().skipAirLevels) {
                 int startingLevel = plugin.getNMSAdapter().getWorldMinHeight(world);
 
-                for (ChunkSnapshot chunkSnapshot : chunkSnapshots) {
+                for (ChunkSnapshotReader chunkSnapshot : chunkSnapshots) {
                     for (int x = 0; x < 16; x++) {
                         for (int z = 0; z < 16; z++) {
-                            startingLevel = Math.max(startingLevel, chunkSnapshot.getHighestBlockYAt(x, z));
+                            startingLevel = Math.max(startingLevel, chunkSnapshot.getHandle().getHighestBlockYAt(x, z));
                         }
                     }
                 }
@@ -230,25 +246,36 @@ public final class WPlayerBuster implements PlayerBuster {
                 for (int y = 0; y < levelsAmount; y++) {
                     //Making sure the buster hasn't reached the stop level
                     if (currentLevel - y >= stopLevel) {
-                        for (Chunk chunk : chunks) {
+                        for (ChunkSnapshotReader chunkSnapshot : chunkSnapshots) {
                             for (int x = 0; x < 16; x++) {
                                 for (int z = 0; z < 16; z++) {
-                                    Block block = chunk.getBlock(x, (currentLevel - y), z);
+                                    int blockY = currentLevel - y;
 
-                                    if (block.getType() == Material.AIR ||
-                                            blockedMaterials.contains(block.getType().name()) ||
-                                            !plugin.getNMSAdapter().isInsideBorder(block.getLocation()) ||
-                                            !plugin.getProviders().canBuild(offlinePlayer, block))
+                                    BlockData blockData = readBlockData(chunkSnapshot, x, blockY, z);
+                                    Material blockType = blockData.getType();
+                                    Location blockLocation = blockData.getLocation();
+
+                                    if (blockType == Material.AIR ||
+                                            blockedMaterials.contains(blockType.name()) ||
+                                            !plugin.getNMSAdapter().isInsideBorder(blockLocation) ||
+                                            !plugin.getProviders().canBuild(offlinePlayer, blockLocation))
                                         continue;
 
-                                    InventoryHolder inventoryHolder = blockStateMap.get(block.getLocation());
-
-                                    BlockData blockData = new WBlockData(block, inventoryHolder);
 
                                     if (plugin.getSettings().reverseMode && !cancelStatus)
                                         removedBlocks.add(blockData);
 
-                                    multiBlockTask.setBlock(block.getLocation(), WBlockData.AIR, tileEntities.contains(block.getLocation()));
+                                    multiBlockTask.setBlock(blockLocation, blockData, WBlockData.AIR,
+                                            tileEntities.contains(blockLocation));
+
+                                    Location upperBlockLocation = blockLocation.clone().add(0, 1, 0);
+                                    if (plugin.getNMSAdapter().isInsideBorder(upperBlockLocation) &&
+                                            plugin.getProviders().canBuild(offlinePlayer, upperBlockLocation)) {
+                                        BlockData upperBlock = readBlockData(chunkSnapshot, x, blockY + 1, z);
+                                        if (plugin.getNMSAdapter().isTallGrass(upperBlock.getType())) {
+                                            multiBlockTask.setBlock(upperBlock.getLocation(), upperBlock, WBlockData.AIR, false);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -274,7 +301,7 @@ public final class WPlayerBuster implements PlayerBuster {
                 }
             }, plugin.getSettings().bustingInterval);
 
-        });
+        }, Scheduler::runTaskAsync);
     }
 
     @Override
@@ -338,7 +365,8 @@ public final class WPlayerBuster implements PlayerBuster {
                 }
 
                 BlockData blockData = removedBlocks.get(0);
-                multiBlockTask.setBlock(blockData.getLocation(), blockData, tileEntities.contains(blockData.getLocation()));
+                multiBlockTask.setBlock(blockData.getLocation(), WBlockData.AIR, blockData,
+                        tileEntities.contains(blockData.getLocation()));
 
                 currentLevel = blockData.getY();
                 removedBlocks.remove(0);
@@ -375,4 +403,21 @@ public final class WPlayerBuster implements PlayerBuster {
     public List<Player> getNearbyPlayers() {
         return world.getPlayers().stream().filter(player -> PlayerUtils.isCloseEnough(player.getLocation(), originalChunk)).collect(Collectors.toList());
     }
+
+    private BlockData readBlockData(ChunkSnapshotReader chunkSnapshot, int x, int y, int z) {
+        Material blockType = chunkSnapshot.getBlockType(x, y, z);
+
+        Location location = new Location(this.world,
+                (chunkSnapshot.getHandle().getX() << 4) + x,
+                y,
+                (chunkSnapshot.getHandle().getZ() << 4) + z);
+
+        InventoryHolder inventoryHolder = blockStateMap.remove(location);
+
+        byte data = chunkSnapshot.getBlockData(x, y, z);
+        int combinedId = chunkSnapshot.getCombinedId(x, y, z);
+
+        return new WBlockData(location, blockType, data, combinedId, inventoryHolder);
+    }
+
 }

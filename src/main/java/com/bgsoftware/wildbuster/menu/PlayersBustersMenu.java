@@ -2,9 +2,9 @@ package com.bgsoftware.wildbuster.menu;
 
 import com.bgsoftware.wildbuster.Locale;
 import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
+import com.bgsoftware.wildbuster.scheduler.Scheduler;
 import com.bgsoftware.wildbuster.utils.items.ItemBuilder;
 import com.bgsoftware.wildbuster.utils.legacy.Materials;
-import com.bgsoftware.wildbuster.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -111,14 +111,14 @@ public final class PlayersBustersMenu extends WildMenu {
 
     public static void open(Player player, OfflinePlayer targetPlayer, int page){
         if(Bukkit.isPrimaryThread()){
-            Executor.async(() -> open(player, targetPlayer, page));
+            Scheduler.runTaskAsync(() -> open(player, targetPlayer, page));
             return;
         }
 
         PlayersBustersMenu bustersCancelMenu = new PlayersBustersMenu(targetPlayer);
         Inventory inventory = bustersCancelMenu.buildInventory(page);
 
-        Executor.sync(() -> player.openInventory(inventory));
+        Scheduler.runTask(player, () -> player.openInventory(inventory));
     }
 
 }

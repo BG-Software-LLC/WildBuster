@@ -1,6 +1,7 @@
 package com.bgsoftware.wildbuster.nms.v1_8_R3;
 
 import com.bgsoftware.wildbuster.api.objects.BlockData;
+import com.bgsoftware.wildbuster.nms.ChunkSnapshotReader;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
@@ -14,6 +15,7 @@ import net.minecraft.server.v1_8_R3.NBTTagList;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_8_R3.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.v1_8_R3.World;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WorldBorder;
@@ -121,6 +123,11 @@ public final class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
+    public ChunkSnapshotReader createChunkSnapshotReader(ChunkSnapshot chunkSnapshot) {
+        return new ChunkSnapshotReaderImpl(chunkSnapshot);
+    }
+
+    @Override
     public Object getBlockData(int combined) {
         return null;
     }
@@ -154,11 +161,22 @@ public final class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public boolean isInsideBorder(Location location) {
-        WorldBorder worldBorder = location.getWorld().getWorldBorder();
+        org.bukkit.World bukkitWorld = location.getWorld();
+
+        WorldBorder worldBorder = bukkitWorld.getWorldBorder();
         Location center = worldBorder.getCenter();
         int radius = (int) worldBorder.getSize() / 2;
-        return location.getBlockX() <= (center.getBlockX() + radius) && location.getBlockX() >= (center.getBlockX() - radius) &&
-                location.getBlockZ() <= (center.getBlockZ() + radius) && location.getBlockZ() >= (center.getBlockZ() - radius);
+
+        int centerX = center.getBlockX();
+        int centerZ = center.getBlockZ();
+
+        int blockX = location.getBlockX();
+        int blockY = location.getBlockY();
+        int blockZ = location.getBlockZ();
+
+        return blockX <= (centerX + radius) && blockX >= (centerX - radius) &&
+                blockZ <= (centerZ + radius) && blockZ >= (centerZ - radius) &&
+                blockY >= 0 && blockY <= bukkitWorld.getMaxHeight();
     }
 
     @Override

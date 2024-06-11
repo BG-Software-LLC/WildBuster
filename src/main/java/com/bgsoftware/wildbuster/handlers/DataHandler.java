@@ -4,8 +4,8 @@ import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 import com.bgsoftware.wildbuster.objects.WBlockData;
+import com.bgsoftware.wildbuster.scheduler.Scheduler;
 import com.bgsoftware.wildbuster.utils.items.ItemUtils;
-import com.bgsoftware.wildbuster.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -25,7 +25,7 @@ public final class DataHandler {
 
     public DataHandler(WildBusterPlugin plugin){
         this.plugin = plugin;
-        Executor.sync(this::loadBusters, 1L);
+        Scheduler.runTask(this::loadBusters, 1L);
     }
 
     public void saveBusters(){
@@ -146,7 +146,8 @@ public final class DataHandler {
 
             // Load player-buster to database
             // We load it on the second tick of the game so all the plugins can initliaze themselves
-            Executor.sync(() -> plugin.getBustersManager().loadPlayerBuster(busterName, uuid, world, cancelStatus, notifyStatus, currentLevel, chunksList, removedBlocks), 1L);
+            Scheduler.runTask(() -> plugin.getBustersManager().loadPlayerBuster(
+                    busterName, uuid, world, cancelStatus, notifyStatus, currentLevel, chunksList, removedBlocks), 1L);
 
             bustersAmount++;
         }

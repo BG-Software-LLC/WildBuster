@@ -3,6 +3,7 @@ package com.bgsoftware.wildbuster.nms.v1_20_4;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
+import com.bgsoftware.wildbuster.nms.ChunkSnapshotReader;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
 import com.bgsoftware.wildbuster.nms.algorithms.v1_20_R3.PaperGlowEnchantment;
 import com.bgsoftware.wildbuster.nms.algorithms.v1_20_R3.SpigotGlowEnchantment;
@@ -20,10 +21,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
+import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.craftbukkit.CraftChunk;
 import org.bukkit.craftbukkit.CraftRegistry;
@@ -131,6 +134,11 @@ public final class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
+    public ChunkSnapshotReader createChunkSnapshotReader(ChunkSnapshot chunkSnapshot) {
+        return new ChunkSnapshotReaderImpl(chunkSnapshot);
+    }
+
+    @Override
     public Object getBlockData(int combined) {
         return CraftBlockData.fromData(Block.stateById(combined));
     }
@@ -151,11 +159,13 @@ public final class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public boolean isInsideBorder(Location location) {
-        WorldBorder worldBorder = location.getWorld().getWorldBorder();
-        Location center = worldBorder.getCenter();
-        int radius = (int) worldBorder.getSize() / 2;
-        return location.getBlockX() <= (center.getBlockX() + radius) && location.getBlockX() >= (center.getBlockX() - radius) &&
-                location.getBlockZ() <= (center.getBlockZ() + radius) && location.getBlockZ() >= (center.getBlockZ() - radius);
+        World bukkitWorld = location.getWorld();
+
+        WorldBorder worldBorder = bukkitWorld.getWorldBorder();
+        int blockY = location.getBlockY();
+
+        return worldBorder.isInside(location) &&
+                blockY >= bukkitWorld.getMinHeight() && blockY <= bukkitWorld.getMaxHeight();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.bgsoftware.wildbuster.hooks;
 
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Block;
 
 public interface ClaimsProviderPerBlock extends ClaimsProvider {
 
@@ -9,6 +9,6 @@ public interface ClaimsProviderPerBlock extends ClaimsProvider {
         return Type.BLOCK_CLAIM;
     }
 
-    boolean canBuild(OfflinePlayer offlinePlayer, Block block);
+    boolean canBuild(OfflinePlayer offlinePlayer, Location blockLocation);
 
 }

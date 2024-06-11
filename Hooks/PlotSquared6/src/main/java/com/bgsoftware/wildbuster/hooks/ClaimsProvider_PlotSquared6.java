@@ -6,15 +6,14 @@ import com.plotsquared.core.location.Location;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Block;
 
 public final class ClaimsProvider_PlotSquared6 implements ClaimsProviderPerBlock {
 
     private final PlotSquared instance = PlotSquared.get();
 
     @Override
-    public boolean canBuild(OfflinePlayer player, Block block) {
-        Location plotLocation = BukkitUtil.adaptComplete(block.getLocation());
+    public boolean canBuild(OfflinePlayer player, org.bukkit.Location blockLocation) {
+        Location plotLocation = BukkitUtil.adaptComplete(blockLocation);
         PlotArea plotArea = instance.getPlotAreaManager().getPlotArea(plotLocation);
         Plot plot = plotArea == null ? null : plotArea.getPlot(plotLocation);
         return plot == null || (player.isOnline() && player.getPlayer().hasPermission("plots.admin.build.other")) ||

@@ -1,6 +1,7 @@
 package com.bgsoftware.wildbuster.nms.v1_12_R1;
 
 import com.bgsoftware.wildbuster.api.objects.BlockData;
+import com.bgsoftware.wildbuster.nms.ChunkSnapshotReader;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -15,6 +16,7 @@ import net.minecraft.server.v1_12_R1.NBTTagList;
 import net.minecraft.server.v1_12_R1.PacketPlayOutChat;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.v1_12_R1.World;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WorldBorder;
@@ -123,6 +125,11 @@ public final class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
+    public ChunkSnapshotReader createChunkSnapshotReader(ChunkSnapshot chunkSnapshot) {
+        return new ChunkSnapshotReaderImpl(chunkSnapshot);
+    }
+
+    @Override
     public Object getBlockData(int combined) {
         return null;
     }
@@ -157,11 +164,12 @@ public final class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public boolean isInsideBorder(Location location) {
-        WorldBorder worldBorder = location.getWorld().getWorldBorder();
-        Location center = worldBorder.getCenter();
-        int radius = (int) worldBorder.getSize() / 2;
-        return location.getBlockX() <= (center.getBlockX() + radius) && location.getBlockX() >= (center.getBlockX() - radius) &&
-                location.getBlockZ() <= (center.getBlockZ() + radius) && location.getBlockZ() >= (center.getBlockZ() - radius);
+        org.bukkit.World bukkitWorld = location.getWorld();
+
+        WorldBorder worldBorder = bukkitWorld.getWorldBorder();
+        int blockY = location.getBlockY();
+
+        return worldBorder.isInside(location) && blockY >= 0 && blockY <= bukkitWorld.getMaxHeight();
     }
 
     @Override

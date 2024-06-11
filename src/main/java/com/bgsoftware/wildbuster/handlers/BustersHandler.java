@@ -10,9 +10,9 @@ import com.bgsoftware.wildbuster.api.objects.PlayerBuster;
 import com.bgsoftware.wildbuster.objects.WBlockData;
 import com.bgsoftware.wildbuster.objects.WChunkBuster;
 import com.bgsoftware.wildbuster.objects.WPlayerBuster;
+import com.bgsoftware.wildbuster.scheduler.Scheduler;
 import com.bgsoftware.wildbuster.utils.blocks.ChunkPosition;
 import com.bgsoftware.wildbuster.utils.items.ItemUtils;
-import com.bgsoftware.wildbuster.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
@@ -25,6 +25,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -114,12 +115,19 @@ public final class BustersHandler implements BustersManager {
 
     @Override
     public void removePlayerBuster(PlayerBuster playerBuster) {
-        Executor.sync(() -> {
-            playerBusters.remove(playerBuster);
-            playerBuster.getChunks().forEach(chunk -> chunksToPlayerBusters.remove(ChunkPosition.of(chunk)));
-            notifyBusters.remove(playerBuster.getUniqueID());
-            plugin.getNMSAdapter().handleChunkUnload(playerBuster.getWorld(), playerBuster.getChunks(), plugin, true);
-        });
+        playerBusters.remove(playerBuster);
+        notifyBusters.remove(playerBuster.getUniqueID());
+
+        if (Scheduler.isRegionScheduler()) {
+            playerBuster.getChunks().forEach(chunk -> {
+                chunksToPlayerBusters.remove(ChunkPosition.of(chunk));
+                Scheduler.runTask(chunk, () -> plugin.getNMSAdapter().handleChunkUnload(
+                        playerBuster.getWorld(), Collections.singletonList(chunk), plugin, true));
+            });
+        } else {
+            Scheduler.runTask(() ->
+                    playerBuster.getChunks().forEach(chunk -> chunksToPlayerBusters.remove(ChunkPosition.of(chunk))));
+        }
     }
 
     @Override

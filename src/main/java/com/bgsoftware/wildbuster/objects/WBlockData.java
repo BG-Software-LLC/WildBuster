@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 @SuppressWarnings("WeakerAccess")
 public final class WBlockData implements BlockData {
 
-    private static WildBusterPlugin plugin = WildBusterPlugin.getPlugin();
+    private static final WildBusterPlugin plugin = WildBusterPlugin.getPlugin();
     public static BlockData AIR = new WBlockData(Material.AIR, (byte) 0, 0, null, 0, 0, 0);
 
     private final Material type;
@@ -23,16 +23,25 @@ public final class WBlockData implements BlockData {
 
     private ItemStack[] contents;
 
-    public WBlockData(Block block, InventoryHolder inventoryHolder){
-        this(block.getType(), (byte) plugin.getNMSAdapter().getMaterialData(block),
-                plugin.getNMSAdapter().getCombinedId(block), block.getWorld(),
-                block.getX(), block.getY(), block.getZ());
+    public WBlockData(Block block, InventoryHolder inventoryHolder) {
+        this(block.getLocation(), block.getType(), block.getData(),
+                plugin.getNMSAdapter().getCombinedId(block), inventoryHolder);
+    }
 
-        if(inventoryHolder != null)
+    public WBlockData(Location blockLocation, Material blockType, byte blockData, int combinedId, InventoryHolder inventoryHolder) {
+        this.type = blockType;
+        this.data = blockData;
+        this.combinedId = combinedId;
+        this.world = blockLocation.getWorld();
+        this.x = blockLocation.getBlockX();
+        this.y = blockLocation.getBlockY();
+        this.z = blockLocation.getBlockZ();
+
+        if (inventoryHolder != null)
             this.contents = inventoryHolder.getInventory().getContents();
     }
 
-    public WBlockData(Material type, byte data, int combinedId, World world, int x, int y, int z){
+    public WBlockData(Material type, byte data, int combinedId, World world, int x, int y, int z) {
         this.type = type;
         this.data = data;
         this.combinedId = combinedId;

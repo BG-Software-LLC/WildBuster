@@ -13,6 +13,7 @@ import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -28,22 +29,22 @@ public final class ClaimsProvider_WorldGuard implements ClaimsProviderPerBlock {
     }
 
     @Override
-    public boolean canBuild(OfflinePlayer player, Block block) {
+    public boolean canBuild(OfflinePlayer player, Location blockLocation) {
         if (CAN_BUILD_METHOD.isValid()) {
             Player onlinePlayer = player.getPlayer();
-            return onlinePlayer != null && CAN_BUILD_METHOD.invoke(worldGuard, onlinePlayer, block);
+            return onlinePlayer != null && CAN_BUILD_METHOD.invoke(worldGuard, onlinePlayer, blockLocation.getBlock());
         }
 
         WorldGuardPlatform worldGuardPlatform = WorldGuard.getInstance().getPlatform();
         RegionContainer regionContainer = worldGuardPlatform.getRegionContainer();
-        com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(block.getWorld());
+        com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(blockLocation.getWorld());
         RegionManager regionManager = regionContainer.get(world);
 
         if (regionManager == null)
             return false;
 
         LocalPlayer localPlayer = worldGuard.wrapOfflinePlayer(player);
-        BlockVector3 blockVector3 = BlockVector3.at(block.getX(), block.getY(), block.getZ());
+        BlockVector3 blockVector3 = BlockVector3.at(blockLocation.getBlockX(), blockLocation.getBlockY(), blockLocation.getBlockZ());
         ApplicableRegionSet set = regionManager.getApplicableRegions(blockVector3);
 
         return set.testState(localPlayer, Flags.BUILD) || set.testState(localPlayer, Flags.BLOCK_BREAK);

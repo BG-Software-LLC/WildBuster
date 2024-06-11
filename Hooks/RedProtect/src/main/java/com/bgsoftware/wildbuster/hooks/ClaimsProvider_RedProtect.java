@@ -3,8 +3,8 @@ package com.bgsoftware.wildbuster.hooks;
 import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
 import br.net.fabiozumbi12.RedProtect.Bukkit.Region;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Block;
 
 public final class ClaimsProvider_RedProtect implements ClaimsProviderPerBlock {
 
@@ -13,8 +13,8 @@ public final class ClaimsProvider_RedProtect implements ClaimsProviderPerBlock {
     }
 
     @Override
-    public boolean canBuild(OfflinePlayer player, Block block) {
-        Region region = RedProtect.get().getAPI().getRegion(block.getLocation());
+    public boolean canBuild(OfflinePlayer player, Location blockLocation) {
+        Region region = RedProtect.get().getAPI().getRegion(blockLocation);
         String uuid = player.getUniqueId().toString();
         return region == null || region.getFlagBool("build") || region.isLeaderByUUID(uuid) ||
                 region.isAdminByUUID(uuid) || region.isMemberByUUID(uuid) || (player.isOnline() &&

@@ -3,6 +3,7 @@ package com.bgsoftware.wildbuster.nms;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import org.bukkit.Chunk;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -39,6 +40,8 @@ public interface NMSAdapter {
     int getMaterialData(Block block);
 
     int getCombinedId(Block block);
+
+    ChunkSnapshotReader createChunkSnapshotReader(ChunkSnapshot chunkSnapshot);
 
     Object getBlockData(int combined);
 

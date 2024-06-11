@@ -17,6 +17,7 @@ import com.bgsoftware.wildbuster.listeners.BlocksListener;
 import com.bgsoftware.wildbuster.listeners.MenusListener;
 import com.bgsoftware.wildbuster.listeners.PlayersListener;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
+import com.bgsoftware.wildbuster.scheduler.Scheduler;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -44,6 +45,8 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
     @Override
     public void onLoad() {
         plugin = this;
+
+        Scheduler.initialize();
 
         DependenciesManager.inject(this);
 

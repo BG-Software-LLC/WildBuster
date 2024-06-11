@@ -1,6 +1,7 @@
 package com.bgsoftware.wildbuster.nms.v1_7_R4;
 
 import com.bgsoftware.wildbuster.api.objects.BlockData;
+import com.bgsoftware.wildbuster.nms.ChunkSnapshotReader;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
 import net.minecraft.server.v1_7_R4.Block;
 import net.minecraft.server.v1_7_R4.Chunk;
@@ -12,6 +13,7 @@ import net.minecraft.server.v1_7_R4.NBTTagList;
 import net.minecraft.server.v1_7_R4.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.v1_7_R4.TileEntity;
 import net.minecraft.server.v1_7_R4.World;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_7_R4.CraftChunk;
@@ -119,6 +121,11 @@ public final class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
+    public ChunkSnapshotReader createChunkSnapshotReader(ChunkSnapshot chunkSnapshot) {
+        return new ChunkSnapshotReaderImpl(chunkSnapshot);
+    }
+
+    @Override
     public Object getBlockData(int combined) {
         return null;
     }
@@ -152,7 +159,11 @@ public final class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public boolean isInsideBorder(Location location) {
-        return true;
+        org.bukkit.World bukkitWorld = location.getWorld();
+
+        int blockY = location.getBlockY();
+
+        return blockY >= 0 && blockY <= bukkitWorld.getMaxHeight();
     }
 
     @Override
