@@ -39,6 +39,7 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
 
     private NMSAdapter nmsAdapter;
 
+    @Nullable
     private Enchantment glowEnchant;
 
     private boolean shouldEnable = true;
@@ -51,7 +52,12 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
 
         DependenciesManager.inject(this);
 
-        shouldEnable = loadNMSAdapter();
+        if (!loadNMSAdapter()) {
+            this.shouldEnable = false;
+            return;
+        }
+
+        this.glowEnchant = nmsAdapter.createGlowEnchantment();
     }
 
     @Override
@@ -74,8 +80,6 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
         CommandsHandler commandsHandler = new CommandsHandler(this);
         getCommand("buster").setExecutor(commandsHandler);
         getCommand("buster").setTabCompleter(commandsHandler);
-
-        this.glowEnchant = nmsAdapter.createGlowEnchantment();
 
         bustersManager = new BustersHandler(this);
         providersHandler = new ProvidersHandler(this);
