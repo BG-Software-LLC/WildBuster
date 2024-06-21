@@ -5,8 +5,6 @@ import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.nms.ChunkSnapshotReader;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
-import com.bgsoftware.wildbuster.nms.algorithms.v1_20_R3.PaperGlowEnchantment;
-import com.bgsoftware.wildbuster.nms.algorithms.v1_20_R3.SpigotGlowEnchantment;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import net.md_5.bungee.api.ChatMessageType;
@@ -25,7 +23,6 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.craftbukkit.CraftChunk;
@@ -170,22 +167,14 @@ public final class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public Enchantment getGlowEnchant() {
-        try {
-            return new PaperGlowEnchantment("wildbuster_glowing_enchant");
-        } catch (Throwable error) {
-            return new SpigotGlowEnchantment("wildbuster_glowing_enchant");
-        }
+        // Not supported anymore
+        return null;
     }
 
     @Override
     public Enchantment createGlowEnchantment() {
-        Enchantment enchantment = getGlowEnchant();
-
-        Map<NamespacedKey, Enchantment> registryCache = REGISTRY_CACHE.get(Registry.ENCHANTMENT);
-
-        registryCache.put(enchantment.getKey(), enchantment);
-
-        return enchantment;
+        // Not supported anymore
+        return null;
     }
 
     @Override

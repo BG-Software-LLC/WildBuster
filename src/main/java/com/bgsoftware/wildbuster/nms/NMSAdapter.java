@@ -14,6 +14,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -49,22 +50,26 @@ public interface NMSAdapter {
 
     boolean isInsideBorder(Location location);
 
+    @Nullable
     Enchantment getGlowEnchant();
 
+    @Nullable
     default Enchantment createGlowEnchantment() {
         Enchantment glowEnchant = getGlowEnchant();
 
-        try {
-            Field field = Enchantment.class.getDeclaredField("acceptingNew");
-            field.setAccessible(true);
-            field.set(null, true);
-            field.setAccessible(false);
-        } catch (Exception ignored) {
-        }
+        if (glowEnchant != null) {
+            try {
+                Field field = Enchantment.class.getDeclaredField("acceptingNew");
+                field.setAccessible(true);
+                field.set(null, true);
+                field.setAccessible(false);
+            } catch (Exception ignored) {
+            }
 
-        try {
-            Enchantment.registerEnchantment(glowEnchant);
-        } catch (Exception ignored) {
+            try {
+                Enchantment.registerEnchantment(glowEnchant);
+            } catch (Exception ignored) {
+            }
         }
 
         return glowEnchant;
