@@ -4,6 +4,7 @@ import com.bgsoftware.common.dependencies.DependenciesManager;
 import com.bgsoftware.common.nmsloader.INMSLoader;
 import com.bgsoftware.common.nmsloader.NMSHandlersFactory;
 import com.bgsoftware.common.nmsloader.NMSLoadException;
+import com.bgsoftware.common.nmsloader.config.NMSConfiguration;
 import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.wildbuster.api.WildBuster;
 import com.bgsoftware.wildbuster.api.WildBusterAPI;
@@ -109,7 +110,7 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
 
     private boolean loadNMSAdapter() {
         try {
-            INMSLoader nmsLoader = NMSHandlersFactory.createNMSLoader(this);
+            INMSLoader nmsLoader = NMSHandlersFactory.createNMSLoader(this, NMSConfiguration.forPlugin(this));
             this.nmsAdapter = nmsLoader.loadNMSHandler(NMSAdapter.class);
 
             return true;
