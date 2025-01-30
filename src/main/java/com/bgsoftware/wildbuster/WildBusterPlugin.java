@@ -20,10 +20,8 @@ import com.bgsoftware.wildbuster.listeners.PlayersListener;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
 import com.bgsoftware.wildbuster.scheduler.Scheduler;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 
@@ -40,9 +38,6 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
 
     private NMSAdapter nmsAdapter;
 
-    @Nullable
-    private Enchantment glowEnchant;
-
     private boolean shouldEnable = true;
 
     @Override
@@ -57,8 +52,6 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
             this.shouldEnable = false;
             return;
         }
-
-        this.glowEnchant = nmsAdapter.createGlowEnchantment();
     }
 
     @Override
@@ -158,11 +151,6 @@ public final class WildBusterPlugin extends JavaPlugin implements WildBuster {
 
     public NMSAdapter getNMSAdapter() {
         return nmsAdapter;
-    }
-
-    @Nullable
-    public Enchantment getGlowEnchant() {
-        return glowEnchant;
     }
 
     public Updater getUpdater() {

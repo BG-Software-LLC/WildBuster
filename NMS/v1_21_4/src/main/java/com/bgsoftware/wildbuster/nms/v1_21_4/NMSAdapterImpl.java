@@ -23,7 +23,6 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.craftbukkit.CraftChunk;
@@ -38,6 +37,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Iterator;
 import java.util.List;
@@ -167,31 +167,8 @@ public final class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
-    public Enchantment getGlowEnchant() {
-        return GlowEnchantment.createEnchantment();
-    }
-
-    @Override
-    public Enchantment createGlowEnchantment() {
-        Enchantment enchantment = Registry.ENCHANTMENT.get(GlowEnchantment.GLOW_ENCHANTMENT_KEY);
-        if (enchantment != null)
-            return enchantment;
-
-        enchantment = getGlowEnchant();
-
-        Registry<Enchantment> registry = Registry.ENCHANTMENT;
-        try {
-            if (registry instanceof io.papermc.paper.registry.legacy.DelayedRegistry) {
-                registry = ((io.papermc.paper.registry.legacy.DelayedRegistry) registry).delegate();
-            }
-        } catch (Throwable ignored) {
-        }
-
-        Map<NamespacedKey, Enchantment> registryCache = REGISTRY_CACHE.get(registry);
-
-        registryCache.put(enchantment.getKey(), enchantment);
-
-        return enchantment;
+    public void makeItemGlow(ItemMeta itemMeta) {
+        itemMeta.setEnchantmentGlintOverride(true);
     }
 
     @Override

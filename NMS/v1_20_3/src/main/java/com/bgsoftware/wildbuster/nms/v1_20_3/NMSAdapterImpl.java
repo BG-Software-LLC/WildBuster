@@ -38,6 +38,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Iterator;
 import java.util.List;
@@ -48,6 +49,8 @@ public final class NMSAdapterImpl implements NMSAdapter {
 
     private static final ReflectField<Map<NamespacedKey, Enchantment>> REGISTRY_CACHE =
             new ReflectField<>(CraftRegistry.class, Map.class, "cache");
+
+    private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
 
     @Override
     public String getVersion() {
@@ -179,23 +182,8 @@ public final class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
-    public Enchantment getGlowEnchant() {
-        try {
-            return new PaperGlowEnchantment("wildbuster_glowing_enchant");
-        } catch (Throwable error) {
-            return new SpigotGlowEnchantment("wildbuster_glowing_enchant");
-        }
-    }
-
-    @Override
-    public Enchantment createGlowEnchantment() {
-        Enchantment enchantment = getGlowEnchant();
-
-        Map<NamespacedKey, Enchantment> registryCache = REGISTRY_CACHE.get(Registry.ENCHANTMENT);
-
-        registryCache.put(enchantment.getKey(), enchantment);
-
-        return enchantment;
+    public void makeItemGlow(ItemMeta itemMeta) {
+        itemMeta.addEnchant(GLOW_ENCHANT, 1, true);
     }
 
     @Override
@@ -222,6 +210,22 @@ public final class NMSAdapterImpl implements NMSAdapter {
     @Override
     public int getWorldMinHeight(org.bukkit.World world) {
         return world.getMinHeight();
+    }
+
+    private static Enchantment initializeGlowEnchantment() {
+        Enchantment glowEnchant;
+
+        try {
+            glowEnchant = new PaperGlowEnchantment("wildbuster_glowing_enchant");
+        } catch (Throwable error) {
+            glowEnchant = new SpigotGlowEnchantment("wildbuster_glowing_enchant");
+        }
+
+        Map<NamespacedKey, Enchantment> registryCache = REGISTRY_CACHE.get(Registry.ENCHANTMENT);
+
+        registryCache.put(glowEnchant.getKey(), glowEnchant);
+
+        return glowEnchant;
     }
 
 }

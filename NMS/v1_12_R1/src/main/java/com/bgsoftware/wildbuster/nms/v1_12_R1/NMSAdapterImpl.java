@@ -28,13 +28,17 @@ import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.ItemMeta;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
 public final class NMSAdapterImpl implements NMSAdapter {
+
+    private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
 
     @Override
     public String getVersion() {
@@ -173,8 +177,16 @@ public final class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
-    public Enchantment getGlowEnchant() {
-        return new Enchantment(201) {
+    public void makeItemGlow(ItemMeta itemMeta) {
+        itemMeta.addEnchant(GLOW_ENCHANT, 1, true);
+    }
+
+    private static Enchantment initializeGlowEnchantment() {
+        int enchantId = 100;
+        while (Enchantment.getById(enchantId) != null)
+            ++enchantId;
+
+        Enchantment glowEnchant = new Enchantment(enchantId) {
             @Override
             public String getName() {
                 return "WildBusterGlow";
@@ -196,16 +208,6 @@ public final class NMSAdapterImpl implements NMSAdapter {
             }
 
             @Override
-            public boolean conflictsWith(Enchantment enchantment) {
-                return false;
-            }
-
-            @Override
-            public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
-                return true;
-            }
-
-            @Override
             public boolean isTreasure() {
                 return false;
             }
@@ -214,7 +216,32 @@ public final class NMSAdapterImpl implements NMSAdapter {
             public boolean isCursed() {
                 return false;
             }
+
+            @Override
+            public boolean conflictsWith(Enchantment enchantment) {
+                return false;
+            }
+
+            @Override
+            public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
+                return true;
+            }
         };
+
+        try {
+            Field field = Enchantment.class.getDeclaredField("acceptingNew");
+            field.setAccessible(true);
+            field.set(null, true);
+            field.setAccessible(false);
+        } catch (Exception ignored) {
+        }
+
+        try {
+            Enchantment.registerEnchantment(glowEnchant);
+        } catch (Exception ignored) {
+        }
+
+        return glowEnchant;
     }
 
 }

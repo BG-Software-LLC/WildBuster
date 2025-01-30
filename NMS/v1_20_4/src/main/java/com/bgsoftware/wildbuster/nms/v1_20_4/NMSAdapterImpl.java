@@ -1,6 +1,5 @@
 package com.bgsoftware.wildbuster.nms.v1_20_4;
 
-import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.nms.ChunkSnapshotReader;
@@ -22,31 +21,25 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.craftbukkit.CraftChunk;
-import org.bukkit.craftbukkit.CraftRegistry;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.legacy.CraftLegacy;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public final class NMSAdapterImpl implements NMSAdapter {
-
-    private static final ReflectField<Map<NamespacedKey, Enchantment>> REGISTRY_CACHE =
-            new ReflectField<>(CraftRegistry.class, Map.class, "cache");
 
     @Override
     public String getVersion() {
@@ -166,15 +159,8 @@ public final class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
-    public Enchantment getGlowEnchant() {
-        // Not supported anymore
-        return null;
-    }
-
-    @Override
-    public Enchantment createGlowEnchantment() {
-        // Not supported anymore
-        return null;
+    public void makeItemGlow(ItemMeta itemMeta) {
+        itemMeta.setEnchantmentGlintOverride(true);
     }
 
     @Override

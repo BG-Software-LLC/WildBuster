@@ -8,14 +8,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-import javax.annotation.Nullable;
-import java.lang.reflect.Field;
 import java.util.List;
 
 public interface NMSAdapter {
@@ -50,30 +48,7 @@ public interface NMSAdapter {
 
     boolean isInsideBorder(Location location);
 
-    @Nullable
-    Enchantment getGlowEnchant();
-
-    @Nullable
-    default Enchantment createGlowEnchantment() {
-        Enchantment glowEnchant = getGlowEnchant();
-
-        if (glowEnchant != null) {
-            try {
-                Field field = Enchantment.class.getDeclaredField("acceptingNew");
-                field.setAccessible(true);
-                field.set(null, true);
-                field.setAccessible(false);
-            } catch (Exception ignored) {
-            }
-
-            try {
-                Enchantment.registerEnchantment(glowEnchant);
-            } catch (Exception ignored) {
-            }
-        }
-
-        return glowEnchant;
-    }
+    void makeItemGlow(ItemMeta itemMeta);
 
     default boolean isTallGrass(Material type) {
         return type == Material.LONG_GRASS;

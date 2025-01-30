@@ -24,7 +24,9 @@ import org.bukkit.craftbukkit.v1_7_R4.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.ItemMeta;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,8 @@ import java.util.UUID;
 
 @SuppressWarnings("unused")
 public final class NMSAdapterImpl implements NMSAdapter {
+
+    private static final Enchantment GLOW_ENCHANT = initializeGlowEnchantment();
 
     @Override
     public String getVersion() {
@@ -167,8 +171,16 @@ public final class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
-    public Enchantment getGlowEnchant() {
-        return new Enchantment(201) {
+    public void makeItemGlow(ItemMeta itemMeta) {
+        itemMeta.addEnchant(GLOW_ENCHANT, 1, true);
+    }
+
+    private static Enchantment initializeGlowEnchantment() {
+        int enchantId = 100;
+        while (Enchantment.getById(enchantId) != null)
+            ++enchantId;
+
+        Enchantment glowEnchant = new Enchantment(enchantId) {
             @Override
             public String getName() {
                 return "WildBusterGlow";
@@ -199,6 +211,21 @@ public final class NMSAdapterImpl implements NMSAdapter {
                 return true;
             }
         };
+
+        try {
+            Field field = Enchantment.class.getDeclaredField("acceptingNew");
+            field.setAccessible(true);
+            field.set(null, true);
+            field.setAccessible(false);
+        } catch (Exception ignored) {
+        }
+
+        try {
+            Enchantment.registerEnchantment(glowEnchant);
+        } catch (Exception ignored) {
+        }
+
+        return glowEnchant;
     }
 
 }

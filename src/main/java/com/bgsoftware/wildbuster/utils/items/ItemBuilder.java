@@ -71,6 +71,11 @@ public final class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder makeItemGlow() {
+        plugin.getNMSAdapter().makeItemGlow(itemMeta);
+        return this;
+    }
+
     public ItemStack build(){
         itemStack.setItemMeta(itemMeta);
         return texture.isEmpty() ? itemStack : plugin.getNMSAdapter().getPlayerSkull(itemStack, texture);

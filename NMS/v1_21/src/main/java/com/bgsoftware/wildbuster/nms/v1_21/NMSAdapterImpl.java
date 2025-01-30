@@ -23,7 +23,6 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.craftbukkit.CraftChunk;
@@ -38,6 +37,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Iterator;
 import java.util.List;
@@ -167,19 +167,8 @@ public final class NMSAdapterImpl implements NMSAdapter {
     }
 
     @Override
-    public Enchantment getGlowEnchant() {
-        return new GlowEnchantment();
-    }
-
-    @Override
-    public Enchantment createGlowEnchantment() {
-        Enchantment enchantment = getGlowEnchant();
-
-        Map<NamespacedKey, Enchantment> registryCache = REGISTRY_CACHE.get(Registry.ENCHANTMENT);
-
-        registryCache.put(enchantment.getKey(), enchantment);
-
-        return enchantment;
+    public void makeItemGlow(ItemMeta itemMeta) {
+        itemMeta.setEnchantmentGlintOverride(true);
     }
 
     @Override

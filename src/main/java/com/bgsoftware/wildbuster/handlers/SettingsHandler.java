@@ -96,9 +96,7 @@ public final class SettingsHandler {
                 }
 
                 if (cfg.getBoolean("chunkbusters." + name + ".glow", false)) {
-                    Enchantment glowEnchant = plugin.getGlowEnchant();
-                    if (glowEnchant != null)
-                        itemBuilder.addEnchant(plugin.getGlowEnchant(), 1);
+                    itemBuilder.makeItemGlow();
                 }
 
                 if (cfg.contains("chunkbusters." + name + ".skull")) {
