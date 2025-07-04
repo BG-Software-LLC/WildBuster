@@ -1,4 +1,4 @@
-package com.bgsoftware.wildbuster.nms.v1_21_6;
+package com.bgsoftware.wildbuster.nms.v1_21_7;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

@@ -1,4 +1,4 @@
-package com.bgsoftware.wildbuster.nms.v1_21_6;
+package com.bgsoftware.wildbuster.nms.v1_21_7;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildbuster.nms.ChunkSnapshotReader;

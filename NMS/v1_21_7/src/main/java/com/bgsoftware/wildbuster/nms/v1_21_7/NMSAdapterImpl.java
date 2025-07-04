@@ -1,4 +1,4 @@
-package com.bgsoftware.wildbuster.nms.v1_21_6;
+package com.bgsoftware.wildbuster.nms.v1_21_7;
 
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
@@ -43,7 +43,7 @@ public final class NMSAdapterImpl implements NMSAdapter {
 
     @Override
     public String getVersion() {
-        return "v1_21_6";
+        return "v1_21_7";
     }
 
     @Override
