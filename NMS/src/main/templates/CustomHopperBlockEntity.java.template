@@ -1,4 +1,4 @@
-package com.bgsoftware.wildbuster.nms.v1_21;
+package com.bgsoftware.wildbuster.nms.${NMS_VERSION};
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,7 +20,7 @@ public class CustomHopperBlockEntity extends HopperBlockEntity {
 
     @Override
     public InventoryHolder getOwner() {
-        return holder;
+        return this.holder;
     }
 
 }

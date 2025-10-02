@@ -1,4 +1,4 @@
-package com.bgsoftware.wildbuster.nms.v1_21_7;
+package com.bgsoftware.wildbuster.nms.${NMS_VERSION};
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.wildbuster.nms.ChunkSnapshotReader;
@@ -7,14 +7,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.CraftChunkSnapshot;
+import ${CRAFTBUKKIT_PACKAGE}.CraftChunkSnapshot;
 
 import java.lang.ref.WeakReference;
 
 public class ChunkSnapshotReaderImpl implements ChunkSnapshotReader {
 
     private static final ReflectField<PalettedContainer<BlockState>[]> CHUNK_SNAPSHOT_BLOCK_IDS =
-            new ReflectField<>(CraftChunkSnapshot.class, PalettedContainer[].class, "blockIds");
+            new ReflectField<>(CraftChunkSnapshot.class, PalettedContainer[].class, "blockIds", "blockids");
     private static final ReflectField<Integer> CHUNK_SNAPSHOT_MIN_HEIGHT =
             new ReflectField<>(CraftChunkSnapshot.class, int.class, "minHeight");
 
