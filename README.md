@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://bg-software.com/imgs/wildbuster-logo.png" />
+<img src="https://static.bg-software.com/imgs/wildbuster-logo.png" />
 <h2 align="center">Remove chunks at the speed of light!</h2>
 </p>
 <br>
