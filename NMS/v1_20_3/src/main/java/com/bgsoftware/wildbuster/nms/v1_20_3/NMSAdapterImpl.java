@@ -6,11 +6,15 @@ import com.bgsoftware.wildbuster.nms.algorithms.v1_20_R3.SpigotGlowEnchantment;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.craftbukkit.v1_20_R3.CraftRegistry;
+import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -28,6 +32,16 @@ public class NMSAdapterImpl extends com.bgsoftware.wildbuster.nms.v1_20_3.Abstra
     @Override
     protected LevelChunkSection getChunkSectionForY(LevelChunk levelChunk, int y) {
         return levelChunk.getSection(levelChunk.getSectionIndex(y));
+    }
+
+    @Override
+    protected BlockState getBlockState(org.bukkit.block.Block bukkitBlock) {
+        return ((CraftBlock) bukkitBlock).getNMS();
+    }
+
+    @Override
+    public Object getBlockData(int combined) {
+        return CraftBlockData.fromData(Block.stateById(combined));
     }
 
     @Override

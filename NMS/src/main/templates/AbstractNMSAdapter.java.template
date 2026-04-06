@@ -113,15 +113,17 @@ public abstract class AbstractNMSAdapter implements NMSAdapter {
 
     @Override
     public int getMaterialData(org.bukkit.block.Block block) {
-        BlockState blockState = ((CraftBlock) block).getNMS();
+        BlockState blockState = getBlockState(block);
         return CraftMagicNumbers.toLegacyData(blockState);
     }
 
     @Override
     public int getCombinedId(org.bukkit.block.Block block) {
-        BlockState blockState = ((CraftBlock) block).getNMS();
+        BlockState blockState = getBlockState(block);
         return Block.getId(blockState);
     }
+
+    protected abstract BlockState getBlockState(org.bukkit.block.Block bukkitBlock);
 
     @Override
     public ChunkSnapshotReader createChunkSnapshotReader(ChunkSnapshot chunkSnapshot) {
@@ -129,9 +131,7 @@ public abstract class AbstractNMSAdapter implements NMSAdapter {
     }
 
     @Override
-    public Object getBlockData(int combined) {
-        return CraftBlockData.fromData(Block.stateById(combined));
-    }
+    public abstract Object getBlockData(int combined);
 
     @Override
     public org.bukkit.inventory.ItemStack getPlayerSkull(org.bukkit.inventory.ItemStack bukkitItem, String texture) {

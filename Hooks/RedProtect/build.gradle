@@ -4,7 +4,7 @@ dependencies {
     compileOnly 'br.net.fabiozumbi12:RedProtect:7.7.2'
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
-    compileOnly rootProject
+    compileOnly project(":")
 }
 
 if (project.hasProperty('hook.compile_redprotect') &&
