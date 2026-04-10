@@ -85,10 +85,6 @@ shadowJar {
     relocate 'org.bstats', 'com.bgsoftware.wildbuster.libs.org.bstats'
     relocate 'com.bgsoftware.common', 'com.bgsoftware.wildbuster.libs.com.bgsoftware.common'
 
-    archiveFileName = rootProject.name + "-" + rootProject.buildVersion + ".jar"
-
-    destinationDirectory = rootProject.targetFolder
-
     archiveClassifier.set('')
 
     from sourceSets.main.output
@@ -130,25 +126,32 @@ shadowJar {
     }
 }
 
-tasks.register('copyAPI', Copy) {
-    dependsOn ':API:build'
-    from project(":API").layout.buildDirectory.file("libs/API.jar")
-    into rootProject.targetFolder.getAbsolutePath()
-    rename('API.jar', rootProject.name + 'API.jar')
+tasks.register('cleanTarget', Delete) {
+    delete rootProject.targetFolder
 }
 
-build {
-    dependsOn shadowJar
-    dependsOn copyAPI
-    dependsOn clean
+tasks.register('collectArtifacts', Copy) {
+    group = 'build'
+
+    dependsOn('cleanTarget')
+    dependsOn(tasks.named('shadowJar'))
+    dependsOn(project(':API').tasks.named('shadowJar'))
+
+    from(tasks.named('shadowJar').map { it.archiveFile }) {
+        rename { rootProject.name + "-" + rootProject.buildVersion + ".jar" }
+    }
+
+    from(project(':API').tasks.named('shadowJar').map { it.archiveFile }) {
+        rename { rootProject.name + "-API.jar" }
+    }
+
+    into(rootProject.targetFolder)
 }
 
-subprojects.each { evaluationDependsOn(it.path) }
+tasks.named('build') {
+    dependsOn(tasks.named('shadowJar'))
+}
 
-publish.shouldRunAfter shadowJar
-shadowJar.shouldRunAfter build
-build.shouldRunAfter subprojects.build
-clean.shouldRunAfter copyAPI
-
-shadowJar.dependsOn subprojects.build
-compileJava.dependsOn childProjects.values().shadowJar
+tasks.named('shadowJar') {
+    finalizedBy('collectArtifacts')
+}
