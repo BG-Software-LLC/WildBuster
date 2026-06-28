@@ -76,7 +76,7 @@ public abstract class AbstractNMSAdapter implements NMSAdapter {
     public void refreshChunk(org.bukkit.Chunk bukkitChunk, List<Location> blocksList, List<Player> playerList) {
         ServerLevel serverLevel = ((CraftChunk) bukkitChunk).getCraftWorld().getHandle();
         LevelChunk levelChunk = serverLevel.getChunk(bukkitChunk.getX(), bukkitChunk.getZ());
-        ServerChunkCache chunkCache = levelChunk.level.getChunkSource();
+        ServerChunkCache chunkCache = (ServerChunkCache) levelChunk.getLevel().getChunkSource();
         blocksList.forEach(location -> {
             BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
             chunkCache.blockChanged(blockPos);
