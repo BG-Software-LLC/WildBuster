@@ -158,7 +158,7 @@ public final class NMSAdapterImpl implements NMSAdapter {
 
         nmsItem.setTag(nbtTagCompound);
 
-        return CraftItemStack.asBukkitCopy(nmsItem);
+        return CraftItemStack.asCraftMirror(nmsItem);
     }
 
     @Override

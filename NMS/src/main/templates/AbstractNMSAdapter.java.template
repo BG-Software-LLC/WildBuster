@@ -137,7 +137,7 @@ public abstract class AbstractNMSAdapter implements NMSAdapter {
     public org.bukkit.inventory.ItemStack getPlayerSkull(org.bukkit.inventory.ItemStack bukkitItem, String texture) {
         ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitItem);
         setProfileForItem(itemStack, texture);
-        return CraftItemStack.asBukkitCopy(itemStack);
+        return CraftItemStack.asCraftMirror(itemStack);
     }
 
     protected abstract void setProfileForItem(ItemStack itemStack, String texture);
