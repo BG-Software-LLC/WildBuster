@@ -15,6 +15,7 @@ import org.bukkit.Registry;
 import org.bukkit.craftbukkit.v1_20_R3.CraftRegistry;
 import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -42,6 +43,11 @@ public class NMSAdapterImpl extends com.bgsoftware.wildbuster.nms.v1_20_3.Abstra
     @Override
     public Object getBlockData(int combined) {
         return CraftBlockData.fromData(Block.stateById(combined));
+    }
+
+    @Override
+    protected org.bukkit.inventory.ItemStack asMirror(ItemStack itemStack) {
+        return CraftItemStack.asCraftMirror(itemStack);
     }
 
     @Override
