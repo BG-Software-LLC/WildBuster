@@ -3,9 +3,9 @@ package com.bgsoftware.wildbuster.nms.${NMS_VERSION};
 import com.bgsoftware.wildbuster.WildBusterPlugin;
 import com.bgsoftware.wildbuster.api.objects.BlockData;
 import com.bgsoftware.wildbuster.nms.ChunkSnapshotReader;
+import com.bgsoftware.wildbuster.nms.${NMS_VERSION}.ChunkSnapshotReaderImpl;
+import com.bgsoftware.wildbuster.nms.${NMS_VERSION}.CustomHopperBlockEntity;
 import com.bgsoftware.wildbuster.nms.NMSAdapter;
-import com.mojang.authlib.properties.Property;
-import com.mojang.authlib.properties.PropertyMap;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.core.BlockPos;
@@ -23,8 +23,6 @@ import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import ${CRAFTBUKKIT_PACKAGE}.CraftChunk;
 import ${CRAFTBUKKIT_PACKAGE}.CraftWorld;
-import ${CRAFTBUKKIT_PACKAGE}.block.CraftBlock;
-import ${CRAFTBUKKIT_PACKAGE}.block.data.CraftBlockData;
 import ${CRAFTBUKKIT_PACKAGE}.inventory.CraftItemStack;
 import ${CRAFTBUKKIT_PACKAGE}.legacy.CraftLegacy;
 import ${CRAFTBUKKIT_PACKAGE}.util.CraftMagicNumbers;
@@ -35,7 +33,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 public abstract class AbstractNMSAdapter implements NMSAdapter {
 
