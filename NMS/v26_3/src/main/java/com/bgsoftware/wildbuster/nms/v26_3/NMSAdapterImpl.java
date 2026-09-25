@@ -1,5 +1,6 @@
-package com.bgsoftware.wildbuster.nms.v1_21_10;
+package com.bgsoftware.wildbuster.nms.v26_3;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.authlib.properties.Property;
@@ -14,13 +15,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.bukkit.craftbukkit.block.CraftBlock;
-import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Optional;
 
-public class NMSAdapterImpl extends com.bgsoftware.wildbuster.nms.v1_21_10.AbstractNMSAdapter {
+public class NMSAdapterImpl extends com.bgsoftware.wildbuster.nms.v26_3.AbstractNMSAdapter {
+
+    private static final ReflectMethod<org.bukkit.inventory.ItemStack> CRAFT_ITEM_STACK_AS_CRAFT_MIRROR = new ReflectMethod<>(
+            CraftItemStack.class, org.bukkit.inventory.ItemStack.class, "asCraftMirror", ItemStack.class);
 
     @Override
     protected LevelChunkSection getChunkSectionForY(LevelChunk levelChunk, int y) {
@@ -29,17 +32,22 @@ public class NMSAdapterImpl extends com.bgsoftware.wildbuster.nms.v1_21_10.Abstr
 
     @Override
     protected BlockState getBlockState(org.bukkit.block.Block bukkitBlock) {
-        return ((CraftBlock) bukkitBlock).getNMS();
+        return ((CraftBlock) bukkitBlock).getBlockState();
     }
 
     @Override
     public Object getBlockData(int combined) {
-        return CraftBlockData.fromData(Block.stateById(combined));
+        return Block.stateById(combined).asBlockData();
     }
 
     @Override
     protected org.bukkit.inventory.ItemStack asMirror(ItemStack itemStack) {
-        return CraftItemStack.asCraftMirror(itemStack);
+        // Spigot still uses the CraftItemStack#asCraftMirror(ItemStack).
+        if (CRAFT_ITEM_STACK_AS_CRAFT_MIRROR.isValid()) {
+            return CRAFT_ITEM_STACK_AS_CRAFT_MIRROR.invoke(null, itemStack);
+        }
+
+        return CraftItemStack.asBukkitMirror(itemStack);
     }
 
     @Override

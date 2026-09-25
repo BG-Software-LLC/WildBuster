@@ -11,6 +11,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Optional;
@@ -30,6 +31,11 @@ public class NMSAdapterImpl extends com.bgsoftware.wildbuster.nms.v1_21.Abstract
     @Override
     public Object getBlockData(int combined) {
         return CraftBlockData.fromData(Block.stateById(combined));
+    }
+
+    @Override
+    protected org.bukkit.inventory.ItemStack asMirror(ItemStack itemStack) {
+        return CraftItemStack.asCraftMirror(itemStack);
     }
 
     @Override
